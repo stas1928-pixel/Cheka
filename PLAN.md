@@ -57,11 +57,14 @@ Started: 2026-09-15. Local-only personal project. Repo is local, never pushed.
   Serial requests unlimited, parallel may 429 → we fetch months one at a
   time. PGNs contain `{[%clk …]}` comments and `1...` numbering; parser
   handles both (checked against a live game).
-- **Stockfish WASM (job 7, unverified)** — multi-threaded builds need
-  COOP/COEP headers a static host may not send; plan on a single-threaded
-  build in a Worker. Workers must be same-origin, so the engine files must be
-  vendored (several MB). Licence is GPL-3; fine for a personal tool. Verify
-  build, size and UCI handshake before writing the branch-builder UI.
+- **Stockfish 18 lite single-threaded (verified)** — `vendor/stockfish/`,
+  7 MB, GPL-3, no special headers. Built files are GitHub *release assets*
+  (jsDelivr refuses the 250 MB npm package). Loaded lazily on first "Check
+  with Stockfish", so the 7 MB is not paid on every page open. UCI handshake
+  ≈0.9 s, depth 14 per position well under a second on a laptop; expect a
+  few seconds per position on a phone. `parseInfo` ignores `multipv > 1`.
+  Clipboard API needs HTTPS or localhost, so on a LAN `http://` address the
+  Copy button falls back to select-all text.
 
 ---
 
@@ -80,7 +83,7 @@ job per session); each still got its own commit.
 | 4 | Feedback: square flash + Web Audio sounds, mute toggle | done 2026-09-15 |
 | 5 | Progress in localStorage: accuracy, streaks, weak spots, export/import/reset | done 2026-09-15 |
 | 6 | Lichess Explorer panel in review mode (token in Settings) | done 2026-09-15 — needs the owner's token to see data |
-| 7 | Stockfish WASM + punishment-branch eval-cutoff builder | **todo** — next job. Do the vendor verification first, as a session of its own. |
+| 7 | Stockfish WASM + punishment-branch eval-cutoff builder | done 2026-09-15 — Engine check panel in review mode, Build button on each gap |
 | 8 | Chess.com import + gap report | done 2026-09-15 — needs the owner's username for a real scan |
 
 Rules for every job:
@@ -89,19 +92,25 @@ Rules for every job:
 - `npm test` green and a browser check before commit.
 - Update this table, commit, stop.
 
-### Job 7 sketch (do not start without reading the gotchas above)
-1. Vendor a single-threaded Stockfish WASM build; prove `uci` → `uciok` and
-   `go depth 12` → `info … score cp N` in a Worker from the static server.
-2. `js/engine.js`: `evaluate(fen, depth) -> centipawns from White's view`,
-   with a queue so one position is analysed at a time.
-3. `js/branchBuilder.js` (pure, tested): given (opening, deviation ply,
-   opponent move, candidate response line) and a list of evals per ply,
-   apply the brief's decaying threshold: ≥ +1.5 within 6 moves → cut there;
-   else ≥ +0.5 later → cut there; never reached → discard.
-4. A small "Build branch" screen in review mode that takes a gap from the
-   Chess.com report and walks it with the engine, showing the eval per move,
-   and offers to add the result to `repertoire.js` (as copy-pasteable JSON —
-   the repertoire stays a hand-edited file).
+### How the engine is used (job 7, done)
+- Review mode → **Check with Stockfish** evaluates the position after each
+  of YOUR moves in the selected line. For a branch it then extends the line
+  with engine best moves for both sides until `decideCut` fires:
+  ≥ +1.5 within 6 moves → punishment; later ≥ +0.5 → punishment
+  (small-edge rule); forced mate → tactical; nothing by move 10 → discard
+  (the opponent's move was sound, keep only a short "know the reply" branch).
+- **Build** on a gap in the Chess.com report opens a draft branch and runs
+  the same builder; the result is paste-ready JSON for `repertoire.js`.
+  The repertoire stays a hand-edited file on purpose.
+- Known verdicts so far: 3.Nxe5 Bd6 in the Elephant is "discard" (−0.5 for
+  Black, White's move is sound). The gambit is objectively dubious; the app
+  reports that honestly instead of pretending every deviation is punishable.
+
+### Next candidates (owner picks, one per session)
+- Run the engine check over all 16 hand-made branches and paste in the
+  engine-checked responses; remove branches the engine calls sound + rare.
+- Service worker for offline use (now worth it: the engine is 7 MB).
+- Weakest-first line ordering in training, using the weak-spot data.
 
 ---
 
