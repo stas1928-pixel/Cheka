@@ -13,6 +13,7 @@ import { Chess } from '../vendor/chess.js';
 import { OPENINGS, getOpening } from './repertoire.js';
 import * as tree from './tree.js';
 import * as feedback from './feedback.js';
+import * as progress from './progress.js';
 import { loadSettings, updateSetting } from './settings.js';
 
 const OPPONENT_DELAY_MS = 500;
@@ -21,12 +22,24 @@ const OPPONENT_DELAY_MS = 500;
 let settings = loadSettings();
 feedback.setSoundEnabled(settings.sound);
 
+// Accuracy / streaks / weak spots, saved after every training move.
+let prog = progress.loadProgress();
+function saveProg() { progress.saveProgress(prog); }
+
 // One glyph per piece type; colour comes from CSS (.piece.w / .piece.b).
 const GLYPH = { p: '♟', r: '♜', n: '♞', b: '♝', q: '♛', k: '♚' };
 
 const $ = (sel) => document.querySelector(sel);
 const els = {
   cards: $('#opening-cards'),
+  progressCards: $('#progress-cards'),
+  deviationRange: $('#deviation-range'),
+  deviationOut: $('#deviation-out'),
+  exportBtn: $('#export-progress'),
+  importBtn: $('#import-progress'),
+  importFile: $('#import-file'),
+  resetBtn: $('#reset-progress'),
+  settingsMsg: $('#settings-msg'),
   back: $('#back'),
   name: $('#trainer-name'),
   side: $('#trainer-side'),
@@ -93,6 +106,95 @@ els.cards.addEventListener('click', (e) => {
   if (!btn) return;
   if (btn.dataset.train) openTrainer(btn.dataset.train, 'train');
   else openTrainer(btn.dataset.review, 'review');
+});
+
+/* ---------- home: progress panel ---------- */
+
+/** "main line" or "after 3...Nxd4" from a progress line key like "b5:Nxd4". */
+function describeLineKey(key) {
+  if (key === 'main') return 'main line';
+  const [, ply, san] = key.match(/^b(\d+):(.+)$/) ?? [];
+  return ply ? `after ${tree.moveLabel(Number(ply), san)}` : key;
+}
+
+function renderProgress() {
+  els.progressCards.innerHTML = OPENINGS.map((o) => {
+    const s = prog.openings[o.id];
+    const acc = progress.accuracy(s);
+    const spots = progress.weakSpots(prog, o.id, 3);
+
+    let weak;
+    if (!s || s.attempts === 0) weak = 'Not trained yet.';
+    else if (spots.length === 0) weak = 'No mistakes so far. 👌';
+    else {
+      weak = '<b>Weak spots:</b> ' + spots.map((w) =>
+        `${tree.moveLabel(w.ply, w.expected)} <span class="dim">(${describeLineKey(w.lineKey)}, missed ${w.count}×)</span>`,
+      ).join(' · ');
+    }
+
+    return `
+      <div class="stat-card">
+        <h3>${o.name}</h3>
+        <div class="stat-row">
+          <div class="stat"><b>${acc === null ? '–' : acc + '%'}</b><span>accuracy</span></div>
+          <div class="stat"><b>${s?.streak ?? 0}</b><span>streak</span></div>
+          <div class="stat"><b>${s?.bestStreak ?? 0}</b><span>best</span></div>
+          <div class="stat"><b>${s?.linesCompleted ?? 0}</b><span>lines</span></div>
+        </div>
+        <p class="weak">${weak}</p>
+      </div>`;
+  }).join('');
+}
+
+/* ---------- home: settings panel ---------- */
+
+function renderSettingsPanel() {
+  const pct = Math.round(settings.deviationChance * 100);
+  els.deviationRange.value = pct;
+  els.deviationOut.textContent = `${pct}%`;
+}
+
+els.deviationRange.addEventListener('input', () => {
+  const pct = Number(els.deviationRange.value);
+  settings = updateSetting('deviationChance', pct / 100);
+  els.deviationOut.textContent = `${pct}%`;
+});
+
+function showSettingsMsg(text, kind = 'neutral') {
+  els.settingsMsg.textContent = text;
+  els.settingsMsg.style.color = kind === 'bad' ? 'var(--bad)' : kind === 'good' ? 'var(--good)' : '';
+}
+
+els.exportBtn.addEventListener('click', () => {
+  const blob = new Blob([progress.exportJSON(prog)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `opening-trainer-progress-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showSettingsMsg('Progress exported.', 'good');
+});
+
+els.importBtn.addEventListener('click', () => els.importFile.click());
+els.importFile.addEventListener('change', async () => {
+  const file = els.importFile.files[0];
+  if (!file) return;
+  try {
+    prog = progress.importJSON(await file.text());
+    saveProg();
+    renderProgress();
+    showSettingsMsg(`Imported ${file.name}.`, 'good');
+  } catch (err) {
+    showSettingsMsg(err.message, 'bad');
+  }
+  els.importFile.value = '';
+});
+
+els.resetBtn.addEventListener('click', () => {
+  if (!confirm('Delete all progress (accuracy, streaks, weak spots)? Export first if you want a backup.')) return;
+  prog = progress.resetProgress();
+  renderProgress();
+  showSettingsMsg('Progress reset.');
 });
 
 /* ---------- entering the trainer screen ---------- */
@@ -262,8 +364,18 @@ function onSquareClick(square) {
 
 function attemptUserMove(move) {
   const expected = state.line[state.ply];
+  const correct = move.san === expected;
 
-  if (move.san !== expected) {
+  progress.recordAttempt(prog, state.opening.id, {
+    correct,
+    lineKey: tree.lineKey(state.branch),
+    ply: state.ply,
+    expected,
+    played: move.san,
+  });
+  saveProg();
+
+  if (!correct) {
     renderBoard();
     feedback.flash(els.board, [move.from, move.to], 'bad');
     feedback.play('bad');
@@ -323,7 +435,10 @@ function finishLine() {
   state.selected = null;
   renderBoard();
   feedback.play('complete');
-  setStatus(state.branch ? 'Branch complete! 🎉' : 'Line complete! 🎉', 'good');
+  progress.recordLineComplete(prog, state.opening.id);
+  saveProg();
+  const streak = prog.openings[state.opening.id].streak;
+  setStatus(`${state.branch ? 'Branch' : 'Line'} complete! 🎉  ·  streak ${streak}`, 'good');
   els.restart.textContent = 'Next line';
 }
 
@@ -406,8 +521,11 @@ renderSoundToggle();
 els.restart.addEventListener('click', resetLine);
 els.back.addEventListener('click', () => {
   state.session += 1; // cancel any pending opponent move
+  renderProgress();   // stats changed while training
   showScreen('home');
 });
 
 renderHome();
+renderProgress();
+renderSettingsPanel();
 showScreen('home');

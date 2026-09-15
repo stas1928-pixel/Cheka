@@ -20,6 +20,32 @@
   </header>
 
   <section id="opening-cards" class="cards" aria-label="Openings"></section>
+
+  <section class="panel" aria-label="Progress">
+    <h2 class="panel-title">Progress</h2>
+    <div id="progress-cards" class="cards"></div>
+  </section>
+
+  <section class="panel" aria-label="Settings">
+    <h2 class="panel-title">Settings</h2>
+    <div class="setting-card">
+      <label class="row" for="deviation-range">
+        <span>Opponent leaves the book</span>
+        <output id="deviation-out">35%</output>
+      </label>
+      <input id="deviation-range" type="range" min="0" max="100" step="5" value="35">
+      <p class="hint">How often the opponent plays a prepared deviation instead of the main-line move (only where you have a branch).</p>
+    </div>
+    <div class="setting-card">
+      <div class="row-buttons">
+        <button id="export-progress">Export progress</button>
+        <button id="import-progress">Import…</button>
+        <button id="reset-progress" class="subtle">Reset</button>
+      </div>
+      <input id="import-file" type="file" accept="application/json,.json" hidden>
+      <p id="settings-msg" class="hint" role="status"></p>
+    </div>
+  </section>
 </main>
 
 <!-- ============ TRAINER SCREEN ============
