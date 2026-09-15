@@ -37,6 +37,14 @@
       <p class="hint">How often the opponent plays a prepared deviation instead of the main-line move (only where you have a branch).</p>
     </div>
     <div class="setting-card">
+      <label class="row" for="lichess-token">
+        <span>Lichess API token</span>
+        <a class="link" href="https://lichess.org/account/oauth/token/create?description=Opening%20Trainer" target="_blank" rel="noopener">create one ↗</a>
+      </label>
+      <input id="lichess-token" type="password" autocomplete="off" spellcheck="false" placeholder="lip_…">
+      <p class="hint">Needed for master-game statistics in Review mode. No scopes required. Stored only on this device.</p>
+    </div>
+    <div class="setting-card">
       <div class="row-buttons">
         <button id="export-progress">Export progress</button>
         <button id="import-progress">Import…</button>
@@ -82,6 +90,15 @@
       <button id="step-prev" aria-label="Previous move">◀</button>
       <button id="step-next" aria-label="Next move">▶</button>
       <button id="step-last" aria-label="End of line">⏭</button>
+    </div>
+
+    <!-- Master-game statistics for the position on the board (Lichess explorer). -->
+    <div class="explorer" aria-label="Masters database">
+      <div class="explorer-head">
+        <span>Masters database</span>
+        <span id="explorer-meta" class="dim"></span>
+      </div>
+      <div id="explorer-body" class="explorer-body"></div>
     </div>
   </div>
 </main>

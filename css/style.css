@@ -278,5 +278,49 @@ select {
 .stepper button { flex: 1; font-size: 18px; padding: 10px 0; }
 .stepper button:disabled { opacity: 0.35; cursor: default; }
 
+/* ---------- Explorer panel (review mode) ---------- */
+.explorer {
+  display: flex; flex-direction: column; gap: 8px;
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+.explorer-head {
+  display: flex; justify-content: space-between; gap: 10px;
+  color: var(--text-dim);
+  font-weight: 600; font-size: 12px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.explorer-head .dim { text-transform: none; letter-spacing: 0; font-weight: 500; text-align: right; }
+.explorer-body { display: flex; flex-direction: column; gap: 7px; min-height: 20px; color: var(--text-dim); line-height: 1.4; }
+.explorer-body .bad { color: var(--bad); }
+.ex-row {
+  display: grid;
+  grid-template-columns: 68px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 10px; row-gap: 3px;
+  align-items: center;
+}
+.ex-san { grid-row: 1 / span 2; color: var(--text); font-weight: 600; font-size: 15px; }
+.ex-book { color: var(--accent); font-size: 12px; margin-left: 4px; }
+.ex-games { font-size: 12px; font-variant-numeric: tabular-nums; }
+.ex-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--surface-2); }
+.ex-bar i { display: block; height: 100%; }
+.ex-bar .w { background: #e8e8e8; }
+.ex-bar .d { background: #8a8a90; }
+.ex-bar .b { background: #3a3a40; }
+
+input[type="password"], input[type="text"] {
+  width: 100%;
+  background: var(--surface-2);
+  color: var(--text);
+  border: none;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 15px;
+}
+a.link { color: var(--accent); font-size: 13px; text-decoration: none; }
+
 .moves .mv.future { opacity: 0.45; }
 .moves .mv.clickable { cursor: pointer; }

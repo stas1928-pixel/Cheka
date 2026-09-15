@@ -14,6 +14,7 @@ import { OPENINGS, getOpening } from './repertoire.js';
 import * as tree from './tree.js';
 import * as feedback from './feedback.js';
 import * as progress from './progress.js';
+import { fetchExplorer } from './explorer.js';
 import { loadSettings, updateSetting } from './settings.js';
 
 const OPPONENT_DELAY_MS = 500;
@@ -40,6 +41,9 @@ const els = {
   importFile: $('#import-file'),
   resetBtn: $('#reset-progress'),
   settingsMsg: $('#settings-msg'),
+  tokenInput: $('#lichess-token'),
+  explorerMeta: $('#explorer-meta'),
+  explorerBody: $('#explorer-body'),
   back: $('#back'),
   name: $('#trainer-name'),
   side: $('#trainer-side'),
@@ -152,7 +156,13 @@ function renderSettingsPanel() {
   const pct = Math.round(settings.deviationChance * 100);
   els.deviationRange.value = pct;
   els.deviationOut.textContent = `${pct}%`;
+  els.tokenInput.value = settings.lichessToken;
 }
+
+els.tokenInput.addEventListener('change', () => {
+  settings = updateSetting('lichessToken', els.tokenInput.value.trim());
+  showSettingsMsg(settings.lichessToken ? 'Lichess token saved.' : 'Lichess token removed.');
+});
 
 els.deviationRange.addEventListener('input', () => {
   const pct = Number(els.deviationRange.value);
@@ -474,6 +484,60 @@ function stepTo(ply) {
   renderBoard();
   renderMoves();
   renderReviewStatus();
+  scheduleExplorer();
+}
+
+/* ---------- masters database (Lichess explorer) ---------- */
+
+let explorerTimer = null;
+let explorerRequest = 0;
+
+/** Wait a beat after the last step so tapping ▶ quickly does not fire a
+ *  request per tap. */
+function scheduleExplorer() {
+  clearTimeout(explorerTimer);
+  explorerTimer = setTimeout(loadExplorer, 250);
+}
+
+async function loadExplorer() {
+  const requestId = ++explorerRequest;
+  els.explorerMeta.textContent = '';
+
+  if (!settings.lichessToken) {
+    els.explorerBody.innerHTML = 'Add a Lichess API token in Settings (home screen) to see what masters play here.';
+    return;
+  }
+
+  els.explorerBody.textContent = 'Loading…';
+  const played = state.line.slice(0, state.ply);
+  const bookMove = state.line[state.ply]; // the move our repertoire wants next, if any
+
+  try {
+    const data = await fetchExplorer(played, { token: settings.lichessToken, moves: 6 });
+    if (requestId !== explorerRequest) return; // user has stepped on since
+    renderExplorer(data, bookMove);
+  } catch (err) {
+    if (requestId !== explorerRequest) return;
+    els.explorerBody.innerHTML = `<span class="bad">${err.message}</span>`;
+  }
+}
+
+function renderExplorer(data, bookMove) {
+  const meta = [data.opening?.name, data.total ? `${data.total.toLocaleString()} games` : null].filter(Boolean);
+  els.explorerMeta.textContent = meta.join(' · ');
+
+  if (data.moves.length === 0) {
+    els.explorerBody.textContent = 'No master games from this position.';
+    return;
+  }
+  els.explorerBody.innerHTML = data.moves.map((m) => `
+    <div class="ex-row">
+      <span class="ex-san">${m.san}${m.san === bookMove ? '<span class="ex-book">★ book</span>' : ''}</span>
+      <span class="ex-games">${m.games.toLocaleString()} games · ${m.sharePct}% · W ${m.whitePct} / D ${m.drawPct} / B ${m.blackPct}</span>
+      <div class="ex-bar" title="White ${m.whitePct}% · Draw ${m.drawPct}% · Black ${m.blackPct}%">
+        <i class="w" style="width:${m.whitePct}%"></i><i class="d" style="width:${m.drawPct}%"></i><i class="b" style="width:${m.blackPct}%"></i>
+      </div>
+    </div>`).join('');
 }
 
 function renderReviewStatus() {
