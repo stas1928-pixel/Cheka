@@ -38,6 +38,11 @@ for (const opening of OPENINGS) {
     assert.ok(opening.mainLine.length >= 16, 'brief asks for roughly 20 plies');
   });
 
+  test(`${opening.id}: signature ends with the user's defining move`, () => {
+    assert.ok(opening.signaturePlies > 0 && opening.signaturePlies <= opening.mainLine.length);
+    assert.ok(isUserPly(opening, opening.signaturePlies - 1), 'last signature ply should be ours');
+  });
+
   test(`${opening.id}: every branch is a legal opponent deviation with a response`, () => {
     for (const b of opening.branches) {
       const label = `${opening.id} branch ${b.deviatesAt}:${b.opponentMove}`;

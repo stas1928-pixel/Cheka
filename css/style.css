@@ -322,5 +322,14 @@ input[type="password"], input[type="text"] {
 }
 a.link { color: var(--accent); font-size: 13px; text-decoration: none; }
 
+/* ---------- Chess.com gap report ---------- */
+.row-inline { display: flex; gap: 8px; }
+.row-inline input { flex: 1; min-width: 0; }
+.gap-opening h3 { margin: 8px 0 2px; font-size: 15px; font-weight: 600; }
+.gap-opening h3 .dim { color: var(--text-dim); font-weight: 500; font-size: 13px; }
+.gaps { margin: 4px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: var(--text-dim); }
+.gaps b { color: var(--text); }
+.gaps a { color: var(--accent); text-decoration: none; margin-left: 4px; }
+
 .moves .mv.future { opacity: 0.45; }
 .moves .mv.clickable { cursor: pointer; }

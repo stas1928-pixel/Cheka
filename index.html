@@ -26,6 +26,19 @@
     <div id="progress-cards" class="cards"></div>
   </section>
 
+  <!-- Opponent-awareness: what did real opponents play that the tree does not cover? -->
+  <section class="panel" aria-label="Chess.com import">
+    <h2 class="panel-title">Gaps from your Chess.com games</h2>
+    <div class="setting-card">
+      <div class="row-inline">
+        <input id="chesscom-user" type="text" autocomplete="off" spellcheck="false" placeholder="Chess.com username">
+        <button id="scan-games" class="primary">Scan</button>
+      </div>
+      <p id="scan-msg" class="hint" role="status">Reads your last 6 months of public games and lists opponent moves you have no prepared answer for.</p>
+      <div id="gap-report"></div>
+    </div>
+  </section>
+
   <section class="panel" aria-label="Settings">
     <h2 class="panel-title">Settings</h2>
     <div class="setting-card">

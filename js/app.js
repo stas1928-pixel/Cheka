@@ -15,6 +15,7 @@ import * as tree from './tree.js';
 import * as feedback from './feedback.js';
 import * as progress from './progress.js';
 import { fetchExplorer } from './explorer.js';
+import { importGames, analyseGames } from './chesscom.js';
 import { loadSettings, updateSetting } from './settings.js';
 
 const OPPONENT_DELAY_MS = 500;
@@ -42,6 +43,10 @@ const els = {
   resetBtn: $('#reset-progress'),
   settingsMsg: $('#settings-msg'),
   tokenInput: $('#lichess-token'),
+  chesscomUser: $('#chesscom-user'),
+  scanBtn: $('#scan-games'),
+  scanMsg: $('#scan-msg'),
+  gapReport: $('#gap-report'),
   explorerMeta: $('#explorer-meta'),
   explorerBody: $('#explorer-body'),
   back: $('#back'),
@@ -150,6 +155,75 @@ function renderProgress() {
   }).join('');
 }
 
+/* ---------- home: Chess.com gap report ---------- */
+
+const GAPS_KEY = 'openingTrainer.gaps.v1';
+const SCAN_MONTHS = 6;
+
+function loadGapReport() {
+  try { return JSON.parse(localStorage.getItem(GAPS_KEY)); } catch { return null; }
+}
+
+function showScanMsg(text, kind = 'neutral') {
+  els.scanMsg.textContent = text;
+  els.scanMsg.style.color = kind === 'bad' ? 'var(--bad)' : kind === 'good' ? 'var(--good)' : '';
+}
+
+els.scanBtn.addEventListener('click', async () => {
+  const username = els.chesscomUser.value.trim();
+  if (!username) { showScanMsg('Enter your Chess.com username first.', 'bad'); return; }
+  settings = updateSetting('chesscomUser', username);
+
+  els.scanBtn.disabled = true;
+  try {
+    const games = await importGames(username, {
+      months: SCAN_MONTHS,
+      onProgress: (done, total) => showScanMsg(`Loading month ${done} of ${total}…`),
+    });
+    const report = analyseGames(games, username, OPENINGS);
+    const saved = { scannedAt: new Date().toISOString(), username, months: SCAN_MONTHS, gamesScanned: games.length, report };
+    localStorage.setItem(GAPS_KEY, JSON.stringify(saved));
+    renderGapReport(saved);
+    showScanMsg(`Scanned ${games.length} games from the last ${SCAN_MONTHS} months.`, 'good');
+  } catch (err) {
+    showScanMsg(err.message, 'bad');
+  } finally {
+    els.scanBtn.disabled = false;
+  }
+});
+
+function renderGapReport(saved) {
+  if (!saved) { els.gapReport.innerHTML = ''; return; }
+  const when = saved.scannedAt.slice(0, 10);
+
+  els.gapReport.innerHTML = OPENINGS.map((o) => {
+    const r = saved.report[o.id];
+    if (!r) return '';
+    let body;
+    if (r.games === 0) {
+      body = `<p class="hint">No games with this opening as ${o.side === 'w' ? 'White' : 'Black'}.</p>`;
+    } else {
+      const hits = Object.entries(r.branchHits)
+        .map(([k, n]) => { const [ply, san] = k.split(':'); return `${tree.moveLabel(Number(ply), san)} ×${n}`; })
+        .join(', ');
+      const summary = [
+        `complete lines: ${r.complete}`,
+        `you left the book: ${r.userLeft}`,
+        hits ? `branches met: ${hits}` : null,
+      ].filter(Boolean).join(' · ');
+
+      const gaps = r.gaps.length === 0
+        ? '<p class="hint">No gaps — every opponent move was covered. 👌</p>'
+        : `<ul class="gaps">${r.gaps.map((g) => `
+            <li><b>${tree.moveLabel(g.ply, g.move)}</b> after ${tree.formatMoves(g.prefix).map((m) => m.text).join(' ')}
+              <span class="dim">· ${g.count} game${g.count === 1 ? '' : 's'}</span>${g.urls[0] ? `<a href="${g.urls[0]}" target="_blank" rel="noopener">view ↗</a>` : ''}</li>`).join('')}
+          </ul>`;
+      body = `<p class="hint">${summary}</p>${gaps}`;
+    }
+    return `<div class="gap-opening"><h3>${o.name} <span class="dim">· ${r.games} game${r.games === 1 ? '' : 's'}</span></h3>${body}</div>`;
+  }).join('') + `<p class="hint">Last scan: ${when} for ${saved.username}.</p>`;
+}
+
 /* ---------- home: settings panel ---------- */
 
 function renderSettingsPanel() {
@@ -157,6 +231,7 @@ function renderSettingsPanel() {
   els.deviationRange.value = pct;
   els.deviationOut.textContent = `${pct}%`;
   els.tokenInput.value = settings.lichessToken;
+  els.chesscomUser.value = settings.chesscomUser;
 }
 
 els.tokenInput.addEventListener('change', () => {
@@ -592,4 +667,5 @@ els.back.addEventListener('click', () => {
 renderHome();
 renderProgress();
 renderSettingsPanel();
+renderGapReport(loadGapReport());
 showScreen('home');

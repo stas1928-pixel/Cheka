@@ -32,6 +32,9 @@ export const OPENINGS = [
     name: 'Scotch Opening',
     subtitle: 'Scotch Four Knights',
     side: 'w', // you play White
+    // A game "is" this opening once its first 5 plies match the main line
+    // (1.e4 e5 2.Nf3 Nc6 3.d4). Used by the Chess.com import to pick games.
+    signaturePlies: 5,
 
     // 1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nc3 Bb4 6.Nxc6 bxc6
     // 7.Bd3 d5 8.exd5 cxd5 9.O-O O-O 10.Bg5 c6
@@ -73,6 +76,8 @@ export const OPENINGS = [
     name: 'Elephant Gambit',
     subtitle: 'Main line with ...Bf5 and long castling',
     side: 'b', // you play Black
+    // 1.e4 e5 2.Nf3 d5 — four plies identify the gambit.
+    signaturePlies: 4,
 
     // 1.e4 e5 2.Nf3 d5 3.exd5 e4 4.Qe2 Nf6 5.d3 Qxd5 6.Nbd2 Bf5
     // 7.g3 Nc6 8.Bg2 O-O-O 9.O-O h5
