@@ -113,6 +113,20 @@
       </div>
       <div id="explorer-body" class="explorer-body"></div>
     </div>
+
+    <!-- Stockfish: verify or extend the selected branch with the brief's eval-cutoff rule. -->
+    <div class="explorer" aria-label="Engine check">
+      <div class="explorer-head">
+        <span>Engine check</span>
+        <span id="engine-meta" class="dim"></span>
+      </div>
+      <div id="engine-body" class="explorer-body">Pick a branch above, then run the check. Stockfish looks at each of your moves and says where the line should stop.</div>
+      <div class="row-buttons">
+        <button id="engine-check">Check with Stockfish</button>
+        <button id="engine-copy" hidden>Copy branch JSON</button>
+      </div>
+      <pre id="engine-json" class="json" hidden></pre>
+    </div>
   </div>
 </main>
 

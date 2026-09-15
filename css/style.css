@@ -322,6 +322,30 @@ input[type="password"], input[type="text"] {
 }
 a.link { color: var(--accent); font-size: 13px; text-decoration: none; }
 
+/* ---------- Engine check ---------- */
+.ev-row { display: grid; grid-template-columns: 76px 64px 1fr; gap: 8px; align-items: baseline; font-variant-numeric: tabular-nums; }
+.ev-row .ev-san { color: var(--text); font-weight: 600; }
+.ev-row .ev-cp { font-weight: 600; text-align: right; }
+.ev-row .ev-best { font-size: 12px; }
+.ev-good { color: var(--good); }
+.ev-bad  { color: var(--bad); }
+.ev-verdict { margin-top: 4px; font-weight: 600; color: var(--text); }
+.ev-verdict.discard { color: var(--warn); }
+.json {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 8px;
+  overflow: auto;
+  user-select: all;
+  white-space: pre;
+}
+.json[hidden] { display: none; }
+.gaps button { padding: 3px 10px; font-size: 12px; margin-left: 6px; vertical-align: middle; }
+
 /* ---------- Chess.com gap report ---------- */
 .row-inline { display: flex; gap: 8px; }
 .row-inline input { flex: 1; min-width: 0; }

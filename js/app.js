@@ -16,6 +16,8 @@ import * as feedback from './feedback.js';
 import * as progress from './progress.js';
 import { fetchExplorer } from './explorer.js';
 import { importGames, analyseGames } from './chesscom.js';
+import { Engine } from './engine.js';
+import { buildBranch, toBranchJSON } from './branchBuilder.js';
 import { loadSettings, updateSetting } from './settings.js';
 
 const OPPONENT_DELAY_MS = 500;
@@ -49,6 +51,11 @@ const els = {
   gapReport: $('#gap-report'),
   explorerMeta: $('#explorer-meta'),
   explorerBody: $('#explorer-body'),
+  engineMeta: $('#engine-meta'),
+  engineBody: $('#engine-body'),
+  engineCheck: $('#engine-check'),
+  engineCopy: $('#engine-copy'),
+  engineJson: $('#engine-json'),
   back: $('#back'),
   name: $('#trainer-name'),
   side: $('#trainer-side'),
@@ -216,13 +223,27 @@ function renderGapReport(saved) {
         ? '<p class="hint">No gaps — every opponent move was covered. 👌</p>'
         : `<ul class="gaps">${r.gaps.map((g) => `
             <li><b>${tree.moveLabel(g.ply, g.move)}</b> after ${tree.formatMoves(g.prefix).map((m) => m.text).join(' ')}
-              <span class="dim">· ${g.count} game${g.count === 1 ? '' : 's'}</span>${g.urls[0] ? `<a href="${g.urls[0]}" target="_blank" rel="noopener">view ↗</a>` : ''}</li>`).join('')}
+              <span class="dim">· ${g.count} game${g.count === 1 ? '' : 's'}</span>${g.urls[0] ? `<a href="${g.urls[0]}" target="_blank" rel="noopener">view ↗</a>` : ''}
+              <button data-build="${o.id}|${g.ply}|${g.move}">Build</button></li>`).join('')}
           </ul>`;
       body = `<p class="hint">${summary}</p>${gaps}`;
     }
     return `<div class="gap-opening"><h3>${o.name} <span class="dim">· ${r.games} game${r.games === 1 ? '' : 's'}</span></h3>${body}</div>`;
   }).join('') + `<p class="hint">Last scan: ${when} for ${saved.username}.</p>`;
 }
+
+// "Build" on a gap: open review mode with a draft branch and let the engine fill it.
+els.gapReport.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-build]');
+  if (!btn) return;
+  const [id, ply, move] = btn.dataset.build.split('|');
+  openTrainer(id, 'review');
+  const draft = { deviatesAt: Number(ply), opponentMove: move, response: [], type: 'punishment', note: 'Draft — not in the repertoire yet. Run the engine check to fill it in.', draft: true };
+  els.lineSelect.insertAdjacentHTML('beforeend', `<option value="draft" selected>Draft: ${tree.describeBranch(draft)}</option>`);
+  state.draft = draft;
+  reviewLine(draft);
+  runEngineCheck();
+});
 
 /* ---------- home: settings panel ---------- */
 
@@ -533,6 +554,12 @@ function finishLine() {
 
 function populateLineSelect() {
   const { opening } = state;
+  state.draft = null;
+  engineRun += 1; // abandon any engine run from the previous opening
+  els.engineBody.textContent = 'Pick a branch above, then run the check. Stockfish looks at each of your moves and says where the line should stop.';
+  els.engineMeta.textContent = '';
+  els.engineJson.hidden = true;
+  els.engineCopy.hidden = true;
   const options = ['<option value="">Main line</option>'].concat(
     opening.branches.map((b, i) => `<option value="${i}">${tree.describeBranch(b)}</option>`),
   );
@@ -629,7 +656,115 @@ function renderReviewStatus() {
 
 els.lineSelect.addEventListener('change', () => {
   const v = els.lineSelect.value;
-  reviewLine(v === '' ? null : state.opening.branches[Number(v)]);
+  reviewLine(v === '' ? null : v === 'draft' ? state.draft : state.opening.branches[Number(v)]);
+});
+
+/* ---------- engine check (Stockfish) ---------- */
+
+let engine = null;              // created on first use — 7 MB download, so not at page load
+let engineRun = 0;              // bumps on every run so a stale run stops painting
+
+function fmtCp(cp, mate, side) {
+  // Shown from the user's point of view: + is good for you.
+  const sign = side === 'w' ? 1 : -1;
+  if (mate !== null && mate !== undefined) return `M${mate * sign}`;
+  if (cp === null || cp === undefined) return '?';
+  const v = (cp * sign) / 100;
+  return (v > 0 ? '+' : '') + v.toFixed(2);
+}
+
+async function runEngineCheck() {
+  const run = ++engineRun;
+  const { opening, branch } = state;
+  els.engineCopy.hidden = true;
+  els.engineJson.hidden = true;
+  els.engineCheck.disabled = true;
+  els.engineMeta.textContent = 'starting…';
+  els.engineBody.innerHTML = '';
+
+  try {
+    engine ??= new Engine();
+    await engine.start();
+    if (run !== engineRun) return;
+
+    if (!branch) {
+      // Main line: no cutoff rule, just show the eval after each of your moves.
+      els.engineMeta.textContent = 'main line';
+      for (let ply = 0; ply < state.line.length; ply++) {
+        if (!tree.isUserPly(opening, ply)) continue;
+        const r = await engine.evaluate(state.line.slice(0, ply + 1));
+        if (run !== engineRun) return;
+        appendEvalRow({ ply, san: state.line[ply], cp: r.cp, mate: r.mate, bestMove: r.bestMove });
+      }
+      els.engineBody.insertAdjacentHTML('beforeend', '<div class="ev-verdict">Main line evaluated. Anything below −0.5 is worth a second look.</div>');
+      return;
+    }
+
+    els.engineMeta.textContent = branch.draft ? 'building draft…' : 'checking branch…';
+    const result = await buildBranch({
+      opening,
+      deviationPly: branch.deviatesAt,
+      opponentMove: branch.opponentMove,
+      seedResponse: branch.response,
+      evaluate: (sans, opts) => engine.evaluate(sans, opts),
+      onStep: (step) => { if (run === engineRun) appendEvalRow(step); },
+    });
+    if (run !== engineRun) return;
+
+    const v = result.verdict;
+    els.engineMeta.textContent = v.type;
+    els.engineBody.insertAdjacentHTML('beforeend',
+      `<div class="ev-verdict ${v.type === 'discard' ? 'discard' : ''}">${verdictText(v, result, branch)}</div>`);
+
+    // Offer the paste-ready branch when the engine has something to say.
+    const changed = JSON.stringify(result.response) !== JSON.stringify(branch.response);
+    if (v.cutAt !== null && (changed || branch.draft)) {
+      els.engineJson.textContent = toBranchJSON({ deviationPly: branch.deviatesAt, opponentMove: branch.opponentMove, response: result.response, verdict: v });
+      els.engineJson.hidden = false;
+      els.engineCopy.hidden = false;
+      // Show the engine's line on the board so it can be stepped through.
+      state.line = tree.buildLine(opening, { ...branch, response: result.response });
+      renderMoves();
+      renderReviewStatus();
+    }
+  } catch (err) {
+    if (run === engineRun) els.engineBody.innerHTML = `<span class="bad">${err.message}</span>`;
+  } finally {
+    if (run === engineRun) els.engineCheck.disabled = false;
+  }
+}
+
+function appendEvalRow(step) {
+  const side = state.opening.side;
+  const userCp = (step.cp ?? 0) * (side === 'w' ? 1 : -1);
+  const cls = step.mate ? 'ev-good' : userCp >= 50 ? 'ev-good' : userCp <= -50 ? 'ev-bad' : '';
+  els.engineBody.insertAdjacentHTML('beforeend', `
+    <div class="ev-row">
+      <span class="ev-san">${tree.moveLabel(step.ply, step.san)}${step.fromSeed === false ? ' <span class="dim">(engine)</span>' : ''}</span>
+      <span class="ev-cp ${cls}">${fmtCp(step.cp, step.mate, side)}</span>
+      <span class="ev-best">${step.bestMove ? `then ${step.bestMove}` : ''}</span>
+    </div>`);
+}
+
+function verdictText(v, result, branch) {
+  const stop = v.cutAt === null ? '' : ` Stop after ${tree.moveLabel(v.cutAt, result.response[v.cutAt - branch.deviatesAt - 1])}.`;
+  switch (v.type) {
+    case 'tactical': return `Forced win — ${v.reason}.${stop}`;
+    case 'punishment': return `Clear edge — ${v.reason}.${stop}`;
+    case 'discard': return `No punishment here — the opponent's move is sound (${v.reason}). Keep a short "know the reply" branch if it comes up often; there is nothing to extend.`;
+    default: return `Undecided: ${v.reason}.`;
+  }
+}
+
+els.engineCheck.addEventListener('click', runEngineCheck);
+els.engineCopy.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(els.engineJson.textContent);
+    els.engineCopy.textContent = 'Copied ✓';
+    setTimeout(() => { els.engineCopy.textContent = 'Copy branch JSON'; }, 1500);
+  } catch {
+    els.engineJson.focus(); // clipboard blocked: the text is select-all on tap
+  }
 });
 els.stepFirst.addEventListener('click', () => stepTo(0));
 els.stepPrev.addEventListener('click', () => stepTo(state.ply - 1));
