@@ -1,0 +1,14 @@
+# original delivery archive, already extracted
+files.zip
+
+# local tooling / secrets / data
+.claude/settings.local.json
+.env
+*.local
+data/
+backups/
+exports/
+
+# OS / editor
+Thumbs.db
+.DS_Store
