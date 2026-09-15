@@ -33,6 +33,12 @@
     </div>
   </header>
 
+  <!-- Train = quiz with right/wrong feedback. Review = just step through a line. -->
+  <div id="mode-toggle" class="segmented" role="tablist">
+    <button data-mode="train" role="tab">Train</button>
+    <button data-mode="review" role="tab">Review</button>
+  </div>
+
   <div id="board" class="board" role="grid" aria-label="Chess board"></div>
   <div id="status" class="status neutral" role="status">Loading…</div>
   <div id="moves" class="moves"></div>
@@ -40,6 +46,16 @@
 
   <div class="controls">
     <button id="restart">Restart line</button>
+  </div>
+
+  <div id="review-controls" class="review" hidden>
+    <select id="line-select" aria-label="Line to review"></select>
+    <div class="stepper">
+      <button id="step-first" aria-label="Start position">⏮</button>
+      <button id="step-prev" aria-label="Previous move">◀</button>
+      <button id="step-next" aria-label="Next move">▶</button>
+      <button id="step-last" aria-label="End of line">⏭</button>
+    </div>
   </div>
 </main>
 

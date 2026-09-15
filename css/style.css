@@ -190,3 +190,45 @@ button.subtle { background: transparent; color: var(--text-dim); }
 .note[hidden] { display: none; }
 
 .controls { display: flex; gap: 10px; margin-top: 4px; }
+.controls[hidden] { display: none; }
+
+/* ---------- Train / Review toggle ---------- */
+.segmented {
+  width: min(92vw, var(--board-max));
+  display: flex;
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 3px;
+}
+.segmented button {
+  flex: 1;
+  background: transparent;
+  color: var(--text-dim);
+  padding: 8px;
+  border-radius: 8px;
+}
+.segmented button.active { background: var(--surface-2); color: var(--text); }
+
+/* ---------- Review controls ---------- */
+.review {
+  width: min(92vw, var(--board-max));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.review[hidden] { display: none; }
+select {
+  width: 100%;
+  background: var(--surface-2);
+  color: var(--text);
+  border: none;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 15px;
+}
+.stepper { display: flex; gap: 8px; }
+.stepper button { flex: 1; font-size: 18px; padding: 10px 0; }
+.stepper button:disabled { opacity: 0.35; cursor: default; }
+
+.moves .mv.future { opacity: 0.45; }
+.moves .mv.clickable { cursor: pointer; }

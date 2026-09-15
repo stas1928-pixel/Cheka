@@ -4,10 +4,10 @@
 
    Reading order if you are new here:
      1. `state` — everything the trainer needs to remember.
-     2. startTraining / resetLine — how a drill begins.
-     3. onSquareClick / attemptUserMove — what happens when you tap.
-     4. playOpponentMove — how the "opponent" replies (and sometimes
-        leaves the book to test a prepared branch).
+     2. openTrainer / setMode — how a screen is entered.
+     3. TRAINING: resetLine, onSquareClick, attemptUserMove,
+        playOpponentMove — the quiz loop.
+     4. REVIEW: reviewLine, stepTo — stepping through a line freely.
 --------------------------------------------------------------- */
 import { Chess } from '../vendor/chess.js';
 import { OPENINGS, getOpening } from './repertoire.js';
@@ -27,18 +27,27 @@ const els = {
   back: $('#back'),
   name: $('#trainer-name'),
   side: $('#trainer-side'),
+  modeToggle: $('#mode-toggle'),
   board: $('#board'),
   status: $('#status'),
   moves: $('#moves'),
   note: $('#branch-note'),
+  controls: $('.controls'),
   restart: $('#restart'),
+  review: $('#review-controls'),
+  lineSelect: $('#line-select'),
+  stepFirst: $('#step-first'),
+  stepPrev: $('#step-prev'),
+  stepNext: $('#step-next'),
+  stepLast: $('#step-last'),
 };
 
 const state = {
   opening: null,        // the opening object from repertoire.js
-  line: [],             // the SAN list being drilled (main line or a branch)
-  branch: null,         // the branch the opponent chose, if any
-  ply: 0,               // how many plies of `line` have been played
+  mode: 'train',        // 'train' (quiz) or 'review' (browse)
+  line: [],             // the SAN list on screen (main line or a branch)
+  branch: null,         // the branch in play, if any
+  ply: 0,               // how many plies of `line` are on the board
   game: new Chess(),    // the rules engine holding the real position
   selected: null,       // square the user tapped first, e.g. "e2"
   finished: false,
@@ -69,44 +78,52 @@ function renderHome() {
         <p class="card-line">${preview} …</p>
         <div class="card-actions">
           <button class="primary" data-train="${o.id}">Train</button>
+          <button data-review="${o.id}">Review</button>
         </div>
       </article>`;
   }).join('');
 }
 
 els.cards.addEventListener('click', (e) => {
-  const btn = e.target.closest('button[data-train]');
-  if (btn) startTraining(btn.dataset.train);
+  const btn = e.target.closest('button[data-train], button[data-review]');
+  if (!btn) return;
+  if (btn.dataset.train) openTrainer(btn.dataset.train, 'train');
+  else openTrainer(btn.dataset.review, 'review');
 });
 
-/* ---------- starting a drill ---------- */
+/* ---------- entering the trainer screen ---------- */
 
-function startTraining(openingId) {
+function openTrainer(openingId, mode) {
   state.opening = getOpening(openingId);
   els.name.textContent = state.opening.name;
   els.side.textContent = state.opening.side === 'w' ? 'White' : 'Black';
   els.side.className = `pill ${state.opening.side}`;
   showScreen('trainer');
-  resetLine();
+  setMode(mode);
 }
 
-function resetLine() {
-  state.session += 1;
-  state.branch = null;
-  state.line = tree.buildLine(state.opening);
-  state.ply = 0;
-  state.game.reset();
-  state.selected = null;
-  state.finished = false;
-  els.restart.textContent = 'Restart line';
+function setMode(mode) {
+  state.mode = mode;
+  els.modeToggle.querySelectorAll('button').forEach((b) => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  els.controls.hidden = mode !== 'train';
+  els.review.hidden = mode !== 'review';
 
-  renderBoard();
-  renderMoves();
-  setStatus(tree.isUserPly(state.opening, 0) ? 'Your move' : 'Opponent to move…');
-  scheduleOpponent();
+  if (mode === 'train') {
+    resetLine();
+  } else {
+    populateLineSelect();
+    reviewLine(null);
+  }
 }
 
-/* ---------- rendering ---------- */
+els.modeToggle.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-mode]');
+  if (btn && btn.dataset.mode !== state.mode) setMode(btn.dataset.mode);
+});
+
+/* ---------- shared rendering ---------- */
 
 function renderBoard() {
   const { game, opening, selected } = state;
@@ -149,25 +166,64 @@ function renderBoard() {
   }
 }
 
+/**
+ * Move list under the board.
+ * Training: only the moves played so far.
+ * Review: the whole line, future moves dimmed, every move tappable.
+ */
 function renderMoves() {
-  const played = tree.formatMoves(state.line, state.ply);
-  els.moves.innerHTML = played.length === 0
+  const review = state.mode === 'review';
+  const entries = tree.formatMoves(state.line, review ? state.line.length : state.ply);
+
+  els.moves.innerHTML = entries.length === 0
     ? '<span class="mv">No moves yet.</span>'
-    : played.map((m) => `<span class="mv${m.ply === state.ply - 1 ? ' cur' : ''}">${m.text}</span>`).join('');
+    : entries.map((m) => {
+        const cls = ['mv'];
+        if (m.ply === state.ply - 1) cls.push('cur');
+        if (review) {
+          cls.push('clickable');
+          if (m.ply >= state.ply) cls.push('future');
+        }
+        return `<span class="${cls.join(' ')}" data-ply="${m.ply}">${m.text}</span>`;
+      }).join(' '); // the space lets the list wrap between moves
 
   els.note.hidden = !state.branch;
   els.note.textContent = state.branch ? state.branch.note : '';
 }
+
+els.moves.addEventListener('click', (e) => {
+  const span = e.target.closest('.mv[data-ply]');
+  if (span && state.mode === 'review') stepTo(Number(span.dataset.ply) + 1);
+});
 
 function setStatus(text, kind = 'neutral') {
   els.status.className = `status ${kind}`;
   els.status.textContent = text;
 }
 
-/* ---------- user input ---------- */
+/* =================================================================
+   TRAINING MODE
+   ================================================================= */
+
+function resetLine() {
+  state.session += 1;
+  state.branch = null;
+  state.line = tree.buildLine(state.opening);
+  state.ply = 0;
+  state.game.reset();
+  state.selected = null;
+  state.finished = false;
+  els.restart.textContent = 'Restart line';
+
+  renderBoard();
+  renderMoves();
+  setStatus(tree.isUserPly(state.opening, 0) ? 'Your move' : 'Opponent to move…');
+  scheduleOpponent();
+}
 
 function onSquareClick(square) {
   const { game, opening } = state;
+  if (state.mode !== 'train') return;
   if (state.finished || !tree.isUserPly(opening, state.ply)) return;
 
   const piece = game.get(square);
@@ -219,8 +275,6 @@ function attemptUserMove(move) {
   else scheduleOpponent();
 }
 
-/* ---------- opponent ---------- */
-
 function scheduleOpponent() {
   const session = state.session;
   setTimeout(() => {
@@ -263,6 +317,68 @@ function finishLine() {
   setStatus(state.branch ? 'Branch complete! 🎉' : 'Line complete! 🎉', 'good');
   els.restart.textContent = 'Next line';
 }
+
+/* =================================================================
+   REVIEW MODE — no quiz, no judgement, just look at the line.
+   ================================================================= */
+
+function populateLineSelect() {
+  const { opening } = state;
+  const options = ['<option value="">Main line</option>'].concat(
+    opening.branches.map((b, i) => `<option value="${i}">${tree.describeBranch(b)}</option>`),
+  );
+  els.lineSelect.innerHTML = options.join('');
+}
+
+function reviewLine(branch) {
+  state.session += 1;   // cancels any opponent move still pending from training
+  state.branch = branch;
+  state.line = tree.buildLine(state.opening, branch);
+  state.selected = null;
+  state.finished = false;
+  stepTo(0);
+}
+
+/** Show the position after `ply` half-moves. Replays from the start —
+ *  simple and always consistent with the line. */
+function stepTo(ply) {
+  const target = Math.max(0, Math.min(ply, state.line.length));
+  state.game.reset();
+  for (let i = 0; i < target; i++) state.game.move(state.line[i]);
+  state.ply = target;
+
+  renderBoard();
+  renderMoves();
+  renderReviewStatus();
+}
+
+function renderReviewStatus() {
+  const { ply, line, opening } = state;
+  if (ply === 0) {
+    setStatus('Start position — step forward or tap a move');
+  } else {
+    const who = tree.isUserPly(opening, ply - 1) ? 'you' : 'opponent';
+    setStatus(`${tree.moveLabel(ply - 1, line[ply - 1])}  ·  ${who}`);
+  }
+  els.stepFirst.disabled = els.stepPrev.disabled = ply === 0;
+  els.stepNext.disabled = els.stepLast.disabled = ply >= line.length;
+}
+
+els.lineSelect.addEventListener('change', () => {
+  const v = els.lineSelect.value;
+  reviewLine(v === '' ? null : state.opening.branches[Number(v)]);
+});
+els.stepFirst.addEventListener('click', () => stepTo(0));
+els.stepPrev.addEventListener('click', () => stepTo(state.ply - 1));
+els.stepNext.addEventListener('click', () => stepTo(state.ply + 1));
+els.stepLast.addEventListener('click', () => stepTo(state.line.length));
+
+// Arrow keys are handy when reviewing on a laptop.
+document.addEventListener('keydown', (e) => {
+  if (state.mode !== 'review' || els.review.hidden) return;
+  if (e.key === 'ArrowRight') stepTo(state.ply + 1);
+  if (e.key === 'ArrowLeft') stepTo(state.ply - 1);
+});
 
 /* ---------- wiring ---------- */
 
