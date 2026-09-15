@@ -118,13 +118,31 @@ Rules for every job:
 - `docs/LAYOUT.md` — file map, run/test, how to get it on the phone, moving.
 - `docs/UNINSTALL.md` — removal order.
 
+## Decided 2026-09-15 (after the first real data scan)
+- **Scotch = Scotch Gambit (4.Bc4), not the Four Knights.** 421 games scanned;
+  4.Nxd4 appeared zero times, 4.Bc4 twenty-four times. Main line is now the
+  Max Lange Attack, top master move at every ply.
+- **Branches cover what real opponents play, not what theory prefers.** Every
+  uncovered move from the scan with 2+ occurrences now has a reply, chosen by
+  best score in the Lichess 1400–1800 database. Branches are 1–3 moves, "far
+  enough to be clearly better", per the owner's instruction. They are NOT
+  engine-verified — that is job 7.
+- **Re-scanning is the regression test for repertoire changes.** Complete
+  lines went 0→14 (Scotch) and 0→18 (Elephant) on the same 421 games.
+
 ## Open questions (owner's call)
 - **Hosting for the phone.** Same-Wi-Fi Python server vs. a static host.
   See `docs/LAYOUT.md`. Nothing personal is in the repo, so a public static
   host is acceptable privacy-wise, but it is the owner's decision.
-- **Chess.com username** — type it into the Gaps panel; not guessed.
-- **Lichess token** — create and paste; nobody but the owner should do this.
-- **Elephant Gambit main line** — hand-picked (…Bf5, g3, long castling).
-  Confirm with the explorer once a token exists; adjust `repertoire.js`.
+- **Chess.com username** — `stas1928`, confirmed 2026-09-15.
+- **Lichess token** — the first token was shared in a chat transcript and
+  should be revoked and replaced. The replacement must be pasted into the
+  Settings field on the device itself; it is never stored in this repo.
+- **Elephant Gambit main line** — checked against masters and kept
+  (4.Qe2 is 75% there). The 3.Nxe5 reply was corrected to 3...Bd6.
+- **A few of your own habits differ from the tree**: you play 4.d5 against
+  3...d6 (tree says 4.dxe5, better score) and 4...Bd7 against 4.Bb5+ (tree
+  says 4...c6, 63% vs 48%). The tree teaches the better move on purpose;
+  say the word if you would rather it match your habit.
 - **Sound design** — WebAudio oscillator tones chosen (no asset files). Tune
   or replace if they get annoying.
