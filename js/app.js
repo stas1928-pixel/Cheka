@@ -12,11 +12,14 @@
 import { Chess } from '../vendor/chess.js';
 import { OPENINGS, getOpening } from './repertoire.js';
 import * as tree from './tree.js';
+import * as feedback from './feedback.js';
+import { loadSettings, updateSetting } from './settings.js';
 
-// How often the opponent plays a prepared deviation instead of the
-// main-line move, when one exists at that ply. 0 = never, 1 = always.
-const DEVIATION_CHANCE = 0.35;
 const OPPONENT_DELAY_MS = 500;
+
+// User preferences (sound on/off, how often the opponent leaves the book…).
+let settings = loadSettings();
+feedback.setSoundEnabled(settings.sound);
 
 // One glyph per piece type; colour comes from CSS (.piece.w / .piece.b).
 const GLYPH = { p: '♟', r: '♜', n: '♞', b: '♝', q: '♛', k: '♚' };
@@ -28,6 +31,7 @@ const els = {
   name: $('#trainer-name'),
   side: $('#trainer-side'),
   modeToggle: $('#mode-toggle'),
+  soundToggle: $('#sound-toggle'),
   board: $('#board'),
   status: $('#status'),
   moves: $('#moves'),
@@ -261,6 +265,8 @@ function attemptUserMove(move) {
 
   if (move.san !== expected) {
     renderBoard();
+    feedback.flash(els.board, [move.from, move.to], 'bad');
+    feedback.play('bad');
     setStatus(`Not the line — expected ${expected}`, 'bad');
     return;
   }
@@ -269,6 +275,8 @@ function attemptUserMove(move) {
   state.ply += 1;
   renderBoard();
   renderMoves();
+  feedback.flash(els.board, [move.from, move.to], 'good');
+  feedback.play('good');
   setStatus('Correct ✓', 'good');
 
   if (state.ply >= state.line.length) finishLine();
@@ -291,7 +299,7 @@ function playOpponentMove() {
   // prepared answer — otherwise there would be nothing to train.
   let leftBook = false;
   if (!state.branch) {
-    const branch = tree.pickDeviation(opening, state.ply, { chance: DEVIATION_CHANCE });
+    const branch = tree.pickDeviation(opening, state.ply, { chance: settings.deviationChance });
     if (branch) {
       state.branch = branch;
       state.line = tree.buildLine(opening, branch);
@@ -314,6 +322,7 @@ function finishLine() {
   state.finished = true;
   state.selected = null;
   renderBoard();
+  feedback.play('complete');
   setStatus(state.branch ? 'Branch complete! 🎉' : 'Line complete! 🎉', 'good');
   els.restart.textContent = 'Next line';
 }
@@ -381,6 +390,18 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ---------- wiring ---------- */
+
+function renderSoundToggle() {
+  els.soundToggle.textContent = settings.sound ? '🔊' : '🔇';
+  els.soundToggle.classList.toggle('off', !settings.sound);
+}
+els.soundToggle.addEventListener('click', () => {
+  settings = updateSetting('sound', !settings.sound);
+  feedback.setSoundEnabled(settings.sound);
+  renderSoundToggle();
+  if (settings.sound) feedback.play('good'); // a little preview
+});
+renderSoundToggle();
 
 els.restart.addEventListener('click', resetLine);
 els.back.addEventListener('click', () => {
