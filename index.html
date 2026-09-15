@@ -3,298 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Opening Trainer — Prototype</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/1.0.0/chess.min.js"></script>
-<style>
-  :root {
-    --bg: #121212;
-    --surface: #1c1c1e;
-    --surface-2: #262629;
-    --text: #f2f2f2;
-    --text-dim: #9a9a9d;
-    --accent: #4f9dff;
-    --good: #4caf50;
-    --bad: #e5534b;
-    --light-sq: #3a3a3d;
-    --dark-sq: #232326;
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    padding: 16px;
-  }
-  h1 {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin: 4px 0 16px;
-  }
-  #board {
-    width: min(92vw, 420px);
-    aspect-ratio: 1;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-  }
-  .sq {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(24px, 8vw, 40px);
-    position: relative;
-    user-select: none;
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-  .sq.light { background: var(--light-sq); }
-  .sq.dark  { background: var(--dark-sq); }
-  .sq.selected { background: var(--accent) !important; opacity: 0.85; }
-  .sq.legal::after {
-    content: "";
-    position: absolute;
-    width: 22%;
-    height: 22%;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.35);
-  }
-  .piece { pointer-events: none; }
-  .white-piece { color: #fafafa; text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
-  .black-piece { color: #1a1a1a; text-shadow: 0 1px 1px rgba(255,255,255,0.15); }
-
-  #status {
-    margin-top: 18px;
-    min-height: 44px;
-    width: min(92vw, 420px);
-    text-align: center;
-    font-size: 16px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    padding: 10px 14px;
-    transition: background 0.2s ease, color 0.2s ease;
-  }
-  #status.neutral { background: var(--surface); color: var(--text-dim); }
-  #status.good { background: rgba(76,175,80,0.15); color: var(--good); }
-  #status.bad { background: rgba(229,83,75,0.15); color: var(--bad); }
-
-  #moves {
-    margin-top: 14px;
-    width: min(92vw, 420px);
-    background: var(--surface);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 14px;
-    color: var(--text-dim);
-    min-height: 24px;
-    letter-spacing: 0.02em;
-  }
-  #controls {
-    margin-top: 16px;
-    display: flex;
-    gap: 10px;
-  }
-  button {
-    background: var(--surface-2);
-    color: var(--text);
-    border: none;
-    border-radius: 8px;
-    padding: 10px 18px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  button:active { opacity: 0.7; }
-</style>
+<meta name="theme-color" content="#121212">
+<title>Opening Trainer</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<h1>Scotch Opening · Training</h1>
-<div id="board"></div>
-<div id="status" class="neutral">Loading…</div>
-<div id="moves"></div>
-<div id="controls">
-  <button id="restart">Restart line</button>
-</div>
+<!-- ============ HOME SCREEN ============
+     The two openings pinned at the top (training is one tap away),
+     progress and settings below on scroll. -->
+<main data-screen="home">
+  <header class="home-header">
+    <h1>Opening Trainer</h1>
+  </header>
 
-<script>
-/* ---------------------------------------------------------
-   BUILDING BLOCK 1: the repertoire data itself.
-   This is hardcoded for now — later this becomes something
-   you build in an editor and save to local storage.
-   Format: SAN moves in order. Even indices = White, odd = Black.
---------------------------------------------------------- */
-const REPERTOIRE = {
-  name: "Scotch Opening (main line)",
-  youPlay: "w", // "w" or "b" — which side you're training
-  moves: ["e4", "e5", "Nf3", "Nc6", "d4", "exd4", "Nxd4", "Nf6", "Nc3"]
-};
+  <section id="opening-cards" class="cards" aria-label="Openings"></section>
+</main>
 
-/* ---------------------------------------------------------
-   Chess engine state (chess.js handles all legality/rules)
---------------------------------------------------------- */
-const game = new Chess();
-let repIndex = 0;      // where we are in REPERTOIRE.moves
-let selectedSquare = null;
+<!-- ============ TRAINER SCREEN ============
+     Board is the hero; everything else stays minimal. -->
+<main data-screen="trainer" hidden>
+  <header class="trainer-header">
+    <button id="back" class="icon-btn" aria-label="Back to home">‹</button>
+    <div class="trainer-title">
+      <span id="trainer-name"></span>
+      <span id="trainer-side" class="pill"></span>
+    </div>
+  </header>
 
-const boardEl = document.getElementById('board');
-const statusEl = document.getElementById('status');
-const movesEl = document.getElementById('moves');
+  <div id="board" class="board" role="grid" aria-label="Chess board"></div>
+  <div id="status" class="status neutral" role="status">Loading…</div>
+  <div id="moves" class="moves"></div>
+  <div id="branch-note" class="note" hidden></div>
 
-const PIECE_UNICODE = {
-  p: '♟', r: '♜', n: '♞', b: '♝', q: '♛', k: '♚',
-  P: '♙', R: '♖', N: '♘', B: '♗', Q: '♕', K: '♔'
-};
+  <div class="controls">
+    <button id="restart">Restart line</button>
+  </div>
+</main>
 
-function squareId(fileIdx, rankIdx) {
-  // fileIdx 0-7 -> a-h, rankIdx 0-7 -> 8-1 (top to bottom)
-  const file = 'abcdefgh'[fileIdx];
-  const rank = 8 - rankIdx;
-  return file + rank;
-}
-
-function renderBoard() {
-  boardEl.innerHTML = '';
-  const board = game.board(); // 8x8 array, row 0 = rank 8
-
-  for (let r = 0; r < 8; r++) {
-    for (let f = 0; f < 8; f++) {
-      const sq = document.createElement('div');
-      const id = squareId(f, r);
-      const isLight = (r + f) % 2 === 0;
-      sq.className = 'sq ' + (isLight ? 'light' : 'dark');
-      sq.dataset.square = id;
-
-      const piece = board[r][f];
-      if (piece) {
-        const span = document.createElement('span');
-        span.className = 'piece ' + (piece.color === 'w' ? 'white-piece' : 'black-piece');
-        const symbol = piece.color === 'w' ? piece.type.toUpperCase() : piece.type;
-        span.textContent = PIECE_UNICODE[symbol];
-        sq.appendChild(span);
-      }
-
-      if (id === selectedSquare) sq.classList.add('selected');
-
-      sq.addEventListener('click', () => onSquareClick(id));
-      boardEl.appendChild(sq);
-    }
-  }
-
-  // highlight legal destination squares if something is selected
-  if (selectedSquare) {
-    const legal = game.moves({ square: selectedSquare, verbose: true });
-    legal.forEach(m => {
-      const el = boardEl.querySelector(`[data-square="${m.to}"]`);
-      if (el) el.classList.add('legal');
-    });
-  }
-}
-
-function setStatus(text, kind = 'neutral') {
-  statusEl.className = kind;
-  statusEl.textContent = text;
-}
-
-function renderMoveList() {
-  movesEl.textContent = repIndex === 0
-    ? 'No moves played yet.'
-    : REPERTOIRE.moves.slice(0, repIndex).join('  ');
-}
-
-function onSquareClick(square) {
-  const turnIsUser = (game.turn() === REPERTOIRE.youPlay);
-  if (!turnIsUser) return; // ignore clicks during opponent's auto-play
-
-  if (!selectedSquare) {
-    const piece = game.get(square);
-    if (piece && piece.color === game.turn()) {
-      selectedSquare = square;
-      renderBoard();
-    }
-    return;
-  }
-
-  // second click: attempt the move
-  const attempt = { from: selectedSquare, to: square, promotion: 'q' };
-  selectedSquare = null;
-
-  const expectedSAN = REPERTOIRE.moves[repIndex];
-  const legalMoves = game.moves({ verbose: true });
-  const matched = legalMoves.find(m => m.from === attempt.from && m.to === attempt.to);
-
-  if (!matched) {
-    renderBoard();
-    return; // illegal click, just deselect
-  }
-
-  if (matched.san === expectedSAN) {
-    game.move(matched.san);
-    repIndex++;
-    setStatus('Correct ✓', 'good');
-    renderBoard();
-    renderMoveList();
-    setTimeout(playOpponentMove, 500);
-  } else {
-    setStatus(`Not the line — expected ${expectedSAN}`, 'bad');
-    renderBoard();
-  }
-}
-
-function playOpponentMove() {
-  if (repIndex >= REPERTOIRE.moves.length) {
-    setStatus('Line complete! 🎉', 'good');
-    return;
-  }
-  const opponentTurn = game.turn();
-  if (opponentTurn === REPERTOIRE.youPlay) {
-    setStatus('Your move', 'neutral');
-    return;
-  }
-
-  const san = REPERTOIRE.moves[repIndex];
-  game.move(san);
-  repIndex++;
-  renderBoard();
-  renderMoveList();
-
-  if (repIndex >= REPERTOIRE.moves.length) {
-    setStatus('Line complete! 🎉', 'good');
-  } else {
-    setStatus('Your move', 'neutral');
-  }
-}
-
-function restart() {
-  game.reset();
-  repIndex = 0;
-  selectedSquare = null;
-  renderBoard();
-  renderMoveList();
-  setStatus('Your move', 'neutral');
-
-  // if the user plays Black, opponent (White) moves first
-  if (REPERTOIRE.youPlay === 'b') {
-    setTimeout(playOpponentMove, 400);
-  }
-}
-
-document.getElementById('restart').addEventListener('click', restart);
-
-restart();
-</script>
+<!-- type="module" lets app.js import the other files and the vendored chess.js -->
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
