@@ -73,28 +73,47 @@ test('walkGame: complete main line, known branch, gap, user left book, game ende
   assert.deepEqual(walkGame(['e4', 'e5', 'Nf3'], scotch), { result: 'gameEnded', ply: 3, branch: null });
 });
 
+// Fixture openings, so editing the real repertoire never breaks these
+// logic tests. The real data is validated in repertoire.test.mjs instead.
+const FIXTURES = [
+  {
+    id: 'asWhite',
+    side: 'w',
+    signaturePlies: 5,
+    mainLine: ['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'exd4', 'Bc4', 'Nf6'],
+    branches: [{ deviatesAt: 5, opponentMove: 'd6', response: ['dxe5'], type: 'punishment' }],
+  },
+  {
+    id: 'asBlack',
+    side: 'b',
+    signaturePlies: 4,
+    mainLine: ['e4', 'e5', 'Nf3', 'd5', 'exd5', 'e4', 'Qe2'],
+    branches: [],
+  },
+];
+
 test('analyseGames aggregates gaps per opening, most frequent first', () => {
   const games = [
     { url: 'g1', rules: 'chess', white: { username: 'me' }, black: { username: 'a' }, pgn: pgn(['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'Bc5', 'c3']) },
     { url: 'g2', rules: 'chess', white: { username: 'me' }, black: { username: 'b' }, pgn: pgn(['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'Bc5', 'Nxe5']) },
-    { url: 'g3', rules: 'chess', white: { username: 'me' }, black: { username: 'c' }, pgn: pgn(['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'exd4', 'Nxd4', 'Bc5']) },
+    { url: 'g3', rules: 'chess', white: { username: 'me' }, black: { username: 'c' }, pgn: pgn(['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'exd4', 'Bc4', 'Bc5']) },
     { url: 'g4', rules: 'chess', white: { username: 'me' }, black: { username: 'd' }, pgn: pgn(['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'd6', 'dxe5']) },
     { url: 'g5', rules: 'chess', white: { username: 'x' }, black: { username: 'me' }, pgn: pgn(['e4', 'e5', 'Nf3', 'd5', 'exd5', 'e4', 'Ne5'], { white: 'x', black: 'me' }) },
     { url: 'g6', rules: 'chess', white: { username: 'x' }, black: { username: 'me' }, pgn: pgn(['d4', 'd5'], { white: 'x', black: 'me' }) },
   ];
-  const r = analyseGames(games, 'ME', OPENINGS);
+  const r = analyseGames(games, 'ME', FIXTURES);
 
-  assert.equal(r.scotch.games, 4);
-  assert.equal(r.scotch.gaps.length, 2);
-  assert.equal(r.scotch.gaps[0].move, 'Bc5');
-  assert.equal(r.scotch.gaps[0].count, 2);
-  assert.deepEqual(r.scotch.gaps[0].urls, ['g1', 'g2']);
-  assert.equal(r.scotch.gaps[1].ply, 7);
-  assert.deepEqual(r.scotch.branchHits, { '5:d6': 1 });
+  assert.equal(r.asWhite.games, 4);
+  assert.equal(r.asWhite.gaps.length, 2);
+  assert.equal(r.asWhite.gaps[0].move, 'Bc5', 'ply-5 Bc5 happened twice, so it ranks first');
+  assert.equal(r.asWhite.gaps[0].count, 2);
+  assert.deepEqual(r.asWhite.gaps[0].urls, ['g1', 'g2']);
+  assert.equal(r.asWhite.gaps[1].ply, 7, 'the later Bc5 is a separate gap');
+  assert.deepEqual(r.asWhite.branchHits, { '5:d6': 1 });
 
-  assert.equal(r.elephant.games, 1);
-  assert.equal(r.elephant.gaps[0].move, 'Ne5');
-  assert.equal(r.elephant.gaps[0].ply, 6);
+  assert.equal(r.asBlack.games, 1, 'the d4 game is not this opening');
+  assert.equal(r.asBlack.gaps[0].move, 'Ne5');
+  assert.equal(r.asBlack.gaps[0].ply, 6);
 });
 
 function fakeFetch(routes) {
