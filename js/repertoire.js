@@ -24,10 +24,12 @@
    - Replies: chosen by best score in the Lichess amateur database
      (blitz+rapid, 1400-1800) — the population actually faced — then
      verified with Stockfish 18 at depth 16 via the Engine check panel.
-   - Length: the brief's cutoff rule. Big edge (≥ +1.5) within 6 moves →
-     the line runs to that point. Otherwise it stops at the first ≥ +0.5.
-     Where the opponent's move is simply sound ("Engine: … sound"), the
-     branch is kept as a one-move "know the reply", nothing to extend.
+   - Length: every branch shows at least FOUR of your moves (engine best
+     play for both sides, depth 16, rebuilt 2026-09-16), so you learn how
+     to play on, not just the first reply. Where the engine finds a clear
+     edge later than that, the line runs on to it (brief's cutoff rule).
+     Where the opponent's move is simply sound ("Engine: … sound"), those
+     four moves are the whole branch.
    - Numbers in the notes are from YOUR point of view: + is good for you.
 
    The tests in tests/repertoire.test.mjs prove every move is legal and
@@ -59,42 +61,42 @@ export const OPENINGS = [
       {
         deviatesAt: 5,
         opponentMove: 'Nxd4', // 3...Nxd4?!
-        response: ['Nxd4'],
+        response: ['Nxd4', 'exd4', 'Qxd4', 'Qf6', 'Qc4', 'c6', 'Nc3'],
         type: 'punishment',
         note: 'Just recapture. Black has traded the developed knight for nothing and you are ahead in development. Engine: +0.5 at once; nothing bigger follows, so the line stops here.',
       },
       {
         deviatesAt: 5,
         opponentMove: 'd6', // 3...d6
-        response: ['d5'],
+        response: ['d5', 'Nb8', 'h3', 'Nf6', 'Bd3', 'g6', 'c4'],
         type: 'punishment',
         note: 'Push past: the knight must retreat to b8 or e7 and Black is cramped. This is what you already play. Engine: +0.8, better than the queen trade (+0.4).',
       },
       {
         deviatesAt: 5,
         opponentMove: 'f5', // 3...f5?! a Latvian-style lunge
-        response: ['Nxe5', 'Nxe5', 'dxe5'],
+        response: ['Nxe5', 'Nxe5', 'dxe5', 'd6', 'Bf4', 'Qe7', 'Qd4'],
         type: 'punishment',
         note: 'Just take. Black has weakened the king and cannot regain the pawn. Engine: +2.0 after two moves — a real punishment.',
       },
       {
         deviatesAt: 5,
         opponentMove: 'Bd6', // 3...Bd6?! blocks the d-pawn
-        response: ['d5'],
+        response: ['d5', 'Nce7', 'c4', 'Bb4+', 'Nbd2', 'Nf6', 'Qc2'],
         type: 'punishment',
         note: 'Push past. The knight on c6 has to move again and Black’s own bishop blocks the d-pawn, so the queenside stays undeveloped. Engine: +0.8.',
       },
       {
         deviatesAt: 5,
         opponentMove: 'Qf6', // 3...Qf6?! early queen
-        response: ['Bg5', 'Qg6', 'dxe5'],
+        response: ['Bg5', 'Qg6', 'dxe5', 'Nxe5', 'Be3', 'Qxe4', 'Be2'],
         type: 'punishment',
         note: 'Develop with tempo, then take the pawn once the queen has left f6. Engine: +0.6 after two moves.',
       },
       {
         deviatesAt: 5,
         opponentMove: 'Bb4+', // 3...Bb4+
-        response: ['c3', 'Bd6', 'Bd3'],
+        response: ['c3', 'Bd6', 'Bd3', 'b6', 'O-O', 'Nge7', 'Nbd2'],
         type: 'punishment',
         note: 'Block, then develop while the bishop keeps wandering. Engine: +1.6 after two moves — Black has lost time and the centre.',
       },
@@ -103,21 +105,21 @@ export const OPENINGS = [
       {
         deviatesAt: 7,
         opponentMove: 'Bc5', // 4...Bc5 — the Haxo Gambit
-        response: ['c3'],
+        response: ['c3', 'Nf6', 'cxd4', 'Bb4+', 'Bd2', 'Bxd2+', 'Nbxd2'],
         type: 'punishment',
         note: 'Your most common surprise (8 games). Engine: 4...Bc5 is sound — c3 keeps it level (+0.1) and scores best for White in practice. Know the reply; there is nothing to punish.',
       },
       {
         deviatesAt: 7,
         opponentMove: 'h6', // 4...h6 — a wasted move
-        response: ['Nxd4'],
+        response: ['Nxd4', 'Nf6', 'Nc3', 'Bb4', 'Nxc6', 'Bxc3+', 'bxc3'],
         type: 'punishment',
         note: 'Black spent a move on nothing, so simply regain the pawn with a perfect centre. Engine: +0.6.',
       },
       {
         deviatesAt: 7,
         opponentMove: 'Qf6', // 4...Qf6
-        response: ['O-O'],
+        response: ['O-O', 'd6', 'c3', 'd3', 'Be3', 'Nh6', 'Na3'],
         type: 'punishment',
         note: 'Castle and stay ahead. The queen on f6 blocks Black’s own knight and will be a target down the f-file. Engine: +1.0.',
       },
@@ -126,7 +128,7 @@ export const OPENINGS = [
       {
         deviatesAt: 9,
         opponentMove: 'Ne4', // 5...Ne4 instead of 5...d5
-        response: ['O-O'],
+        response: ['O-O', 'Be7', 'Bd5', 'Nc5', 'Nxd4', 'Nxe5', 'f4'],
         type: 'punishment',
         note: 'Finish development first. Engine: 5...Ne4 is sound (+0.2); O-O is the best reply and there is nothing to extend.',
       },
@@ -157,21 +159,21 @@ export const OPENINGS = [
       {
         deviatesAt: 4,
         opponentMove: 'Nxe5', // 3.Nxe5 — the greedy grab (8 of your games)
-        response: ['Bd6'],
+        response: ['Bd6', 'd4', 'dxe4', 'Nc3', 'Bxe5', 'dxe5', 'Qxd1+'],
         type: 'punishment',
         note: 'Hit the knight at once — the master choice and what you already play. Engine: 3.Nxe5 is sound (you are -0.8, the usual gambit price); 3...dxe4 is a hair better but riskier. Watch for 4.Nxf7?! which loses for White.',
       },
       {
         deviatesAt: 4,
         opponentMove: 'd3', // 3.d3
-        response: ['dxe4'],
+        response: ['dxe4', 'Nxe5', 'Nf6', 'Be3', 'Qe7', 'd4', 'Nbd7'],
         type: 'punishment',
         note: 'Take and trade. After 4.dxe4 Qxd1+ the queens come off with easy development. Engine: dead level (0.0), better than any alternative for Black.',
       },
       {
         deviatesAt: 4,
         opponentMove: 'Bd3', // 3.Bd3?! blocks the d-pawn
-        response: ['dxe4'],
+        response: ['dxe4', 'Bxe4', 'f5', 'Bd3', 'e4', 'Bb5+', 'c6'],
         type: 'punishment',
         note: 'Take with tempo. The bishop on d3 blocks White’s own d-pawn. Engine: +1.7 at once — a real punishment.',
       },
@@ -180,28 +182,28 @@ export const OPENINGS = [
       {
         deviatesAt: 6,
         opponentMove: 'Ng1', // 4.Ng1?! full retreat (7 of your games)
-        response: ['Nf6'],
+        response: ['Nf6', 'c4', 'Bc5', 'd4', 'exd3', 'Bxd3', 'O-O'],
         type: 'punishment',
         note: 'Develop and keep the e4 wedge; d5 is not running away. Engine: level (0.0) — White’s two wasted tempi exactly repay the gambit pawn. Already what you play.',
       },
       {
         deviatesAt: 6,
         opponentMove: 'Nd4', // 4.Nd4
-        response: ['Qxd5'],
+        response: ['Qxd5', 'Nb5', 'Qd7', 'd4', 'a6', 'N5c3', 'f5'],
         type: 'punishment',
         note: 'Regain the pawn and centralise. Engine: +0.2 — you are fine, nothing more to extend.',
       },
       {
         deviatesAt: 6,
         opponentMove: 'Bb5+', // 4.Bb5+
-        response: ['c6'],
+        response: ['c6', 'dxc6', 'bxc6', 'Bc4', 'exf3', 'Qxf3', 'Nf6'],
         type: 'punishment',
         note: 'Block with the pawn, not a piece. Engine: +1.8 at once — the check achieves nothing and the bishop must move again. Black scores 63% here in practice.',
       },
       {
         deviatesAt: 6,
         opponentMove: 'Ne5', // 4.Ne5
-        response: ['Qxd5'],
+        response: ['Qxd5', 'd4', 'exd3', 'Nxd3', 'Nc6', 'Nc3', 'Qa5'],
         type: 'punishment',
         note: 'Regain the pawn and attack the knight on e5 at the same time. Engine: level (+0.1).',
       },
@@ -210,14 +212,14 @@ export const OPENINGS = [
       {
         deviatesAt: 8,
         opponentMove: 'Ng5', // 5.Ng5 instead of 5.d3
-        response: ['Be7'],
+        response: ['Be7', 'Nxe4', 'Nxd5', 'd4', 'Nc6', 'c3', 'O-O'],
         type: 'punishment',
         note: 'Kick the knight while developing. Engine: +0.2, the best reply; Black scores 59% here in practice.',
       },
       {
         deviatesAt: 10,
         opponentMove: 'dxe4', // 6.dxe4 instead of 6.Nbd2
-        response: ['Qxe4'],
+        response: ['Qxe4', 'Nc3', 'Bb4', 'Bd2', 'Qxe2+', 'Bxe2', 'O-O'],
         type: 'punishment',
         note: 'Take back and offer the queen trade. Engine: -0.5 — White’s move is sound and this is the best you have. Know the reply.',
       },

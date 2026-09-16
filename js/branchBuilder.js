@@ -22,8 +22,10 @@ import { isUserPly } from './tree.js';
 export const THRESHOLDS = Object.freeze({
   bigCp: 150,          // +1.5 pawns …
   bigWithinMoves: 6,   // … within this many full moves of the deviation
-  smallCp: 50,         // afterwards, +0.5 is enough
+  smallCp: 50,         // otherwise, +0.5 is enough
   horizonMoves: 10,    // give up past this
+  minMoves: 4,         // but always keep at least this many of OUR moves, so a
+                       // branch teaches how to play on, not just the first reply
 });
 
 /** White-view centipawns -> the user's view. */
@@ -125,8 +127,13 @@ export async function buildBranch({
 
   function finish() {
     const verdict = decideCut(evals, { deviationPly, side: opening.side, thresholds });
-    const end = verdict.cutAt === null ? sans.length : verdict.cutAt + 1;
-    return { response: sans.slice(deviationPly + 1, end), evals, verdict };
+    // The verdict says where the *advantage* is reached; the response is
+    // never shorter than `minMoves` of our moves (when the line has them),
+    // and a sound deviation ("discard") keeps exactly that minimum.
+    const minIdx = Math.min(thresholds.minMoves ?? 1, evals.length) - 1;
+    const minPly = minIdx >= 0 ? evals[minIdx].ply : deviationPly;
+    const cutPly = verdict.cutAt === null ? minPly : Math.max(verdict.cutAt, minPly);
+    return { response: sans.slice(deviationPly + 1, cutPly + 1), evals, verdict };
   }
 }
 

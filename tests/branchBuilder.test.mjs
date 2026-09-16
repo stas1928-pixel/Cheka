@@ -75,6 +75,8 @@ function scriptedEvaluate(script) {
 }
 
 const white = { side: 'w', mainLine: ['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'exd4'], branches: [] };
+// Most tests look at the cut itself, so they switch the minimum length off.
+const SHORT = { ...THRESHOLDS, minMoves: 1 };
 
 /** Scripted answers for every length from `from` to the horizon: quiet moves at `cp`. */
 function quietTail(script, from, cp) {
@@ -91,7 +93,7 @@ test('buildBranch builds to the horizon, then cuts at the big threshold', async 
     9: { cp: 170, best: 'Qe7' },       // after 5.dxe5
   }, 10, 170));
   const steps = [];
-  const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', evaluate: s.evaluate, onStep: (x) => steps.push(x.san) });
+  const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', evaluate: s.evaluate, onStep: (x) => steps.push(x.san), thresholds: SHORT });
   assert.deepEqual(r.response, ['Nxe5', 'Nxe5', 'dxe5'], 'cut where +1.7 first appears, not at +0.9');
   assert.equal(r.verdict.type, 'punishment');
   assert.equal(r.verdict.cutAt, 8);
@@ -100,27 +102,38 @@ test('buildBranch builds to the horizon, then cuts at the big threshold', async 
 
 test('buildBranch scores a seeded response and can cut inside it', async () => {
   const s = scriptedEvaluate(quietTail({ 7: { cp: 200, best: 'a6' } }, 8, 200));
-  const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', seedResponse: ['Nxe5', 'Nxe5', 'dxe5'], evaluate: s.evaluate });
+  const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', seedResponse: ['Nxe5', 'Nxe5', 'dxe5'], evaluate: s.evaluate, thresholds: SHORT });
   assert.deepEqual(r.response, ['Nxe5'], 'cut right after the first seeded move');
   assert.equal(r.evals[0].fromSeed, true);
 });
 
 test('buildBranch stops early on a forced mate for us', async () => {
   const s = scriptedEvaluate({ 6: { best: 'Qh5' }, 7: { mate: 2, best: 'g6' } });
-  const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', evaluate: s.evaluate });
+  const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', evaluate: s.evaluate, thresholds: SHORT });
   assert.deepEqual(r.response, ['Qh5']);
   assert.equal(r.verdict.type, 'tactical');
   assert.equal(s.calls.length, 2, 'no need to look further once mate is found');
 });
 
-test('buildBranch gives up at the horizon with a discard verdict', async () => {
+test('buildBranch: a sound deviation keeps exactly minMoves of our moves', async () => {
   const script = {};
   for (let n = 6; n <= 40; n++) script[n] = { cp: 10, best: n % 2 === 0 ? 'a3' : 'a6' };
   // legality is irrelevant here: evaluate is scripted, the builder never checks moves itself
   const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', evaluate: scriptedEvaluate(script).evaluate });
   assert.equal(r.verdict.type, 'discard');
   assert.equal(r.verdict.cutAt, null);
-  assert.ok(r.response.length >= 2 * THRESHOLDS.horizonMoves);
+  // 4 of our moves = plies 6, 8, 10, 12 -> response covers plies 6..12 = 7 SAN
+  assert.equal(r.response.length, 2 * THRESHOLDS.minMoves - 1);
+  assert.equal(r.evals.length, THRESHOLDS.horizonMoves + 1, 'still built to the horizon before deciding');
+});
+
+test('buildBranch: an early cut is padded out to minMoves', async () => {
+  const script = { 6: { best: 'Nxe5' } };
+  for (let n = 7; n <= 40; n++) script[n] = { cp: 200, best: n % 2 === 0 ? 'a3' : 'a6' };
+  const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', evaluate: scriptedEvaluate(script).evaluate });
+  assert.equal(r.verdict.cutAt, 6, 'the advantage is there after one move');
+  assert.equal(r.response.length, 7, 'but the drill still shows four of our moves');
+  assert.equal(r.response[0], 'Nxe5');
 });
 
 test('toBranchJSON produces a paste-ready branch', () => {
