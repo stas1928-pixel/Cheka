@@ -148,15 +148,47 @@ Rules for every job:
   so batch jobs (rebuild branches, analyse games) run on the PC with the
   same modules the app uses.
 
+### Second refinement round, 2026-09-16 ("Scotch has only one line? WTH")
+- **Data model is now LINES, not main line + branches.** An opening is a
+  bundle of named lines sharing a root; lines[0] is the trunk (hand-approved
+  master theory); every other line leaves the trunk at an opponent ply.
+  `kind: 'main'` = a sound variation to know, `kind: 'side'` = an opponent
+  mistake with the punishment. Rule enforced by test: our side plays one
+  move per position across all lines.
+- **Generated from real data.** `tools/build-repertoire.mjs` grows the
+  variations from stas1928's games: every opponent reply seen ≥ 2× becomes a
+  line; the engine (depth 14) classifies it (swing ≥ 0.6 in our favour →
+  side) and plays our moves; opponent moves inside lines are what YOUR
+  opponents most often play, else engine. Trunk is never changed by data.
+  Output → `js/repertoire.data.js` (generated, never hand-edited);
+  explanations live in `js/notes.js` keyed by line id.
+  Result: Scotch 5 main + 3 side lines, Elephant 7 main + 6 side lines.
+- **Tabs open into a tickable line list** (Chess Reps-style): under
+  Main lines / Side lines / My games, a list shows every line with its
+  name, the moves after the deviation, badges (punish, ×games, new / due /
+  days-until-due) and a ▶ to drill it now. Unticked lines leave the
+  rotation (settings.hiddenLines). Tab labels carry counts.
+- **Spaced repetition** (`progress.js`): a clean run multiplies a line's
+  interval (1 → 2.3 → 5.3 → 12 days …), any mistake resets it to 1 day.
+  The picker weights new (3) and due (2 + overdue days) lines far above
+  not-yet-due ones (0.2); My games multiplies by log2 of opponent frequency.
+  Home cards show "N due".
+- Gap report now counts `lineHits` per line id (was branchHits per move).
+- **Gotcha found while testing:** after a deploy the browser's HTTP cache
+  can serve a mix of old and new ES modules (one file imports a symbol the
+  other no longer exports → blank page). The service worker now fetches app
+  files with `cache: 'no-cache'` so every module is revalidated together.
+  When editing locally, hard-reload if the console shows "does not provide
+  an export named".
+
 ### Next candidates (owner picks, one per session)
-- Spaced repetition proper: schedule lines by last result and time since
-  last drill instead of the simple mistake weighting.
-- Opponent replies inside branches from the amateur database (what people
-  actually play) instead of engine best moves, where the data is thick.
+- Opponent replies inside lines from the Lichess amateur database where
+  it is thicker than your own games. Needs `LICHESS_TOKEN` in a local
+  `.env` (git-ignored) for the PC-side tools.
 - Analyse more than 60 games on the phone in the background, or run
   `tools/analyse-games.mjs` on the PC and import the JSON.
-- Remove branches that are both sound and rare once the "My games" data
-  shows they never occur.
+- A "Lines" screen on the home page (all openings at once) once there are
+  more than two openings.
 
 ---
 

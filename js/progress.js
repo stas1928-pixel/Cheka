@@ -123,6 +123,54 @@ export function weakSpots(progress, openingId, limit = 3) {
     .slice(0, limit);
 }
 
+/* ---------- spaced repetition per line ----------
+   Each drilled line gets { interval (days), due (ISO), reps, lapses }.
+   A clean run multiplies the interval (1 → 2 → 5 → 11 → 25 days …);
+   any mistake resets it to 1 day. Lines never drilled are always due.
+   The picker turns this into weights: due lines first, the more overdue
+   the heavier; not-yet-due lines still get a small chance. */
+
+const DAY = 24 * 60 * 60 * 1000;
+
+export function scheduleLine(progress, openingId, lineId, { perfect }, now = new Date()) {
+  const s = openingStats(progress, openingId);
+  s.lines ??= {};
+  const entry = s.lines[lineId] ?? { interval: 0, due: null, reps: 0, lapses: 0 };
+  entry.reps += 1;
+  if (perfect) {
+    entry.interval = entry.interval === 0 ? 1 : Math.round(entry.interval * 2.3 * 10) / 10;
+  } else {
+    entry.interval = 1;
+    entry.lapses += 1;
+  }
+  entry.due = new Date(now.getTime() + entry.interval * DAY).toISOString();
+  entry.lastAt = now.toISOString();
+  s.lines[lineId] = entry;
+  return entry;
+}
+
+/** { state: 'new' | 'due' | 'later', overdueDays } for a line. */
+export function lineStatus(progress, openingId, lineId, now = new Date()) {
+  const entry = progress.openings[openingId]?.lines?.[lineId];
+  if (!entry || !entry.due) return { state: 'new', overdueDays: 0, entry: null };
+  const overdue = (now.getTime() - new Date(entry.due).getTime()) / DAY;
+  return overdue >= 0
+    ? { state: 'due', overdueDays: Math.floor(overdue), entry }
+    : { state: 'later', overdueDays: Math.ceil(overdue), entry }; // negative = days until due
+}
+
+/** Weight for the random picker: new 3, due 2 + overdue days (max 10), later 0.2. */
+export function lineWeight(progress, openingId, lineId, now = new Date()) {
+  const { state, overdueDays } = lineStatus(progress, openingId, lineId, now);
+  if (state === 'new') return 3;
+  if (state === 'due') return 2 + Math.min(overdueDays, 8);
+  return 0.2;
+}
+
+export function dueCount(progress, openingId, lineIds, now = new Date()) {
+  return lineIds.filter((id) => lineStatus(progress, openingId, id, now).state !== 'later').length;
+}
+
 /* ---------- backup ---------- */
 
 export function exportJSON(progress) {

@@ -3,7 +3,42 @@ import assert from 'node:assert/strict';
 import {
   emptyProgress, loadProgress, saveProgress, resetProgress, recordAttempt,
   recordLineComplete, accuracy, weakSpots, exportJSON, importJSON, PROGRESS_KEY,
+  scheduleLine, lineStatus, lineWeight, dueCount,
 } from '../js/progress.js';
+
+test('spaced repetition: intervals grow on clean runs and reset on a mistake', () => {
+  const p = emptyProgress();
+  const day = (n) => new Date(Date.UTC(2026, 8, 16 + n));
+  assert.equal(lineStatus(p, 'scotch', 'main').state, 'new');
+  assert.equal(lineWeight(p, 'scotch', 'main'), 3);
+
+  let e = scheduleLine(p, 'scotch', 'main', { perfect: true }, day(0));
+  assert.equal(e.interval, 1);
+  assert.equal(lineStatus(p, 'scotch', 'main', day(0)).state, 'later');
+  assert.equal(lineWeight(p, 'scotch', 'main', day(0)), 0.2);
+  assert.equal(lineStatus(p, 'scotch', 'main', day(1)).state, 'due');
+
+  e = scheduleLine(p, 'scotch', 'main', { perfect: true }, day(1));
+  assert.equal(e.interval, 2.3);
+  e = scheduleLine(p, 'scotch', 'main', { perfect: true }, day(4));
+  assert.equal(e.interval, 5.3);
+  assert.equal(e.reps, 3);
+
+  e = scheduleLine(p, 'scotch', 'main', { perfect: false }, day(10));
+  assert.equal(e.interval, 1, 'a mistake resets the interval');
+  assert.equal(e.lapses, 1);
+  assert.equal(lineStatus(p, 'scotch', 'main', day(15)).overdueDays, 4);
+  assert.equal(lineWeight(p, 'scotch', 'main', day(15)), 6);
+  assert.equal(lineWeight(p, 'scotch', 'main', day(40)), 10, 'overdue weight is capped');
+});
+
+test('dueCount counts new and due lines, not those scheduled later', () => {
+  const p = emptyProgress();
+  const now = new Date('2026-09-16T12:00:00Z');
+  scheduleLine(p, 'scotch', 'a', { perfect: true }, now);           // due tomorrow -> later
+  scheduleLine(p, 'scotch', 'b', { perfect: true }, new Date('2026-09-10T12:00:00Z')); // overdue
+  assert.equal(dueCount(p, 'scotch', ['a', 'b', 'c'], now), 2, 'b is due, c is new');
+});
 
 function fakeStorage() {
   const map = new Map();

@@ -8,7 +8,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Chess } from '../vendor/chess.js';
 import { OPENINGS } from '../js/repertoire.js';
-import { buildLine, isUserPly } from '../js/tree.js';
+import { isUserPly, deviation, mainLine, startsWith } from '../js/tree.js';
 
 /** Play a SAN list from the start; throws if any move is illegal.
  *  Also asserts each SAN is exactly the canonical form chess.js emits. */
@@ -33,24 +33,53 @@ test('opening ids are unique and sides are valid', () => {
 });
 
 for (const opening of OPENINGS) {
-  test(`${opening.id}: main line is legal, canonical, and deep enough`, () => {
-    playAll(opening.mainLine, `${opening.id} main`);
-    assert.ok(opening.mainLine.length >= 16, 'brief asks for roughly 20 plies');
+  test(`${opening.id}: trunk is first, kind main, legal, canonical, deep enough`, () => {
+    const trunk = opening.lines[0];
+    assert.equal(trunk.kind, 'main');
+    assert.equal(trunk.deviatesAt ?? null, null, 'the trunk deviates from nothing');
+    playAll(trunk.moves, `${opening.id} trunk`);
+    assert.ok(trunk.moves.length >= 16, 'brief asks for roughly 20 plies');
   });
 
   test(`${opening.id}: signature ends with the user's defining move`, () => {
-    assert.ok(opening.signaturePlies > 0 && opening.signaturePlies <= opening.mainLine.length);
+    assert.ok(opening.signaturePlies > 0 && opening.signaturePlies <= mainLine(opening).length);
     assert.ok(isUserPly(opening, opening.signaturePlies - 1), 'last signature ply should be ours');
   });
 
-  test(`${opening.id}: every branch is a legal opponent deviation with a response`, () => {
-    for (const b of opening.branches) {
-      const label = `${opening.id} branch ${b.deviatesAt}:${b.opponentMove}`;
-      assert.ok(!isUserPly(opening, b.deviatesAt), `${label}: deviation must be on an opponent ply`);
-      assert.notEqual(b.opponentMove, opening.mainLine[b.deviatesAt], `${label}: not a deviation`);
-      assert.ok(b.response.length >= 1, `${label}: needs a response`);
-      assert.ok(['punishment', 'tactical'].includes(b.type), `${label}: bad type`);
-      playAll(buildLine(opening, b), label);
+  test(`${opening.id}: every line is legal, canonical, named, uniquely identified`, () => {
+    const ids = new Set();
+    for (const l of opening.lines) {
+      const label = `${opening.id}/${l.id}`;
+      assert.ok(l.id && !ids.has(l.id), `${label}: duplicate or missing id`);
+      ids.add(l.id);
+      assert.ok(l.name, `${label}: needs a name`);
+      assert.ok(['main', 'side'].includes(l.kind), `${label}: bad kind`);
+      assert.ok(startsWith(l.moves, mainLine(opening).slice(0, opening.signaturePlies)), `${label}: must start with the opening signature`);
+      playAll(l.moves, label);
+      assert.ok(l.note, `${label}: has a note (hand-written or automatic)`);
+    }
+  });
+
+  test(`${opening.id}: each non-trunk line leaves the trunk at an opponent ply, where it says it does`, () => {
+    for (const l of opening.lines.slice(1)) {
+      const d = deviation(opening, l);
+      assert.ok(d, `${opening.id}/${l.id}: identical to the trunk`);
+      assert.equal(d.ply, l.deviatesAt, `${opening.id}/${l.id}: deviatesAt`);
+      assert.ok(!isUserPly(opening, d.ply), `${opening.id}/${l.id}: deviation must be the opponent's move`);
+      assert.ok(l.moves.length > d.ply + 1, `${opening.id}/${l.id}: needs at least one reply after the deviation`);
+    }
+  });
+
+  test(`${opening.id}: our side plays one move per position across all lines`, () => {
+    const seen = new Map(); // prefix -> our move
+    for (const l of opening.lines) {
+      for (let ply = 0; ply < l.moves.length; ply++) {
+        if (!isUserPly(opening, ply)) continue;
+        const key = l.moves.slice(0, ply).join(' ');
+        const prev = seen.get(key);
+        assert.ok(!prev || prev === l.moves[ply], `${opening.id}: after "${key}" we play both ${prev} and ${l.moves[ply]} (${l.id})`);
+        seen.set(key, l.moves[ply]);
+      }
     }
   });
 }

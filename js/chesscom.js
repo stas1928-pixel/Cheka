@@ -19,7 +19,7 @@
    Everything except importGames is pure and unit-tested.
 --------------------------------------------------------------- */
 import { Chess } from '../vendor/chess.js';
-import { buildLine, isUserPly } from './tree.js';
+import { isUserPly, repertoireMove, continuations, startsWith, definingPly, mainLine } from './tree.js';
 
 export const CHESSCOM_BASE = 'https://api.chess.com/pub';
 
@@ -98,8 +98,9 @@ export function userSide(game, username) {
 export function matchesOpening(sans, side, opening) {
   if (side !== opening.side) return false;
   if (sans.length < opening.signaturePlies) return false;
+  const trunk = mainLine(opening);
   for (let i = 0; i < opening.signaturePlies; i++) {
-    if (sans[i] !== opening.mainLine[i]) return false;
+    if (sans[i] !== trunk[i]) return false;
   }
   return true;
 }
@@ -107,54 +108,49 @@ export function matchesOpening(sans, side, opening) {
 /* ---------- walking one game against the tree ---------- */
 
 /**
- * Follow the game move by move along the repertoire.
- * Returns one of:
- *   { result: 'gap',      ply, move, prefix }   opponent played something we have no answer to
+ * Follow the game move by move through the repertoire tree (all lines at
+ * once). Returns one of:
+ *   { result: 'gap',      ply, move, prefix }   opponent played something no line covers
  *   { result: 'userLeft', ply, move, expected } we ourselves left the book
- *   { result: 'complete', branch }              game followed a whole line
- *   { result: 'gameEnded', ply }                game was shorter than the line
- * plus `branch` (the branch entered, or null) in every case.
+ *   { result: 'complete' }                      game ran past the end of our lines without leaving them
+ *   { result: 'gameEnded', ply }                game was shorter than our lines
+ * plus `lines`: ids of every line whose defining move the game played.
  */
 export function walkGame(sans, opening) {
-  let line = opening.mainLine;
-  let branch = null;
+  const hit = (prefix) => opening.lines
+    .filter((l) => definingPly(opening, l) === prefix.length - 1 && startsWith(l.moves, prefix))
+    .map((l) => l.id);
+  const lines = [];
 
-  for (let ply = 0; ply < line.length; ply++) {
-    if (ply >= sans.length) return { result: 'gameEnded', ply, branch };
+  for (let ply = 0; ; ply++) {
+    const prefix = sans.slice(0, ply);
+    const covered = continuations(opening, prefix);
+    if (covered.length === 0) return { result: 'complete', ply, lines };      // our lines end here
+    if (ply >= sans.length) return { result: 'gameEnded', ply, lines };
     const played = sans[ply];
-    const expected = line[ply];
-    if (played === expected) continue;
 
     if (isUserPly(opening, ply)) {
-      return { result: 'userLeft', ply, move: played, expected, branch };
+      const expected = repertoireMove(opening, prefix);
+      if (played !== expected) return { result: 'userLeft', ply, move: played, expected, lines };
+    } else if (!covered.includes(played)) {
+      return { result: 'gap', ply, move: played, prefix, lines };
     }
-
-    // Opponent deviated. Do we have a prepared branch for exactly this?
-    const known = branch === null
-      ? opening.branches.find((b) => b.deviatesAt === ply && b.opponentMove === played)
-      : null; // branches only fork off the main line, not off other branches
-    if (known) {
-      branch = known;
-      line = buildLine(opening, known);
-      continue;
-    }
-    return { result: 'gap', ply, move: played, prefix: sans.slice(0, ply), branch };
+    lines.push(...hit([...prefix, played]));
   }
-  return { result: 'complete', branch };
 }
 
 /* ---------- putting it together ---------- */
 
 /**
  * Run every game through every opening. Returns, per opening id:
- *   { games, gaps: [{ key, ply, move, prefix, count, urls }], branchHits: { "<ply>:<move>": n },
+ *   { games, gaps: [{ key, ply, move, prefix, count, urls }], lineHits: { lineId: n },
  *     userLeft: n, complete: n }
  * Gaps are sorted most frequent first.
  */
 export function analyseGames(games, username, openings) {
   const report = {};
   for (const o of openings) {
-    report[o.id] = { games: 0, gaps: new Map(), branchHits: {}, userLeft: 0, complete: 0 };
+    report[o.id] = { games: 0, gaps: new Map(), lineHits: {}, userLeft: 0, complete: 0 };
   }
 
   for (const g of games) {
@@ -166,10 +162,7 @@ export function analyseGames(games, username, openings) {
       const r = report[o.id];
       r.games += 1;
       const w = walkGame(sans, o);
-      if (w.branch) {
-        const k = `${w.branch.deviatesAt}:${w.branch.opponentMove}`;
-        r.branchHits[k] = (r.branchHits[k] ?? 0) + 1;
-      }
+      for (const id of w.lines) r.lineHits[id] = (r.lineHits[id] ?? 0) + 1;
       if (w.result === 'userLeft') r.userLeft += 1;
       if (w.result === 'complete') r.complete += 1;
       if (w.result === 'gap') {

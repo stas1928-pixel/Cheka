@@ -1,28 +1,18 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  isWhitePly, isUserPly, buildLine, branchesAt, lineKey,
-  moveLabel, describeBranch, formatMoves, pickDeviation, pickWeighted,
+  isWhitePly, isUserPly, mainLine, lineById, linesOfKind, startsWith, repertoireMove,
+  continuations, definingPly, deviation, lineKey, moveLabel, describeLine, formatMoves, pickWeighted,
 } from '../js/tree.js';
-
-test('pickWeighted respects weights, skips zeros, handles nothing pickable', () => {
-  const items = ['a', 'b', 'c'];
-  assert.equal(pickWeighted(items, [1, 0, 1], () => 0.0), 'a');
-  assert.equal(pickWeighted(items, [1, 0, 1], () => 0.99), 'c');
-  assert.equal(pickWeighted(items, [1, 0, 1], () => 0.5), 'c', 'b has weight 0 and is skipped');
-  assert.equal(pickWeighted(items, [1, 3, 0], () => 0.3), 'b', '0.3*4=1.2 lands in b');
-  assert.equal(pickWeighted(items, [0, 0, 0]), null);
-  assert.equal(pickWeighted([], []), null);
-});
 
 // A tiny fake opening so these tests do not depend on the real data.
 const white = {
   side: 'w',
-  mainLine: ['e4', 'e5', 'Nf3', 'Nc6', 'd4'],
-  branches: [
-    { deviatesAt: 1, opponentMove: 'c5', response: ['Nf3'], type: 'punishment' },
-    { deviatesAt: 1, opponentMove: 'e6', response: ['d4'], type: 'punishment' },
-    { deviatesAt: 3, opponentMove: 'Nf6', response: ['Nxe5'], type: 'tactical' },
+  signaturePlies: 3,
+  lines: [
+    { id: 'main', name: 'Trunk', kind: 'main', moves: ['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'exd4', 'Bc4'] },
+    { id: 'nf6', name: 'Petrov-ish', kind: 'main', moves: ['e4', 'e5', 'Nf3', 'Nf6', 'Nxe5'], deviatesAt: 3 },
+    { id: 'f5', name: 'Latvian lunge', kind: 'side', moves: ['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'f5', 'Nxe5', 'Nxe5', 'dxe5'], deviatesAt: 5 },
   ],
 };
 const black = { ...white, side: 'b' };
@@ -36,26 +26,40 @@ test('ply parity', () => {
   assert.equal(isUserPly(black, 1), true);
 });
 
-test('buildLine: main line is a copy, branch splices at the deviation', () => {
-  const main = buildLine(white);
-  assert.deepEqual(main, white.mainLine);
-  assert.notEqual(main, white.mainLine, 'must not hand out the original array');
-  assert.deepEqual(buildLine(white, white.branches[2]), ['e4', 'e5', 'Nf3', 'Nf6', 'Nxe5']);
+test('mainLine, lineById, linesOfKind', () => {
+  assert.deepEqual(mainLine(white), white.lines[0].moves);
+  assert.equal(lineById(white, 'f5').name, 'Latvian lunge');
+  assert.equal(lineById(white, 'nope'), null);
+  assert.deepEqual(linesOfKind(white, 'side').map((l) => l.id), ['f5']);
+  assert.equal(linesOfKind(white, 'main').length, 2);
 });
 
-test('branchesAt and lineKey', () => {
-  assert.equal(branchesAt(white, 1).length, 2);
-  assert.equal(branchesAt(white, 3).length, 1);
-  assert.equal(branchesAt(white, 0).length, 0);
-  assert.equal(lineKey(), 'main');
-  assert.equal(lineKey(white.branches[0]), 'b1:c5');
+test('startsWith / repertoireMove / continuations', () => {
+  assert.equal(startsWith(['e4', 'e5', 'Nf3'], ['e4', 'e5']), true);
+  assert.equal(startsWith(['e4'], ['e4', 'e5']), false);
+  assert.equal(repertoireMove(white, ['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'f5']), 'Nxe5');
+  assert.equal(repertoireMove(white, ['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'exd4']), 'Bc4');
+  assert.equal(repertoireMove(white, ['d4']), null, 'not our opening');
+  assert.deepEqual(continuations(white, ['e4', 'e5', 'Nf3']).sort(), ['Nc6', 'Nf6']);
+  assert.deepEqual(continuations(white, ['e4', 'e5', 'Nf3', 'Nc6', 'd4']).sort(), ['exd4', 'f5']);
+  assert.deepEqual(continuations(white, ['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'exd4', 'Bc4']), [], 'trunk ends here');
+});
+
+test('deviation and definingPly', () => {
+  assert.equal(deviation(white, white.lines[0]), null);
+  assert.deepEqual(deviation(white, white.lines[1]), { ply: 3, move: 'Nf6' });
+  assert.deepEqual(deviation(white, white.lines[2]), { ply: 5, move: 'f5' });
+  assert.equal(definingPly(white, white.lines[2]), 5);
+  assert.equal(definingPly(white, white.lines[0]), 3, 'trunk: first opponent ply after the signature');
+  assert.equal(lineKey(white.lines[2]), 'f5');
 });
 
 test('labels', () => {
   assert.equal(moveLabel(0, 'e4'), '1.e4');
   assert.equal(moveLabel(1, 'e5'), '1...e5');
   assert.equal(moveLabel(4, 'd4'), '3.d4');
-  assert.equal(describeBranch(white.branches[2]), '2...Nf6 · tactical');
+  assert.equal(describeLine(white, white.lines[2]), '3...f5 · Latvian lunge');
+  assert.equal(describeLine(white, white.lines[0]), 'Trunk');
 });
 
 test('formatMoves numbers White moves only and respects upTo', () => {
@@ -68,15 +72,12 @@ test('formatMoves numbers White moves only and respects upTo', () => {
   assert.deepEqual(formatMoves([], 0), []);
 });
 
-test('pickDeviation: chance 0 never, chance 1 always, none where no branch', () => {
-  const always = () => 0;   // random() returning 0 is below any chance > 0
-  assert.equal(pickDeviation(white, 1, { chance: 0, random: always }), null);
-  assert.equal(pickDeviation(white, 0, { chance: 1, random: always }), null);
-  assert.equal(pickDeviation(white, 1, { chance: 1, random: always }), white.branches[0]);
-});
-
-test('pickDeviation: second random() call selects among options', () => {
-  const rolls = [0, 0.99];  // first: pass the chance check; second: pick last option
-  const random = () => rolls.shift();
-  assert.equal(pickDeviation(white, 1, { chance: 0.5, random }), white.branches[1]);
+test('pickWeighted respects weights, skips zeros, handles nothing pickable', () => {
+  const items = ['a', 'b', 'c'];
+  assert.equal(pickWeighted(items, [1, 0, 1], () => 0.0), 'a');
+  assert.equal(pickWeighted(items, [1, 0, 1], () => 0.99), 'c');
+  assert.equal(pickWeighted(items, [1, 0, 1], () => 0.5), 'c', 'b has weight 0 and is skipped');
+  assert.equal(pickWeighted(items, [1, 3, 0], () => 0.3), 'b', '0.3*4=1.2 lands in b');
+  assert.equal(pickWeighted(items, [0, 0, 0]), null);
+  assert.equal(pickWeighted([], []), null);
 });

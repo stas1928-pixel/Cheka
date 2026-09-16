@@ -11,12 +11,12 @@
 
    Bump VERSION whenever vendor/ changes so the old cache is dropped.
 --------------------------------------------------------------- */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE = `opening-trainer-${VERSION}`;
 
 const PRECACHE = [
   './', './index.html', './css/style.css', './manifest.webmanifest', './icon.svg',
-  './js/app.js', './js/repertoire.js', './js/tree.js', './js/progress.js', './js/settings.js',
+  './js/app.js', './js/repertoire.js', './js/repertoire.data.js', './js/notes.js', './js/tree.js', './js/progress.js', './js/settings.js',
   './js/feedback.js', './js/explorer.js', './js/chesscom.js', './js/engine.js',
   './js/branchBuilder.js', './js/weakness.js',
   './vendor/chess.js',
@@ -50,9 +50,11 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Network-first for app files, cache as fallback.
+  // Network-first for app files, cache as fallback. `no-cache` forces a
+  // revalidation with the server so ES modules can never load as a mix of
+  // old and new versions from the browser's HTTP cache after a deploy.
   e.respondWith(
-    fetch(e.request).then((res) => {
+    fetch(e.request, { cache: 'no-cache' }).then((res) => {
       if (res.ok) caches.open(CACHE).then((c) => c.put(e.request, res.clone()));
       return res;
     }).catch(() => caches.match(e.request).then((hit) => hit ?? caches.match('./index.html'))),

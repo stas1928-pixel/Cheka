@@ -9,10 +9,11 @@ export const SETTINGS_KEY = 'openingTrainer.settings.v1';
 
 export const DEFAULT_SETTINGS = Object.freeze({
   sound: true,            // chime / buzz on correct / incorrect
-  lineMode: 'all',        // what the opponent does in training:
-                          //   'main' – always the main line
-                          //   'all'  – a random prepared side line (or the main line)
-                          //   'mine' – side lines weighted by how often YOUR opponents played them
+  lineMode: 'main',       // which tab of lines to train:
+                          //   'main' – the main variations
+                          //   'side' – opponent mistakes and their punishments
+                          //   'mine' – whatever showed up in YOUR games, weighted by frequency
+  hiddenLines: {},        // { [openingId]: { [lineId]: true } } — lines unticked in the list
   deviationChance: 0.35,  // kept for old saved settings; no longer used
   lichessToken: '',       // personal API token for the Opening Explorer (job 6)
   chesscomUser: '',       // Chess.com username for the game import (job 8)

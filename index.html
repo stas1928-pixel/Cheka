@@ -95,10 +95,16 @@
 
   <!-- What the opponent does while you train. -->
   <div id="line-mode" class="segmented small" role="radiogroup" aria-label="Which lines to train">
-    <button data-line="main" role="radio">Main line</button>
-    <button data-line="all" role="radio">Side lines</button>
+    <button data-line="main" role="radio">Main lines</button>
+    <button data-line="side" role="radio">Side lines</button>
     <button data-line="mine" role="radio">My games</button>
   </div>
+
+  <!-- The lines behind the chosen tab: tick what you want in the rotation. -->
+  <details id="line-list" class="line-list">
+    <summary><span id="line-list-title">Lines</span><span id="line-list-meta" class="dim"></span></summary>
+    <div id="line-rows"></div>
+  </details>
 
   <div class="board-wrap">
     <div id="board" class="board" role="grid" aria-label="Chess board"></div>
