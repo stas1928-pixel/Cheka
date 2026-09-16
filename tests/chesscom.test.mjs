@@ -44,33 +44,41 @@ test('matchesOpening needs our side and the signature prefix', () => {
   assert.equal(matchesOpening(['e4', 'e5', 'Nf3', 'd5'], 'b', elephant), true);
 });
 
+// A fixture, so real-repertoire edits cannot break the walking logic test.
+const WALK = {
+  side: 'w',
+  signaturePlies: 5,
+  mainLine: ['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'exd4', 'Bc4', 'Nf6'],
+  branches: [{ deviatesAt: 5, opponentMove: 'd6', response: ['dxe5', 'dxe5', 'Qxd8+', 'Kxd8', 'Bc4'], type: 'punishment' }],
+};
+
 test('walkGame: complete main line, known branch, gap, user left book, game ended early', () => {
-  assert.deepEqual(walkGame(scotch.mainLine, scotch), { result: 'complete', branch: null });
+  assert.deepEqual(walkGame(WALK.mainLine, WALK), { result: 'complete', branch: null });
 
   // 3...d6 is a prepared branch; the game follows the whole response
   const viaBranch = ['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'd6', 'dxe5', 'dxe5', 'Qxd8+', 'Kxd8', 'Bc4', 'Nf6'];
-  const w1 = walkGame(viaBranch, scotch);
+  const w1 = walkGame(viaBranch, WALK);
   assert.equal(w1.result, 'complete');
   assert.equal(w1.branch.opponentMove, 'd6');
 
   // 3...Bc5?! is not covered -> gap after the 5-ply prefix
-  const w2 = walkGame(['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'Bc5', 'c3'], scotch);
+  const w2 = walkGame(['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'Bc5', 'c3'], WALK);
   assert.equal(w2.result, 'gap');
   assert.equal(w2.ply, 5);
   assert.equal(w2.move, 'Bc5');
   assert.deepEqual(w2.prefix, ['e4', 'e5', 'Nf3', 'Nc6', 'd4']);
 
   // we played 3.Bc4 instead of 3.d4 -> userLeft
-  const w3 = walkGame(['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Bc5'], scotch);
+  const w3 = walkGame(['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Bc5'], WALK);
   assert.deepEqual(w3, { result: 'userLeft', ply: 4, move: 'Bc4', expected: 'd4', branch: null });
 
   // deviation inside a branch is a gap too (branches do not nest)
-  const w4 = walkGame(['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'd6', 'dxe5', 'Nxe5'], scotch);
+  const w4 = walkGame(['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'd6', 'dxe5', 'Nxe5'], WALK);
   assert.equal(w4.result, 'gap');
   assert.equal(w4.move, 'Nxe5');
   assert.equal(w4.branch.opponentMove, 'd6');
 
-  assert.deepEqual(walkGame(['e4', 'e5', 'Nf3'], scotch), { result: 'gameEnded', ply: 3, branch: null });
+  assert.deepEqual(walkGame(['e4', 'e5', 'Nf3'], WALK), { result: 'gameEnded', ply: 3, branch: null });
 });
 
 // Fixture openings, so editing the real repertoire never breaks these

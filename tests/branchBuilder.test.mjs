@@ -30,12 +30,20 @@ test('decideCut: same numbers for Black must be negated', () => {
   assert.equal(none.cutAt, null);
 });
 
-test('decideCut: small edge only counts after the big window closes', () => {
-  const early = decideCut([{ ply: 6, cp: 80 }], { deviationPly: 5, side: 'w' });
-  assert.equal(early.cutAt, null, '+0.8 at move 1 is not enough');
-  const late = decideCut([{ ply: 6, cp: 80 }, { ply: 18, cp: 80 }], { deviationPly: 5, side: 'w' });
-  assert.equal(late.cutAt, 18);
-  assert.match(late.reason, /small-edge/);
+test('decideCut: a small edge cuts at once when no big edge is coming', () => {
+  const v = decideCut([{ ply: 6, cp: 80 }, { ply: 8, cp: 90 }, { ply: 10, cp: 95 }], { deviationPly: 5, side: 'w' });
+  assert.equal(v.cutAt, 6, 'stop as soon as we are clearly better');
+  assert.match(v.reason, /small-edge/);
+});
+
+test('decideCut: a big edge within 6 moves beats an earlier small edge', () => {
+  const evals = [{ ply: 6, cp: 80 }, { ply: 8, cp: 90 }, { ply: 14, cp: 220 }];
+  const v = decideCut(evals, { deviationPly: 5, side: 'w' });
+  assert.equal(v.cutAt, 14, 'go deeper for the clear punishment (move 5)');
+  assert.equal(v.type, 'punishment');
+  // …but not if the big edge only arrives after the 6-move window
+  const late = decideCut([{ ply: 6, cp: 80 }, { ply: 20, cp: 220 }], { deviationPly: 5, side: 'w' });
+  assert.equal(late.cutAt, 6);
 });
 
 test('decideCut: mate for us is tactical, mate against us is ignored', () => {
@@ -68,28 +76,41 @@ function scriptedEvaluate(script) {
 
 const white = { side: 'w', mainLine: ['e4', 'e5', 'Nf3', 'Nc6', 'd4', 'exd4'], branches: [] };
 
-test('buildBranch extends with best moves and cuts at the big threshold', async () => {
-  // deviation 3...f5 at ply 5; engine: 4.Nxe5 (+0.9), 4...Nxe5, 5.dxe5 (+1.7) -> cut
-  const s = scriptedEvaluate({
+/** Scripted answers for every length from `from` to the horizon: quiet moves at `cp`. */
+function quietTail(script, from, cp) {
+  for (let n = from; n <= 40; n++) script[n] ??= { cp, best: n % 2 === 0 ? 'a3' : 'a6' };
+  return script;
+}
+
+test('buildBranch builds to the horizon, then cuts at the big threshold', async () => {
+  // deviation 3...f5 at ply 5; engine: 4.Nxe5 (+0.9), 4...Nxe5, 5.dxe5 (+1.7), then quiet
+  const s = scriptedEvaluate(quietTail({
     6: { best: 'Nxe5' },               // position after f5: White to move
     7: { cp: 90, best: 'Nxe5' },       // after 4.Nxe5: score + Black's best
     8: { best: 'dxe5' },               // after 4...Nxe5: White to move
     9: { cp: 170, best: 'Qe7' },       // after 5.dxe5
-  });
+  }, 10, 170));
   const steps = [];
   const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', evaluate: s.evaluate, onStep: (x) => steps.push(x.san) });
-  assert.deepEqual(r.response, ['Nxe5', 'Nxe5', 'dxe5']);
+  assert.deepEqual(r.response, ['Nxe5', 'Nxe5', 'dxe5'], 'cut where +1.7 first appears, not at +0.9');
   assert.equal(r.verdict.type, 'punishment');
   assert.equal(r.verdict.cutAt, 8);
-  assert.deepEqual(steps, ['Nxe5', 'dxe5']);
+  assert.ok(steps.length > 2, 'kept building past the cut to look for something bigger');
 });
 
-test('buildBranch evaluates a seeded response first and can stop inside it', async () => {
-  const s = scriptedEvaluate({ 7: { cp: 200, best: 'a6' } });
+test('buildBranch scores a seeded response and can cut inside it', async () => {
+  const s = scriptedEvaluate(quietTail({ 7: { cp: 200, best: 'a6' } }, 8, 200));
   const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', seedResponse: ['Nxe5', 'Nxe5', 'dxe5'], evaluate: s.evaluate });
   assert.deepEqual(r.response, ['Nxe5'], 'cut right after the first seeded move');
   assert.equal(r.evals[0].fromSeed, true);
-  assert.equal(s.calls.length, 1);
+});
+
+test('buildBranch stops early on a forced mate for us', async () => {
+  const s = scriptedEvaluate({ 6: { best: 'Qh5' }, 7: { mate: 2, best: 'g6' } });
+  const r = await buildBranch({ opening: white, deviationPly: 5, opponentMove: 'f5', evaluate: s.evaluate });
+  assert.deepEqual(r.response, ['Qh5']);
+  assert.equal(r.verdict.type, 'tactical');
+  assert.equal(s.calls.length, 2, 'no need to look further once mate is found');
 });
 
 test('buildBranch gives up at the horizon with a discard verdict', async () => {

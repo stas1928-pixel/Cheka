@@ -94,11 +94,22 @@ Rules for every job:
 
 ### How the engine is used (job 7, done)
 - Review mode → **Check with Stockfish** evaluates the position after each
-  of YOUR moves in the selected line. For a branch it then extends the line
-  with engine best moves for both sides until `decideCut` fires:
-  ≥ +1.5 within 6 moves → punishment; later ≥ +0.5 → punishment
-  (small-edge rule); forced mate → tactical; nothing by move 10 → discard
-  (the opponent's move was sound, keep only a short "know the reply" branch).
+  of YOUR moves in the selected line. For a branch it builds the line to the
+  10-move horizon with engine best moves for both sides, then `decideCut`
+  picks the stop with the whole line in view: forced mate → tactical;
+  ≥ +1.5 within 6 moves → punishment, run to that point; otherwise the
+  first ≥ +0.5 → punishment, stop there; nothing → discard (the opponent's
+  move was sound, keep only a one-move "know the reply" branch).
+  **Changed 2026-09-16** from the brief's literal reading (small edge only
+  after move 6), which produced 13-move engine-vs-engine lines nobody plays.
+  The owner's words: "not all the way, just so I get an advantage, deeper if
+  there is a clear punishment."
+- **All 19 branches are engine-checked (2026-09-16).** Real punishments:
+  Scotch 3...f5 (+2.0), 3...Bb4+ (+1.6), 4...Qf6 (+1.0); Elephant 3.Bd3
+  (+1.7), 4.Bb5+ (+1.8). Sound opponent moves kept as one-move replies:
+  Scotch 4...Bc5, 5...Ne4; Elephant 3.Nxe5, 3.d3, 4.Ng1, 4.Nd4, 4.Ne5,
+  5.Ng5, 6.dxe4. The Elephant main line's 6...Bf5 was a −2 blunder and is
+  now 6...Nc6 (engine both sides from there).
 - **Build** on a gap in the Chess.com report opens a draft branch and runs
   the same builder; the result is paste-ready JSON for `repertoire.js`.
   The repertoire stays a hand-edited file on purpose.
@@ -107,8 +118,8 @@ Rules for every job:
   reports that honestly instead of pretending every deviation is punishable.
 
 ### Next candidates (owner picks, one per session)
-- Run the engine check over all 16 hand-made branches and paste in the
-  engine-checked responses; remove branches the engine calls sound + rare.
+- Hosting so the phone works without the PC (GitHub Pages or similar) —
+  see docs/LAYOUT.md; the repo holds no personal data.
 - Service worker for offline use (now worth it: the engine is 7 MB).
 - Weakest-first line ordering in training, using the weak-spot data.
 

@@ -39,27 +39,35 @@ export function movesSince(deviationPly, ply) {
 /**
  * evals: [{ ply, cp, mate }] in WHITE view, one entry per position reached
  * after one of OUR moves (ply is the index of our move in the line).
+ * Looks at the WHOLE list before deciding (so the line must be built to
+ * the horizon first):
+ *   1. a forced mate for us            -> cut at the first one, "tactical"
+ *   2. a big edge within 6 moves       -> cut at the first one, "punishment"
+ *      (worth going deeper for — the owner's "clear punishment")
+ *   3. otherwise the first small edge  -> cut there, "punishment"
+ *      (the owner's "just far enough to be better")
+ *   4. nothing by the horizon          -> "discard"; before it -> "unfinished"
  * Returns { cutAt: ply | null, type, reason }.
  */
 export function decideCut(evals, { deviationPly, side, thresholds = THRESHOLDS }) {
-  for (const e of evals) {
-    const moves = movesSince(deviationPly, e.ply);
-    const mate = e.mate === null || e.mate === undefined ? null : fromUserPov(e.mate, side);
-    if (mate !== null && mate > 0) {
-      return { cutAt: e.ply, type: 'tactical', reason: `forced mate in ${mate}` };
-    }
-    if (e.cp === null || e.cp === undefined) continue;
-    const cp = fromUserPov(e.cp, side);
-    if (moves <= thresholds.bigWithinMoves && cp >= thresholds.bigCp) {
-      return { cutAt: e.ply, type: 'punishment', reason: `+${(cp / 100).toFixed(1)} after ${moves} move${moves === 1 ? '' : 's'}` };
-    }
-    if (moves > thresholds.bigWithinMoves && cp >= thresholds.smallCp) {
-      return { cutAt: e.ply, type: 'punishment', reason: `+${(cp / 100).toFixed(1)} after ${moves} moves (small-edge rule)` };
-    }
-    if (moves > thresholds.horizonMoves) break;
-  }
-  const last = evals.at(-1);
-  const reached = last ? movesSince(deviationPly, last.ply) : 0;
+  const view = evals.map((e) => ({
+    ply: e.ply,
+    moves: movesSince(deviationPly, e.ply),
+    cp: e.cp === null || e.cp === undefined ? null : fromUserPov(e.cp, side),
+    mate: e.mate === null || e.mate === undefined ? null : fromUserPov(e.mate, side),
+  }));
+  const label = (v) => `after ${v.moves} move${v.moves === 1 ? '' : 's'}`;
+
+  const mate = view.find((v) => v.mate !== null && v.mate > 0);
+  if (mate) return { cutAt: mate.ply, type: 'tactical', reason: `forced mate in ${mate.mate}` };
+
+  const big = view.find((v) => v.moves <= thresholds.bigWithinMoves && v.cp !== null && v.cp >= thresholds.bigCp);
+  if (big) return { cutAt: big.ply, type: 'punishment', reason: `+${(big.cp / 100).toFixed(1)} ${label(big)}` };
+
+  const small = view.find((v) => v.cp !== null && v.cp >= thresholds.smallCp);
+  if (small) return { cutAt: small.ply, type: 'punishment', reason: `+${(small.cp / 100).toFixed(1)} ${label(small)} (small-edge rule)` };
+
+  const reached = view.at(-1)?.moves ?? 0;
   return {
     cutAt: null,
     type: reached > thresholds.horizonMoves ? 'discard' : 'unfinished',
@@ -70,14 +78,17 @@ export function decideCut(evals, { deviationPly, side, thresholds = THRESHOLDS }
 }
 
 /**
- * Grow a candidate line move by move using the engine's best move for
- * BOTH sides, evaluating after each of our moves, until decideCut says stop.
+ * Grow a candidate line to the horizon using the engine's best move for
+ * BOTH sides, evaluating after each of our moves, then let decideCut pick
+ * where the line should stop. Building the whole line first is what lets
+ * the rule prefer a deep clear punishment over an early small edge.
  *
  * evaluate(sans) -> Promise<{ cp, mate, bestMove }>  (White view, SAN)
  * onStep(step)   -> called after every evaluated ply (for the UI)
  *
  * Returns { response, evals, verdict } where response is the SAN list
  * starting with OUR reply to the deviation, cut at the verdict point.
+ * A forced mate stops the build early — nothing after it matters.
  */
 export async function buildBranch({
   opening, deviationPly, opponentMove, evaluate, onStep = () => {},
@@ -86,19 +97,18 @@ export async function buildBranch({
   const sans = opening.mainLine.slice(0, deviationPly).concat([opponentMove], seedResponse);
   const evals = [];
   const maxPly = deviationPly + 2 * (thresholds.horizonMoves + 1);
+  const mateForUs = (r) => r.mate !== null && r.mate !== undefined && fromUserPov(r.mate, opening.side) > 0;
 
-  // Evaluate whatever we were seeded with first, so an existing branch
-  // gets a verdict before the engine adds anything.
+  // Score whatever we were seeded with first (an existing branch).
   for (let ply = deviationPly + 1; ply < sans.length; ply++) {
     if (!isUserPly(opening, ply)) continue;
     const r = await evaluate(sans.slice(0, ply + 1), { depth });
     evals.push({ ply, san: sans[ply], cp: r.cp, mate: r.mate, bestMove: r.bestMove, fromSeed: true });
     onStep(evals.at(-1));
-    const v = decideCut(evals, { deviationPly, side: opening.side, thresholds });
-    if (v.cutAt !== null) return finish(v);
+    if (mateForUs(r)) return finish();
   }
 
-  // Then extend with engine best moves.
+  // Then extend with engine best moves up to the horizon.
   while (sans.length < maxPly) {
     const ply = sans.length;
     const r = await evaluate(sans, { depth });          // whose move is it, what does the engine want
@@ -108,13 +118,13 @@ export async function buildBranch({
       const after = await evaluate(sans, { depth });    // score once our move is on the board
       evals.push({ ply, san: r.bestMove, cp: after.cp, mate: after.mate, bestMove: after.bestMove, fromSeed: false });
       onStep(evals.at(-1));
-      const v = decideCut(evals, { deviationPly, side: opening.side, thresholds });
-      if (v.cutAt !== null) return finish(v);
+      if (mateForUs(after)) return finish();
     }
   }
-  return finish(decideCut(evals, { deviationPly, side: opening.side, thresholds }));
+  return finish();
 
-  function finish(verdict) {
+  function finish() {
+    const verdict = decideCut(evals, { deviationPly, side: opening.side, thresholds });
     const end = verdict.cutAt === null ? sans.length : verdict.cutAt + 1;
     return { response: sans.slice(deviationPly + 1, end), evals, verdict };
   }
