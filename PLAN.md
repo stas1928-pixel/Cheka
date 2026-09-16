@@ -151,9 +151,12 @@ Rules for every job:
   lines went 0→14 (Scotch) and 0→18 (Elephant) on the same 421 games.
 
 ## Open questions (owner's call)
-- **Hosting for the phone.** Same-Wi-Fi Python server vs. a static host.
-  See `docs/LAYOUT.md`. Nothing personal is in the repo, so a public static
-  host is acceptable privacy-wise, but it is the owner's decision.
+- **Hosting for the phone — decided 2026-09-16: GitHub Pages.** Public repo
+  https://github.com/stas1928-pixel/Cheka, site
+  https://stas1928-pixel.github.io/Cheka/ . Owner chose this over a
+  same-Wi-Fi PC server. Nothing personal is in the repo. This overrides the
+  "local-only repo" default for this project; `.env`, data and backups stay
+  git-ignored regardless.
 - **Chess.com username** — `stas1928`, confirmed 2026-09-15.
 - **Lichess token** — the first token was shared in a chat transcript and
   should be revoked and replaced. The replacement must be pasted into the

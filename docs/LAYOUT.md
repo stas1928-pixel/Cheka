@@ -64,9 +64,12 @@ in Chrome. Options, in order of least effort:
 1. **Same Wi-Fi:** run `python -m http.server 8765` (without `--bind`) on the
    PC and open `http://<pc-ip>:8765/` on the phone. Exposes the folder on
    the LAN while running — fine for a static site with no personal data.
-2. **Static host:** push the folder to any static host (GitHub Pages,
-   Netlify, Cloudflare Pages). The repo contains no personal data; progress
-   and tokens live only in the phone's localStorage.
+2. **Static host (in use since 2026-09-16):** the repo is public at
+   https://github.com/stas1928-pixel/Cheka and served by GitHub Pages at
+   **https://stas1928-pixel.github.io/Cheka/** from the `main` branch root.
+   Publishing a change is just `git push`; Pages rebuilds within a minute.
+   The repo contains no personal data; progress and tokens live only in
+   the phone's localStorage.
 
 Without a service worker the app still needs the network to load each
 time; add one only if offline use becomes a real need (see PLAN.md).
