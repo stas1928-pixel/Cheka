@@ -117,11 +117,46 @@ Rules for every job:
   Black, White's move is sound). The gambit is objectively dubious; the app
   reports that honestly instead of pretending every deviation is punishable.
 
+### Refinement round, 2026-09-16 (owner feedback after first use on the phone)
+- **Branches were one move deep — "what have you achieved?"** Fixed:
+  `THRESHOLDS.minMoves = 4` — every branch shows at least four of our moves
+  (engine best play both sides, depth 16), longer only when a clear edge
+  comes later. All 19 rebuilt with `tools/build-branches.mjs`.
+- **Three training modes** (trainer screen, persisted in settings.lineMode):
+  Main line · Side lines (a random branch, chosen at line start so the
+  deviation can come anywhere) · My games (branches weighted by how often
+  real opponents played them, from the Chess.com scan). Lines you keep
+  getting wrong are picked more often in both random modes. The old
+  deviation-chance slider is gone.
+- **Board redesign**: cburnett SVG pieces (GPLv2+, `vendor/pieces/`),
+  coordinates, check highlight, sliding animation, hint arrow after two
+  misses (instead of telling the answer at once), streak chip.
+- **Work on weaknesses**: `js/weakness.js` replays your games with the
+  engine, flags your moves that cost ≥ 1 pawn, merges by position; home
+  panel "Analyse my games" (newest 60, depth 12, stoppable) + "Train weak
+  spots" puzzle drill. First study of stas1928 (101 games, depth 12):
+  118 positions, almost all one-offs — scattered tactical misses rather
+  than a repeated positional error. The repeated ones (4.Bb5+ → c6 not Bd7;
+  5...exd3 vs 5.Nxe5) are already branches.
+- **Service worker** (`sw.js`): vendor/ cache-first, app files network-first
+  with offline fallback. Bump `VERSION` in sw.js whenever vendor/ changes.
+  PNG icons (192/512) added for the Android install prompt.
+- **Bug found by playing all 21 lines through the UI**: for White openings
+  a stale "opponent" timer overwrote "Correct ✓" after a quick first move.
+  Fixed in resetLine.
+- **Node tooling** (`tools/`): the vendored Stockfish also runs under Node,
+  so batch jobs (rebuild branches, analyse games) run on the PC with the
+  same modules the app uses.
+
 ### Next candidates (owner picks, one per session)
-- Hosting so the phone works without the PC (GitHub Pages or similar) —
-  see docs/LAYOUT.md; the repo holds no personal data.
-- Service worker for offline use (now worth it: the engine is 7 MB).
-- Weakest-first line ordering in training, using the weak-spot data.
+- Spaced repetition proper: schedule lines by last result and time since
+  last drill instead of the simple mistake weighting.
+- Opponent replies inside branches from the amateur database (what people
+  actually play) instead of engine best moves, where the data is thick.
+- Analyse more than 60 games on the phone in the background, or run
+  `tools/analyse-games.mjs` on the PC and import the JSON.
+- Remove branches that are both sound and rare once the "My games" data
+  shows they never occur.
 
 ---
 

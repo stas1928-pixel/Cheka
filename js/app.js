@@ -651,8 +651,13 @@ function resetLine() {
   renderMoves();
   renderLineMode();
   renderStreakChip();
-  setStatus(tree.isUserPly(state.opening, 0) ? 'Your move' : 'Opponent to move…');
-  scheduleOpponent();
+  if (tree.isUserPly(state.opening, 0)) {
+    setStatus('Your move');
+  } else {
+    setStatus('Opponent to move…');
+    scheduleOpponent();   // only when the opponent really is to move, or the
+                          // timer would overwrite "Correct ✓" after a quick first move
+  }
 }
 
 /* ---------- which line the opponent steers into ---------- */
@@ -1087,3 +1092,9 @@ renderSettingsPanel();
 renderGapReport(loadGapReport());
 renderWeakReport(loadWeakReport());
 showScreen('home');
+
+// Offline support + instant loads (see sw.js). Only over HTTPS or localhost,
+// which is where browsers allow service workers anyway.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => { /* fine without it */ });
+}

@@ -20,7 +20,14 @@ js/explorer.js          Lichess masters explorer client (needs a token)
 js/chesscom.js          Chess.com game import + gap analysis
 js/engine.js            Stockfish in a Web Worker, UCI wrapper, evaluate(sans)
 js/branchBuilder.js     the eval-cutoff rule + line extender (pure, tested)
+js/weakness.js          blunder finder over your own games + aggregation (tested)
+sw.js                   service worker: offline + instant loads (bump VERSION when vendor/ changes)
+icon-192.png, icon-512.png   Android install icons (generated with Pillow)
+tools/nodeEngine.mjs    the same Stockfish under Node, evaluate() contract as js/engine.js
+tools/build-branches.mjs     rebuild every branch with the engine, print paste-ready results
+tools/analyse-games.mjs      batch blunder analysis of a Chess.com user's games
 vendor/chess.js         chess.js 1.0.0 ESM, BSD-2-Clause (licence beside it)
+vendor/pieces/          cburnett SVG pieces, GPLv2+ (LICENSE.md beside them)
 vendor/stockfish/       Stockfish 18 lite single-threaded WASM, 7 MB, GPL-3
 tests/*.test.mjs        node:test suites for everything that is not DOM
 docs/sources.md         every external URL consulted, dated
@@ -35,6 +42,7 @@ PROJECT_BRIEF.md        the original spec and the "why"
 | `openingTrainer.progress.v1` | attempts, streaks, mistakes per opening |
 | `openingTrainer.settings.v1` | sound, deviation chance, Lichess token, Chess.com username |
 | `openingTrainer.gaps.v1` | last Chess.com scan report |
+| `openingTrainer.weaknesses.v1` | last engine analysis of your games (positions to drill) |
 
 Progress can be exported/imported as JSON from the Settings panel. That is
 the backup. Everything else is regenerable.
