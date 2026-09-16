@@ -2,8 +2,18 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   isWhitePly, isUserPly, buildLine, branchesAt, lineKey,
-  moveLabel, describeBranch, formatMoves, pickDeviation,
+  moveLabel, describeBranch, formatMoves, pickDeviation, pickWeighted,
 } from '../js/tree.js';
+
+test('pickWeighted respects weights, skips zeros, handles nothing pickable', () => {
+  const items = ['a', 'b', 'c'];
+  assert.equal(pickWeighted(items, [1, 0, 1], () => 0.0), 'a');
+  assert.equal(pickWeighted(items, [1, 0, 1], () => 0.99), 'c');
+  assert.equal(pickWeighted(items, [1, 0, 1], () => 0.5), 'c', 'b has weight 0 and is skipped');
+  assert.equal(pickWeighted(items, [1, 3, 0], () => 0.3), 'b', '0.3*4=1.2 lands in b');
+  assert.equal(pickWeighted(items, [0, 0, 0]), null);
+  assert.equal(pickWeighted([], []), null);
+});
 
 // A tiny fake opening so these tests do not depend on the real data.
 const white = {

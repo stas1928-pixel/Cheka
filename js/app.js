@@ -30,15 +30,16 @@ feedback.setSoundEnabled(settings.sound);
 let prog = progress.loadProgress();
 function saveProg() { progress.saveProgress(prog); }
 
-// One glyph per piece type; colour comes from CSS (.piece.w / .piece.b).
-const GLYPH = { p: '♟', r: '♜', n: '♞', b: '♝', q: '♛', k: '♚' };
+// Piece images: vendor/pieces/wN.svg etc. (cburnett set, see its LICENSE.md).
+const pieceSrc = (piece) => `vendor/pieces/${piece.color}${piece.type.toUpperCase()}.svg`;
+// After this many wrong tries on one move, an arrow shows the answer.
+const HINT_AFTER_MISSES = 2;
 
 const $ = (sel) => document.querySelector(sel);
 const els = {
   cards: $('#opening-cards'),
   progressCards: $('#progress-cards'),
-  deviationRange: $('#deviation-range'),
-  deviationOut: $('#deviation-out'),
+  lineMode: $('#line-mode'),
   exportBtn: $('#export-progress'),
   importBtn: $('#import-progress'),
   importFile: $('#import-file'),
@@ -62,6 +63,8 @@ const els = {
   modeToggle: $('#mode-toggle'),
   soundToggle: $('#sound-toggle'),
   board: $('#board'),
+  arrows: $('#arrows'),
+  streakChip: $('#streak-chip'),
   status: $('#status'),
   moves: $('#moves'),
   note: $('#branch-note'),
@@ -80,9 +83,11 @@ const state = {
   mode: 'train',        // 'train' (quiz) or 'review' (browse)
   line: [],             // the SAN list on screen (main line or a branch)
   branch: null,         // the branch in play, if any
+  planned: null,        // training: the branch the opponent WILL steer into (chosen at line start)
   ply: 0,               // how many plies of `line` are on the board
   game: new Chess(),    // the rules engine holding the real position
   selected: null,       // square the user tapped first, e.g. "e2"
+  misses: 0,            // wrong tries on the current move (drives the hint arrow)
   finished: false,
   session: 0,           // bumped on every reset so stale timers do nothing
 };
@@ -102,7 +107,7 @@ function renderHome() {
     const preview = tree.formatMoves(o.mainLine, 6).map((m) => m.text).join(' ');
     const sideText = o.side === 'w' ? 'You play White' : 'You play Black';
     return `
-      <article class="card">
+      <article class="card ${o.side}">
         <div class="card-top">
           <h2>${o.name}</h2>
           <span class="pill ${o.side}">${sideText}</span>
@@ -248,9 +253,6 @@ els.gapReport.addEventListener('click', (e) => {
 /* ---------- home: settings panel ---------- */
 
 function renderSettingsPanel() {
-  const pct = Math.round(settings.deviationChance * 100);
-  els.deviationRange.value = pct;
-  els.deviationOut.textContent = `${pct}%`;
   els.tokenInput.value = settings.lichessToken;
   els.chesscomUser.value = settings.chesscomUser;
 }
@@ -258,12 +260,6 @@ function renderSettingsPanel() {
 els.tokenInput.addEventListener('change', () => {
   settings = updateSetting('lichessToken', els.tokenInput.value.trim());
   showSettingsMsg(settings.lichessToken ? 'Lichess token saved.' : 'Lichess token removed.');
-});
-
-els.deviationRange.addEventListener('input', () => {
-  const pct = Number(els.deviationRange.value);
-  settings = updateSetting('deviationChance', pct / 100);
-  els.deviationOut.textContent = `${pct}%`;
 });
 
 function showSettingsMsg(text, kind = 'neutral') {
@@ -320,6 +316,7 @@ function setMode(mode) {
     b.classList.toggle('active', b.dataset.mode === mode);
   });
   els.controls.hidden = mode !== 'train';
+  els.lineMode.hidden = mode !== 'train';
   els.review.hidden = mode !== 'review';
 
   if (mode === 'train') {
@@ -337,12 +334,18 @@ els.modeToggle.addEventListener('click', (e) => {
 
 /* ---------- shared rendering ---------- */
 
-function renderBoard() {
+/**
+ * Redraw the whole board from the engine state. `animateFrom` (a square)
+ * makes the piece that just arrived on `last.to` slide in from there.
+ */
+function renderBoard({ animate = false } = {}) {
   const { game, opening, selected } = state;
   const flipped = opening.side === 'b';          // Black at the bottom when training Black
   const rows = game.board();                     // rows[0] is rank 8, rows[7] is rank 1
   const last = game.history({ verbose: true }).at(-1);
   const legal = selected ? game.moves({ square: selected, verbose: true }) : [];
+  const inCheck = game.isCheck();
+  const turn = game.turn();
 
   els.board.innerHTML = '';
   for (let row = 0; row < 8; row++) {
@@ -355,13 +358,18 @@ function renderBoard() {
       const sq = document.createElement('div');
       sq.className = `sq ${(r + f) % 2 === 0 ? 'light' : 'dark'}`;
       sq.dataset.square = square;
+      if (col === 0) sq.dataset.rankLabel = String(8 - r);       // left edge
+      if (row === 7) sq.dataset.fileLabel = 'abcdefgh'[f];       // bottom edge
 
       const piece = rows[r][f];
       if (piece) {
-        const span = document.createElement('span');
-        span.className = `piece ${piece.color}`;
-        span.textContent = GLYPH[piece.type];
-        sq.appendChild(span);
+        const img = document.createElement('img');
+        img.className = 'piece';
+        img.src = pieceSrc(piece);
+        img.alt = '';
+        img.draggable = false;
+        sq.appendChild(img);
+        if (inCheck && piece.type === 'k' && piece.color === turn) sq.classList.add('check');
       }
 
       if (last && (square === last.from || square === last.to)) sq.classList.add('last');
@@ -376,6 +384,63 @@ function renderBoard() {
       els.board.appendChild(sq);
     }
   }
+
+  clearArrows();
+  if (animate && last) slidePiece(last.from, last.to);
+}
+
+/** Slide the piece now standing on `to` in from `from` (FLIP animation). */
+function slidePiece(from, to) {
+  const fromEl = els.board.querySelector(`[data-square="${from}"]`);
+  const toEl = els.board.querySelector(`[data-square="${to}"] .piece`);
+  if (!fromEl || !toEl) return;
+  const a = fromEl.getBoundingClientRect();
+  const b = toEl.parentElement.getBoundingClientRect();
+  toEl.style.transform = `translate(${a.left - b.left}px, ${a.top - b.top}px)`;
+  requestAnimationFrame(() => {
+    toEl.classList.add('slide');
+    toEl.style.transform = '';
+    toEl.addEventListener('transitionend', () => { toEl.classList.remove('slide'); toEl.classList.add('land'); }, { once: true });
+  });
+}
+
+/* ---------- arrows (hint) ---------- */
+
+function squareCenter(square) {
+  const flipped = state.opening.side === 'b';
+  let x = 'abcdefgh'.indexOf(square[0]);
+  let y = 8 - Number(square[1]);
+  if (flipped) { x = 7 - x; y = 7 - y; }
+  return { x: x + 0.5, y: y + 0.5 };
+}
+
+function drawArrow(from, to) {
+  const a = squareCenter(from);
+  const b = squareCenter(to);
+  // Shorten so the head sits inside the target square.
+  const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
+  const k = (len - 0.35) / len;
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+  line.setAttribute('x2', a.x + dx * k); line.setAttribute('y2', a.y + dy * k);
+  els.arrows.appendChild(line);
+}
+
+function clearArrows() {
+  els.arrows.querySelectorAll('line').forEach((l) => l.remove());
+}
+
+/** Show the expected move as an arrow (after repeated misses). */
+function showHint() {
+  const expected = state.line[state.ply];
+  const move = state.game.moves({ verbose: true }).find((m) => m.san === expected);
+  if (move) drawArrow(move.from, move.to);
+}
+
+function renderStreakChip() {
+  const streak = prog.openings[state.opening?.id]?.streak ?? 0;
+  els.streakChip.hidden = !(state.mode === 'train' && streak >= 3);
+  els.streakChip.textContent = `🔥 ${streak}`;
 }
 
 /**
@@ -421,17 +486,68 @@ function resetLine() {
   state.session += 1;
   state.branch = null;
   state.line = tree.buildLine(state.opening);
+  state.planned = planBranch();
   state.ply = 0;
   state.game.reset();
   state.selected = null;
+  state.misses = 0;
   state.finished = false;
   els.restart.textContent = 'Restart line';
 
   renderBoard();
   renderMoves();
+  renderLineMode();
+  renderStreakChip();
   setStatus(tree.isUserPly(state.opening, 0) ? 'Your move' : 'Opponent to move…');
   scheduleOpponent();
 }
+
+/* ---------- which line the opponent steers into ---------- */
+
+/**
+ * Chosen once per drill so the deviation can happen anywhere in the line.
+ *   main – never leave the book.
+ *   all  – every side line and the main line are equally likely…
+ *   mine – …weighted by how often YOUR opponents actually played each one
+ *          (from the last Chess.com scan), so frequent surprises come up more.
+ * In both random modes a line you keep getting wrong is picked more often.
+ */
+function planBranch() {
+  const { opening } = state;
+  if (settings.lineMode === 'main' || opening.branches.length === 0) return null;
+
+  const hits = loadGapReport()?.report?.[opening.id]?.branchHits ?? {};
+  const mistakes = prog.openings[opening.id]?.mistakes ?? {};
+  const missCount = (key) => Object.keys(mistakes).filter((k) => k.startsWith(key + '#')).reduce((n, k) => n + mistakes[k].count, 0);
+
+  const items = [null, ...opening.branches];
+  const weights = items.map((b) => {
+    let w = 1;
+    if (settings.lineMode === 'mine') {
+      w = b ? (hits[`${b.deviatesAt}:${b.opponentMove}`] ?? 0) : 1;
+    }
+    return w > 0 ? w * (1 + missCount(tree.lineKey(b))) : 0;
+  });
+  if (settings.lineMode === 'mine' && weights.slice(1).every((w) => w === 0)) {
+    setTimeout(() => setStatus('No scan data yet — run the Chess.com scan on the home screen. Using all side lines.', 'warn'), 0);
+    return tree.pickWeighted(items, items.map(() => 1));
+  }
+  return tree.pickWeighted(items, weights);
+}
+
+function renderLineMode() {
+  els.lineMode.querySelectorAll('button').forEach((b) => {
+    b.classList.toggle('active', b.dataset.line === settings.lineMode);
+    b.setAttribute('aria-checked', String(b.dataset.line === settings.lineMode));
+  });
+}
+
+els.lineMode.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-line]');
+  if (!btn || btn.dataset.line === settings.lineMode) return;
+  settings = updateSetting('lineMode', btn.dataset.line);
+  resetLine();
+});
 
 function onSquareClick(square) {
   const { game, opening } = state;
@@ -482,19 +598,28 @@ function attemptUserMove(move) {
   saveProg();
 
   if (!correct) {
+    state.misses += 1;
     renderBoard();
     feedback.flash(els.board, [move.from, move.to], 'bad');
     feedback.play('bad');
-    setStatus(`Not the line — expected ${expected}`, 'bad');
+    renderStreakChip();
+    if (state.misses >= HINT_AFTER_MISSES) {
+      showHint();
+      setStatus(`Not the line — follow the arrow: ${expected}`, 'bad');
+    } else {
+      setStatus('Not the line — try again', 'bad');
+    }
     return;
   }
 
   state.game.move(move.san);
   state.ply += 1;
-  renderBoard();
+  state.misses = 0;
+  renderBoard({ animate: true });
   renderMoves();
   feedback.flash(els.board, [move.from, move.to], 'good');
   feedback.play('good');
+  renderStreakChip();
   setStatus('Correct ✓', 'good');
 
   if (state.ply >= state.line.length) finishLine();
@@ -513,22 +638,18 @@ function playOpponentMove() {
   if (state.ply >= state.line.length) { finishLine(); return; }
   if (tree.isUserPly(opening, state.ply)) { setStatus('Your move'); return; }
 
-  // Maybe leave the book. Only once per line, and only where we have a
-  // prepared answer — otherwise there would be nothing to train.
+  // Leave the book at the planned ply (see planBranch).
   let leftBook = false;
-  if (!state.branch) {
-    const branch = tree.pickDeviation(opening, state.ply, { chance: settings.deviationChance });
-    if (branch) {
-      state.branch = branch;
-      state.line = tree.buildLine(opening, branch);
-      leftBook = true;
-    }
+  if (!state.branch && state.planned && state.planned.deviatesAt === state.ply) {
+    state.branch = state.planned;
+    state.line = tree.buildLine(opening, state.planned);
+    leftBook = true;
   }
 
   const san = state.line[state.ply];
   state.game.move(san);
   state.ply += 1;
-  renderBoard();
+  renderBoard({ animate: true });
   renderMoves();
 
   if (state.ply >= state.line.length) { finishLine(); return; }
@@ -544,6 +665,7 @@ function finishLine() {
   progress.recordLineComplete(prog, state.opening.id);
   saveProg();
   const streak = prog.openings[state.opening.id].streak;
+  renderStreakChip();
   setStatus(`${state.branch ? 'Branch' : 'Line'} complete! 🎉  ·  streak ${streak}`, 'good');
   els.restart.textContent = 'Next line';
 }
@@ -583,9 +705,10 @@ function stepTo(ply) {
   for (let i = 0; i < target; i++) state.game.move(state.line[i]);
   state.ply = target;
 
-  renderBoard();
+  renderBoard({ animate: target > 0 });
   renderMoves();
   renderReviewStatus();
+  renderStreakChip();
   scheduleExplorer();
 }
 

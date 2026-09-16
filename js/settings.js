@@ -9,7 +9,11 @@ export const SETTINGS_KEY = 'openingTrainer.settings.v1';
 
 export const DEFAULT_SETTINGS = Object.freeze({
   sound: true,            // chime / buzz on correct / incorrect
-  deviationChance: 0.35,  // how often the opponent leaves the book (0..1)
+  lineMode: 'all',        // what the opponent does in training:
+                          //   'main' – always the main line
+                          //   'all'  – a random prepared side line (or the main line)
+                          //   'mine' – side lines weighted by how often YOUR opponents played them
+  deviationChance: 0.35,  // kept for old saved settings; no longer used
   lichessToken: '',       // personal API token for the Opening Explorer (job 6)
   chesscomUser: '',       // Chess.com username for the game import (job 8)
 });

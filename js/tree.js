@@ -68,6 +68,24 @@ export function formatMoves(sans, upTo = sans.length) {
 }
 
 /**
+ * Pick one item at random, proportionally to its weight.
+ * weights[i] <= 0 means "never". Returns null if nothing is pickable.
+ * `random` is injectable for tests.
+ */
+export function pickWeighted(items, weights, random = Math.random) {
+  const total = weights.reduce((s, w) => s + Math.max(0, w), 0);
+  if (total <= 0) return null;
+  let r = random() * total;
+  for (let i = 0; i < items.length; i++) {
+    const w = Math.max(0, weights[i]);
+    if (w === 0) continue;
+    if (r < w) return items[i];
+    r -= w;
+  }
+  return items[items.length - 1];
+}
+
+/**
  * Decide whether the opponent leaves the book at this ply.
  * Returns a branch, or null to stay on the main line.
  * `random` is injectable so tests can force either outcome.

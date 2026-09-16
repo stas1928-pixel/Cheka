@@ -42,14 +42,6 @@
   <section class="panel" aria-label="Settings">
     <h2 class="panel-title">Settings</h2>
     <div class="setting-card">
-      <label class="row" for="deviation-range">
-        <span>Opponent leaves the book</span>
-        <output id="deviation-out">35%</output>
-      </label>
-      <input id="deviation-range" type="range" min="0" max="100" step="5" value="35">
-      <p class="hint">How often the opponent plays a prepared deviation instead of the main-line move (only where you have a branch).</p>
-    </div>
-    <div class="setting-card">
       <label class="row" for="lichess-token">
         <span>Lichess API token</span>
         <a class="link" href="https://lichess.org/account/oauth/token/create?description=Opening%20Trainer" target="_blank" rel="noopener">create one ↗</a>
@@ -87,7 +79,25 @@
     <button data-mode="review" role="tab">Review</button>
   </div>
 
-  <div id="board" class="board" role="grid" aria-label="Chess board"></div>
+  <!-- What the opponent does while you train. -->
+  <div id="line-mode" class="segmented small" role="radiogroup" aria-label="Which lines to train">
+    <button data-line="main" role="radio">Main line</button>
+    <button data-line="all" role="radio">Side lines</button>
+    <button data-line="mine" role="radio">My games</button>
+  </div>
+
+  <div class="board-wrap">
+    <div id="board" class="board" role="grid" aria-label="Chess board"></div>
+    <!-- Arrow overlay (hint after repeated misses). 8x8 units = one per square. -->
+    <svg id="arrows" class="arrows" viewBox="0 0 8 8" aria-hidden="true">
+      <defs>
+        <marker id="arrowhead" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--hint)"/>
+        </marker>
+      </defs>
+    </svg>
+    <div id="streak-chip" class="streak-chip" hidden></div>
+  </div>
   <div id="status" class="status neutral" role="status">Loading…</div>
   <div id="moves" class="moves"></div>
   <div id="branch-note" class="note" hidden></div>
