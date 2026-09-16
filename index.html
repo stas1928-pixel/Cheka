@@ -39,6 +39,20 @@
     </div>
   </section>
 
+  <!-- Where YOU go wrong: engine analysis of your own games, drilled as puzzles. -->
+  <section class="panel" aria-label="Weaknesses">
+    <h2 class="panel-title">Work on weaknesses</h2>
+    <div class="setting-card">
+      <div class="row-buttons">
+        <button id="analyse-games" class="primary">Analyse my games</button>
+        <button id="analyse-stop" hidden>Stop</button>
+        <button id="train-weak" hidden>Train weak spots</button>
+      </div>
+      <p id="weak-msg" class="hint" role="status">Stockfish replays your recent games in these two openings and finds the moves that cost you a pawn or more. Needs your Chess.com username above. Takes a few minutes.</p>
+      <div id="weak-report"></div>
+    </div>
+  </section>
+
   <section class="panel" aria-label="Settings">
     <h2 class="panel-title">Settings</h2>
     <div class="setting-card">

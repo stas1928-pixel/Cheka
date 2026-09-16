@@ -15,7 +15,8 @@ import * as tree from './tree.js';
 import * as feedback from './feedback.js';
 import * as progress from './progress.js';
 import { fetchExplorer } from './explorer.js';
-import { importGames, analyseGames } from './chesscom.js';
+import { importGames, analyseGames, parseMoves, userSide, matchesOpening } from './chesscom.js';
+import * as weakness from './weakness.js';
 import { Engine } from './engine.js';
 import { buildBranch, toBranchJSON } from './branchBuilder.js';
 import { loadSettings, updateSetting } from './settings.js';
@@ -46,6 +47,11 @@ const els = {
   resetBtn: $('#reset-progress'),
   settingsMsg: $('#settings-msg'),
   tokenInput: $('#lichess-token'),
+  analyseBtn: $('#analyse-games'),
+  analyseStop: $('#analyse-stop'),
+  trainWeak: $('#train-weak'),
+  weakMsg: $('#weak-msg'),
+  weakReport: $('#weak-report'),
   chesscomUser: $('#chesscom-user'),
   scanBtn: $('#scan-games'),
   scanMsg: $('#scan-msg'),
@@ -250,6 +256,151 @@ els.gapReport.addEventListener('click', (e) => {
   runEngineCheck();
 });
 
+/* ---------- home: weaknesses (engine analysis of your games) ---------- */
+
+const WEAK_KEY = 'openingTrainer.weaknesses.v1';
+const WEAK_MAX_GAMES = 60;   // newest first; keeps a phone run to a few minutes
+let analyseStopFlag = false;
+
+function loadWeakReport() {
+  try { return JSON.parse(localStorage.getItem(WEAK_KEY)); } catch { return null; }
+}
+
+function showWeakMsg(text, kind = 'neutral') {
+  els.weakMsg.textContent = text;
+  els.weakMsg.style.color = kind === 'bad' ? 'var(--bad)' : kind === 'good' ? 'var(--good)' : '';
+}
+
+els.analyseBtn.addEventListener('click', async () => {
+  const username = (els.chesscomUser.value || settings.chesscomUser).trim();
+  if (!username) { showWeakMsg('Enter your Chess.com username in the Gaps panel first.', 'bad'); return; }
+
+  analyseStopFlag = false;
+  els.analyseBtn.disabled = true;
+  els.analyseStop.hidden = false;
+  try {
+    showWeakMsg('Downloading games…');
+    const raw = await importGames(username, { months: 6, onProgress: (d, t) => showWeakMsg(`Downloading month ${d} of ${t}…`) });
+    const games = [];
+    for (const g of raw.slice().reverse()) {          // newest first
+      const side = userSide(g, username);
+      if (!side) continue;
+      const sans = parseMoves(g.pgn);
+      const opening = OPENINGS.find((o) => matchesOpening(sans, side, o));
+      if (opening) games.push({ sans, side, url: g.url, openingId: opening.id });
+      if (games.length >= WEAK_MAX_GAMES) break;
+    }
+    if (games.length === 0) { showWeakMsg('No games in these openings found.', 'bad'); return; }
+
+    engine ??= new Engine();
+    await engine.start();
+    const t0 = Date.now();
+    const list = await weakness.analyseGames(games, (s, o) => engine.evaluate(s, o), {
+      depth: 12,
+      shouldStop: () => analyseStopFlag,
+      onProgress: (d, t) => showWeakMsg(`Analysing game ${d} of ${t}… (${Math.round((Date.now() - t0) / 1000)} s)`),
+    });
+    const saved = { analysedAt: new Date().toISOString(), username, games: games.length, weaknesses: list, stopped: analyseStopFlag };
+    localStorage.setItem(WEAK_KEY, JSON.stringify(saved));
+    renderWeakReport(saved);
+    showWeakMsg(`${list.length} weak positions found in ${games.length} games${analyseStopFlag ? ' (stopped early)' : ''}.`, 'good');
+  } catch (err) {
+    showWeakMsg(err.message, 'bad');
+  } finally {
+    els.analyseBtn.disabled = false;
+    els.analyseStop.hidden = true;
+  }
+});
+els.analyseStop.addEventListener('click', () => { analyseStopFlag = true; showWeakMsg('Stopping after this game…'); });
+
+function renderWeakReport(saved) {
+  els.trainWeak.hidden = !(saved?.weaknesses?.length);
+  if (!saved) { els.weakReport.innerHTML = ''; return; }
+  const top = saved.weaknesses.slice(0, 8);
+  els.weakReport.innerHTML = top.length === 0
+    ? '<p class="hint">No pawn-sized mistakes in the opening phase. Nice.</p>'
+    : `<ul class="weak-list">${top.map((w) => {
+        const o = OPENINGS.find((x) => x.id === w.openingId);
+        const played = Object.entries(w.played).sort((a, b) => b[1] - a[1]).map(([san, n]) => `${san}${n > 1 ? `×${n}` : ''}`).join(', ');
+        return `<li><b>${tree.moveLabel(w.ply, w.best)}</b> not ${played} <span class="dim">· ${o?.name ?? ''}</span>
+          <span class="drop">−${(w.avgDrop / 100).toFixed(1)}</span> <span class="dim">× ${w.count}</span>${w.urls[0] ? `<a href="${w.urls[0]}" target="_blank" rel="noopener">view ↗</a>` : ''}</li>`;
+      }).join('')}</ul><p class="hint">Analysed ${saved.games} games on ${saved.analysedAt.slice(0, 10)}. Ranked by how often × how much it cost.</p>`;
+}
+
+/* =================================================================
+   WEAK-SPOT DRILL — the board is set to one of your own bad positions;
+   find the engine's move. Cycles through the list, worst first.
+   ================================================================= */
+
+function openWeakDrill() {
+  const saved = loadWeakReport();
+  if (!saved?.weaknesses?.length) return;
+  state.weak = { list: saved.weaknesses, index: 0 };
+  state.opening = { id: 'weaknesses', name: 'Weak spots', side: 'w', mainLine: [], branches: [] };
+  state.mode = 'weak';
+  els.name.textContent = 'Weak spots';
+  els.modeToggle.hidden = true;
+  els.lineMode.hidden = true;
+  els.review.hidden = true;
+  els.controls.hidden = false;
+  els.restart.textContent = 'Skip';
+  showScreen('trainer');
+  loadWeakPosition();
+}
+
+function loadWeakPosition() {
+  const { list, index } = state.weak;
+  const item = list[index % list.length];
+  state.weak.item = item;
+  state.opening.side = item.side;
+  els.side.textContent = item.side === 'w' ? 'White' : 'Black';
+  els.side.className = `pill ${item.side}`;
+  state.session += 1;
+  state.branch = null;
+  state.planned = null;
+  state.line = [item.best];
+  state.ply = 0;
+  state.game.load(item.fen);
+  state.selected = null;
+  state.misses = 0;
+  state.finished = false;
+
+  renderBoard();
+  const o = OPENINGS.find((x) => x.id === item.openingId);
+  const played = Object.entries(item.played).sort((a, b) => b[1] - a[1])[0][0];
+  els.moves.innerHTML = `<span class="mv">${index % list.length + 1} / ${list.length} · ${o?.name ?? ''} · move ${Math.floor(item.ply / 2) + 1}</span>`;
+  els.note.hidden = false;
+  els.note.textContent = `You played ${played} here ${item.count > 1 ? `${item.count} times` : 'once'} and lost about ${(item.avgDrop / 100).toFixed(1)} pawns. Find the better move.`;
+  setStatus('Your move — what is best here?');
+  renderStreakChip();
+}
+
+function attemptWeakMove(move) {
+  const item = state.weak.item;
+  const correct = move.san === item.best;
+  progress.recordAttempt(prog, 'weaknesses', { correct, lineKey: item.fen, ply: item.ply, expected: item.best, played: move.san });
+  saveProg();
+  if (!correct) {
+    state.misses += 1;
+    renderBoard();
+    feedback.flash(els.board, [move.from, move.to], 'bad');
+    feedback.play('bad');
+    if (state.misses >= HINT_AFTER_MISSES) { showHint(); setStatus(`Not it — follow the arrow: ${item.best}`, 'bad'); }
+    else setStatus(move.san === Object.keys(item.played)[0] ? 'That is the move you played in the game — there is better.' : 'Not it — try again', 'bad');
+    return;
+  }
+  state.game.move(move.san);
+  state.finished = true;
+  renderBoard({ animate: true });
+  feedback.flash(els.board, [move.from, move.to], 'good');
+  feedback.play('good');
+  setStatus(`Correct ✓  ${item.best} — worth about ${(item.avgDrop / 100).toFixed(1)} pawns`, 'good');
+  const session = state.session;
+  setTimeout(() => { if (session === state.session) { state.weak.index += 1; loadWeakPosition(); } }, 1400);
+}
+
+els.trainWeak.addEventListener('click', openWeakDrill);
+
 /* ---------- home: settings panel ---------- */
 
 function renderSettingsPanel() {
@@ -303,9 +454,11 @@ els.resetBtn.addEventListener('click', () => {
 
 function openTrainer(openingId, mode) {
   state.opening = getOpening(openingId);
+  state.weak = null;
   els.name.textContent = state.opening.name;
   els.side.textContent = state.opening.side === 'w' ? 'White' : 'Black';
   els.side.className = `pill ${state.opening.side}`;
+  els.modeToggle.hidden = false;
   showScreen('trainer');
   setMode(mode);
 }
@@ -551,8 +704,10 @@ els.lineMode.addEventListener('click', (e) => {
 
 function onSquareClick(square) {
   const { game, opening } = state;
-  if (state.mode !== 'train') return;
-  if (state.finished || !tree.isUserPly(opening, state.ply)) return;
+  if (state.mode !== 'train' && state.mode !== 'weak') return;
+  if (state.finished) return;
+  if (state.mode === 'train' && !tree.isUserPly(opening, state.ply)) return;
+  if (state.mode === 'weak' && game.turn() !== opening.side) return;
 
   const piece = game.get(square);
   const ownPiece = piece && piece.color === opening.side;
@@ -581,7 +736,8 @@ function onSquareClick(square) {
   }
 
   state.selected = null;
-  attemptUserMove(matched);
+  if (state.mode === 'weak') attemptWeakMove(matched);
+  else attemptUserMove(matched);
 }
 
 function attemptUserMove(move) {
@@ -915,7 +1071,10 @@ els.soundToggle.addEventListener('click', () => {
 });
 renderSoundToggle();
 
-els.restart.addEventListener('click', resetLine);
+els.restart.addEventListener('click', () => {
+  if (state.mode === 'weak') { state.weak.index += 1; loadWeakPosition(); }
+  else resetLine();
+});
 els.back.addEventListener('click', () => {
   state.session += 1; // cancel any pending opponent move
   renderProgress();   // stats changed while training
@@ -926,4 +1085,5 @@ renderHome();
 renderProgress();
 renderSettingsPanel();
 renderGapReport(loadGapReport());
+renderWeakReport(loadWeakReport());
 showScreen('home');

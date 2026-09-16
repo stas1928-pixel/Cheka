@@ -1,0 +1,4 @@
+{
+  "type": "commonjs",
+  "description": "Marks the vendored Emscripten build as CommonJS so Node can require() it for the tools/ scripts. Not used by the browser."
+}

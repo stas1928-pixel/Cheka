@@ -436,6 +436,12 @@ a.link { color: var(--accent); font-size: 13px; text-decoration: none; }
 .json[hidden] { display: none; }
 .gaps button { padding: 3px 10px; font-size: 12px; margin-left: 6px; vertical-align: middle; }
 
+/* ---------- Weakness report ---------- */
+.weak-list { margin: 4px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: var(--text-dim); }
+.weak-list b { color: var(--text); }
+.weak-list .drop { color: var(--bad); font-weight: 600; }
+.weak-list a { color: var(--accent); text-decoration: none; margin-left: 4px; }
+
 /* ---------- Chess.com gap report ---------- */
 .row-inline { display: flex; gap: 8px; }
 .row-inline input { flex: 1; min-width: 0; }
