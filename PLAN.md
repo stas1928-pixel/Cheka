@@ -181,10 +181,46 @@ Rules for every job:
   When editing locally, hard-reload if the console shows "does not provide
   an export named".
 
+### Third round, 2026-09-17 ("lines look odd / AI-like — do deep research")
+- **Owner rejected the game-grown repertoire**: variations that were just
+  what his opponents happened to play, continued by an engine, most of them
+  unnamed. Correct call. That generator (`tools/build-repertoire.mjs`) is
+  kept only as a research tool; it no longer produces the shipped data.
+- **New pipeline: curated seed → engine verification.**
+  `tools/repertoire.seed.mjs` is hand-written from theory (Wikipedia
+  Scotch/Max Lange/Elephant articles citing Wells, Lane, Dembo & Palliser,
+  de Firmian; chessdoctrine.com; chessmood.com's "refutation" article for
+  what strong opponents play vs the Elephant; chessable.com guide; the
+  masters figures from 2026-09-15). Each line is named, sourced, and ends
+  where the theory ends; `extendTo` lets the engine finish a rare
+  sub-variation. `tools/verify-repertoire.mjs` (Stockfish 18, depth 18)
+  then checks every one of OUR moves against the engine's best, flags any
+  ≥ 0.5 drop, flags a side line that ends below +0.5 (or its `minCp`), and
+  flags two lines playing different moves in the same position. Output →
+  `js/repertoire.data.js`. Notes in `js/notes.js` by explicit line id.
+- **What the verifier rejected on the first pass** (all replaced): 5...Ng4
+  6.Qe2 (−0.7 → 6.O-O); the old Møller 7.Nc3 (−0.5 → classical 7.Bd2);
+  Haxo 6...Bb6 7.e5 Ng4 8.O-O (−0.6); London 9.Ng5/10.Ba3 (−1.5, a web
+  source's suggestion); Bxf7+ trap 10.O-O; 3...f5 6.Qh5+ (−0.7); 3...Qf6
+  4.Bg5 (−0.8 → 4.d5); Elephant trunk 9...Rd8 (−1.1); 5.Nc3 line 9...Nd7.
+  4...h6 turned out only +0.3 → reclassified as a main variation.
+- **No public frequency database was reachable** (365chess 403, Lichess
+  needs login, chess.com pages carry no numbers). Which variations to
+  include therefore came from theory + the owner's 427 games; the
+  `[Games]` tag in the seed marks lines chosen because his opponents play
+  them. With a `LICHESS_TOKEN` in `.env` the seed could be cross-checked
+  against masters/amateur frequencies — recommended next step.
+- **Mastery tiers**: clean runs per line (Bronze 3, Silver 6, Gold 10,
+  Master 15) with a progress bar in the line list and a tier summary on
+  the home card. Tapping a row starts that line; the checkbox on the right
+  keeps it in / drops it from the rotation; the list is open by default.
+
 ### Next candidates (owner picks, one per session)
+- Cross-check the seed against Lichess masters + amateur frequencies
+  (needs `LICHESS_TOKEN` in a local `.env`, git-ignored): drop lines
+  nobody plays, add popular replies that are missing.
 - Opponent replies inside lines from the Lichess amateur database where
-  it is thicker than your own games. Needs `LICHESS_TOKEN` in a local
-  `.env` (git-ignored) for the PC-side tools.
+  it is thicker than the owner's own games.
 - Analyse more than 60 games on the phone in the background, or run
   `tools/analyse-games.mjs` on the PC and import the JSON.
 - A "Lines" screen on the home page (all openings at once) once there are

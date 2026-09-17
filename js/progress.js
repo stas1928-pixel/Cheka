@@ -132,11 +132,36 @@ export function weakSpots(progress, openingId, limit = 3) {
 
 const DAY = 24 * 60 * 60 * 1000;
 
+/* Mastery tiers: how many CLEAN runs (no mistake) a line has, lifetime. */
+export const TIERS = Object.freeze([
+  { name: 'Bronze', at: 3 },
+  { name: 'Silver', at: 6 },
+  { name: 'Gold', at: 10 },
+  { name: 'Master', at: 15 },
+]);
+
+/** { tier: 'Bronze' | null, next: { name, at } | null, clean, progress 0..1 toward next } */
+export function tierFor(clean) {
+  let tier = null;
+  let prevAt = 0;
+  for (const t of TIERS) {
+    if (clean >= t.at) { tier = t.name; prevAt = t.at; } else {
+      return { tier, next: t, clean, progress: (clean - prevAt) / (t.at - prevAt) };
+    }
+  }
+  return { tier, next: null, clean, progress: 1 };
+}
+
+export function lineTier(progress, openingId, lineId) {
+  return tierFor(progress.openings[openingId]?.lines?.[lineId]?.clean ?? 0);
+}
+
 export function scheduleLine(progress, openingId, lineId, { perfect }, now = new Date()) {
   const s = openingStats(progress, openingId);
   s.lines ??= {};
-  const entry = s.lines[lineId] ?? { interval: 0, due: null, reps: 0, lapses: 0 };
+  const entry = s.lines[lineId] ?? { interval: 0, due: null, reps: 0, lapses: 0, clean: 0 };
   entry.reps += 1;
+  entry.clean = (entry.clean ?? 0) + (perfect ? 1 : 0);
   if (perfect) {
     entry.interval = entry.interval === 0 ? 1 : Math.round(entry.interval * 2.3 * 10) / 10;
   } else {

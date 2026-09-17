@@ -8,7 +8,16 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Chess } from '../vendor/chess.js';
 import { OPENINGS } from '../js/repertoire.js';
+import { NOTES } from '../js/notes.js';
 import { isUserPly, deviation, mainLine, startsWith } from '../js/tree.js';
+
+test('every line has a hand-written note and every note points at a real line', () => {
+  for (const o of OPENINGS) {
+    const ids = new Set(o.lines.map((l) => l.id));
+    for (const l of o.lines) assert.ok(NOTES[o.id]?.[l.id], `${o.id}/${l.id}: missing note in js/notes.js`);
+    for (const id of Object.keys(NOTES[o.id] ?? {})) assert.ok(ids.has(id), `${o.id}/${id}: note for a line that no longer exists`);
+  }
+});
 
 /** Play a SAN list from the start; throws if any move is illegal.
  *  Also asserts each SAN is exactly the canonical form chess.js emits. */

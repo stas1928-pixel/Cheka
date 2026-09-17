@@ -3,8 +3,29 @@ import assert from 'node:assert/strict';
 import {
   emptyProgress, loadProgress, saveProgress, resetProgress, recordAttempt,
   recordLineComplete, accuracy, weakSpots, exportJSON, importJSON, PROGRESS_KEY,
-  scheduleLine, lineStatus, lineWeight, dueCount,
+  scheduleLine, lineStatus, lineWeight, dueCount, tierFor, lineTier, TIERS,
 } from '../js/progress.js';
+
+test('mastery tiers count clean runs only', () => {
+  assert.deepEqual(tierFor(0), { tier: null, next: TIERS[0], clean: 0, progress: 0 });
+  assert.equal(tierFor(2).progress, 2 / 3);
+  assert.equal(tierFor(3).tier, 'Bronze');
+  assert.equal(tierFor(3).progress, 0);
+  assert.equal(tierFor(8).tier, 'Silver');
+  assert.equal(tierFor(8).progress, 0.5);
+  assert.deepEqual(tierFor(15), { tier: 'Master', next: null, clean: 15, progress: 1 });
+  assert.equal(tierFor(40).tier, 'Master');
+
+  const p = emptyProgress();
+  const now = new Date('2026-09-17T10:00:00Z');
+  scheduleLine(p, 'scotch', 'main', { perfect: true }, now);
+  scheduleLine(p, 'scotch', 'main', { perfect: false }, now);
+  scheduleLine(p, 'scotch', 'main', { perfect: true }, now);
+  assert.equal(p.openings.scotch.lines.main.clean, 2, 'the mistake run does not count');
+  assert.equal(p.openings.scotch.lines.main.reps, 3);
+  assert.equal(lineTier(p, 'scotch', 'main').clean, 2);
+  assert.equal(lineTier(p, 'scotch', 'nope').clean, 0);
+});
 
 test('spaced repetition: intervals grow on clean runs and reset on a mistake', () => {
   const p = emptyProgress();

@@ -122,13 +122,15 @@ function renderHome() {
     const main = tree.linesOfKind(o, 'main').length;
     const side = tree.linesOfKind(o, 'side').length;
     const due = progress.dueCount(prog, o.id, visibleLines(o, o.lines).map((l) => l.id));
+    const tiers = o.lines.map((l) => progress.lineTier(prog, o.id, l.id).tier).filter(Boolean);
+    const tierText = tiers.length ? ' · ' + ['Master', 'Gold', 'Silver', 'Bronze'].map((t) => { const n = tiers.filter((x) => x === t).length; return n ? `${n} ${t.toLowerCase()}` : null; }).filter(Boolean).join(', ') : '';
     return `
       <article class="card ${o.side}">
         <div class="card-top">
           <h2>${o.name}</h2>
           <span class="pill ${o.side}">${sideText}</span>
         </div>
-        <p class="card-sub">${main} main line${main === 1 ? '' : 's'} · ${side} side line${side === 1 ? '' : 's'} · <b>${due} due</b></p>
+        <p class="card-sub">${main} main line${main === 1 ? '' : 's'} · ${side} side line${side === 1 ? '' : 's'} · <b>${due} due</b>${tierText}</p>
         <p class="card-line">${preview} …</p>
         <div class="card-actions">
           <button class="primary" data-train="${o.id}">Train</button>
@@ -170,6 +172,7 @@ function setMode(mode) {
   els.review.hidden = mode !== 'review';
 
   if (mode === 'train') {
+    els.lineList.open = true;   // choosing a line should be one tap away
     resetLine();
   } else {
     populateLineSelect();
@@ -501,7 +504,10 @@ function finishLine() {
   renderStreakChip();
   renderLineList();
   const when = entry.interval >= 1 ? `again in ${Math.round(entry.interval)} day${Math.round(entry.interval) === 1 ? '' : 's'}` : 'again tomorrow';
-  setStatus(`${state.lineMistakes === 0 ? 'Clean run! 🎉' : 'Line complete.'}  ·  streak ${streak}  ·  ${when}`, 'good');
+  const tier = progress.tierFor(entry.clean);
+  const justEarned = state.lineMistakes === 0 && progress.TIERS.some((t) => t.at === entry.clean);
+  const tierMsg = justEarned ? `  ·  ${tier.tier} unlocked! 🏅` : tier.next ? `  ·  ${tier.next.at - entry.clean} more clean to ${tier.next.name}` : '  ·  mastered';
+  setStatus(`${state.lineMistakes === 0 ? 'Clean run! 🎉' : 'Line complete.'}  ·  streak ${streak}  ·  ${when}${tierMsg}`, 'good');
   els.restart.textContent = 'Next line';
 }
 
@@ -542,6 +548,7 @@ function renderLineList() {
     const from = dev ? dev.ply : opening.signaturePlies;
     const tail = tree.formatMoves(l.moves).slice(from).map((m) => m.text).join(' ');
     const st = progress.lineStatus(prog, opening.id, l.id);
+    const tier = progress.lineTier(prog, opening.id, l.id);
     const badges = [];
     if (l.kind === 'side') badges.push('<span class="badge side">punish</span>');
     if (hits[l.id]) badges.push(`<span class="badge">×${hits[l.id]}</span>`);
@@ -549,33 +556,39 @@ function renderLineList() {
     else if (st.state === 'due') badges.push('<span class="badge due">due</span>');
     else badges.push(`<span class="badge ok">${-st.overdueDays}d</span>`);
     const playing = state.lineObj?.id === l.id;
+    const tierCls = (tier.tier ?? '').toLowerCase();
+    const toNext = tier.next ? `${tier.clean} / ${tier.next.at} clean runs to ${tier.next.name}` : `${tier.clean} clean runs · mastered`;
     return `
-      <label class="line-row${hidden[l.id] ? ' hidden-line' : ''}${playing ? ' playing' : ''}" data-line-id="${l.id}">
-        <input type="checkbox" ${hidden[l.id] ? '' : 'checked'} data-toggle="${l.id}">
+      <div class="line-row${hidden[l.id] ? ' hidden-line' : ''}${playing ? ' playing' : ''}" data-play="${l.id}" role="button">
         <div>
-          <div class="lr-name">${lineTitle(l)}</div>
+          <div class="lr-name">${lineTitle(l)}${tier.tier ? `<span class="tier ${tierCls}">${tier.tier}</span>` : ''}</div>
           <div class="lr-moves">${tail}</div>
+          <div class="lr-bar ${tierCls}"><i style="width:${Math.round(tier.progress * 100)}%"></i></div>
+          <div class="lr-clean">${toNext}</div>
         </div>
-        <div class="lr-badges">${badges.join('')}<button class="lr-play" data-play="${l.id}">▶</button></div>
-      </label>`;
+        <div class="lr-badges">${badges.join('')}</div>
+        <input type="checkbox" ${hidden[l.id] ? '' : 'checked'} data-toggle="${l.id}" title="In rotation">
+      </div>`;
   }).join(''));
 }
 
+// Tap a row to drill that line now; the checkbox on the right keeps or drops it from the rotation.
 els.lineRows.addEventListener('click', (e) => {
-  const play = e.target.closest('button[data-play]');
-  if (play) {
-    e.preventDefault();
-    resetLine(tree.lineById(state.opening, play.dataset.play));
-    return;
-  }
   const box = e.target.closest('input[data-toggle]');
   if (box) {
+    e.stopPropagation();
     const hidden = { ...(settings.hiddenLines ?? {}) };
     hidden[state.opening.id] = { ...(hidden[state.opening.id] ?? {}) };
     if (box.checked) delete hidden[state.opening.id][box.dataset.toggle];
     else hidden[state.opening.id][box.dataset.toggle] = true;
     settings = updateSetting('hiddenLines', hidden);
     renderLineList();
+    return;
+  }
+  const row = e.target.closest('.line-row[data-play]');
+  if (row) {
+    resetLine(tree.lineById(state.opening, row.dataset.play));
+    els.board.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 });
 
