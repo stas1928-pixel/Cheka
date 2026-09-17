@@ -215,12 +215,33 @@ Rules for every job:
   the home card. Tapping a row starts that line; the checkbox on the right
   keeps it in / drops it from the rotation; the list is open by default.
 
+### Fourth round, 2026-09-17 — Lichess databases via the owner's token
+- Owner created a token and put it in `.env` (git-ignored; `.gitignore`
+  now also ignores `*.env`, `*.env.*`, `secret*` because the file first
+  arrived as `secret.env.txt`, which would have been committed).
+  **Never print `.env`; never commit it.** A diagnostic echoed part of the
+  token into chat once — owner asked to rotate it.
+- `tools/explorer-check.mjs` queries masters + amateur (1400-1800
+  blitz/rapid) at every opponent node of the seed and reports MISSING
+  popular replies, RARE lines, and PREFER (amateur top move differs from
+  the seed inside a line). Run it after any seed change; ~3 min.
+- Applied to the seed: +23 lines (59 total: Scotch 39, Elephant 20).
+  Headline findings that changed the repertoire: after the Bxf7+ trap
+  club players run to e8 78% (Kf8 was the only line); knights get traded
+  on d4 in 32-52% of the quiet Scotch lines; London 7...Nge7 29%; Elephant
+  4.Ng1 5.Nc3 70%, 4.Nd4 5.Nb3 (masters 100%), 4.Bb5+ … 6.Qe2 (masters
+  100%), 3.Nxe5 Bd6 4.d4 dxe4 has three common 5th moves. Inside lines
+  the opponent now plays the amateur top move wherever the database is
+  thick. Rare lines (<2%: 3...Nxd4, f5, Bd6, Qf6, Bb4+, 3.Bd3) kept only
+  because the owner's opponents played them.
+- Engine re-verification found and fixed: Giuoco 9.O-O (−0.5 → 9.d5),
+  3...Bb4+ 5.d5 (−0.6 → 5.Bd3).
+
 ### Next candidates (owner picks, one per session)
-- Cross-check the seed against Lichess masters + amateur frequencies
-  (needs `LICHESS_TOKEN` in a local `.env`, git-ignored): drop lines
-  nobody plays, add popular replies that are missing.
-- Opponent replies inside lines from the Lichess amateur database where
-  it is thicker than the owner's own games.
+- Rotate the Lichess token (owner) — then the explorer panel in Review
+  mode works on the phone with the new one.
+- Re-run `explorer-check` monthly; the seed should follow what people play.
+- Trim: if "My games" data shows a rare line never occurs, untick it.
 - Analyse more than 60 games on the phone in the background, or run
   `tools/analyse-games.mjs` on the PC and import the JSON.
 - A "Lines" screen on the home page (all openings at once) once there are

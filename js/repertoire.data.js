@@ -99,6 +99,169 @@ export default [
         ]
       },
       {
+        "id": "max-lange-be7",
+        "name": "Max Lange, 9...Be7",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Nf6",
+          "e5",
+          "d5",
+          "Bb5",
+          "Ne4",
+          "Nxd4",
+          "Bd7",
+          "Bxc6",
+          "bxc6",
+          "O-O",
+          "Be7",
+          "f3",
+          "Nc5"
+        ],
+        "deviatesAt": 17,
+        "cp": 12,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "e5",
+            "cp": 10
+          },
+          {
+            "ply": 10,
+            "san": "Bb5",
+            "cp": 9
+          },
+          {
+            "ply": 12,
+            "san": "Nxd4",
+            "cp": 14
+          },
+          {
+            "ply": 14,
+            "san": "Bxc6",
+            "cp": 8
+          },
+          {
+            "ply": 16,
+            "san": "O-O",
+            "cp": 3
+          },
+          {
+            "ply": 18,
+            "san": "f3",
+            "cp": 12
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "max-lange-bxc6",
+        "name": "Max Lange, 8...Bxc6",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Nf6",
+          "e5",
+          "d5",
+          "Bb5",
+          "Ne4",
+          "Nxd4",
+          "Bd7",
+          "Bxc6",
+          "Bxc6",
+          "O-O",
+          "Bc5"
+        ],
+        "deviatesAt": 15,
+        "cp": 21,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "e5",
+            "cp": 10
+          },
+          {
+            "ply": 10,
+            "san": "Bb5",
+            "cp": 9
+          },
+          {
+            "ply": 12,
+            "san": "Nxd4",
+            "cp": 14
+          },
+          {
+            "ply": 14,
+            "san": "Bxc6",
+            "cp": 8
+          },
+          {
+            "ply": 16,
+            "san": "O-O",
+            "cp": 21
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
         "id": "max-lange-bc5",
         "name": "Max Lange, 7...Bc5",
         "kind": "main",
@@ -118,16 +281,14 @@ export default [
           "Nxd4",
           "Bc5",
           "Be3",
-          "Bd7",
+          "O-O",
           "Bxc6",
           "bxc6",
           "O-O",
-          "O-O",
-          "f3",
-          "Ng5"
+          "Qe8"
         ],
         "deviatesAt": 13,
-        "cp": 0,
+        "cp": -19,
         "evals": [
           {
             "ply": 0,
@@ -167,26 +328,93 @@ export default [
           {
             "ply": 14,
             "san": "Be3",
-            "cp": 20
+            "cp": 18
           },
           {
             "ply": 16,
             "san": "Bxc6",
-            "cp": 23
+            "cp": -25
           },
           {
             "ply": 18,
             "san": "O-O",
-            "cp": -15
-          },
-          {
-            "ply": 20,
-            "san": "f3",
-            "cp": 0
+            "cp": -19
           }
         ],
         "sources": [
-          "Lichess"
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "max-lange-nd7",
+        "name": "Max Lange, 6...Nd7",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Nf6",
+          "e5",
+          "d5",
+          "Bb5",
+          "Nd7",
+          "O-O",
+          "Be7",
+          "Bxc6",
+          "bxc6"
+        ],
+        "deviatesAt": 11,
+        "cp": 25,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "e5",
+            "cp": 10
+          },
+          {
+            "ply": 10,
+            "san": "Bb5",
+            "cp": 9
+          },
+          {
+            "ply": 12,
+            "san": "O-O",
+            "cp": 25
+          },
+          {
+            "ply": 14,
+            "san": "Bxc6",
+            "cp": 25
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
         ]
       },
       {
@@ -205,14 +433,14 @@ export default [
           "e5",
           "Ng4",
           "O-O",
-          "Be7",
-          "Re1",
           "d6",
           "exd6",
-          "cxd6"
+          "Bxd6",
+          "Re1+",
+          "Be7"
         ],
         "deviatesAt": 9,
-        "cp": 28,
+        "cp": 34,
         "evals": [
           {
             "ply": 0,
@@ -242,17 +470,17 @@ export default [
           {
             "ply": 10,
             "san": "O-O",
-            "cp": 28
+            "cp": 35
           },
           {
             "ply": 12,
-            "san": "Re1",
-            "cp": 25
+            "san": "exd6",
+            "cp": 36
           },
           {
             "ply": 14,
-            "san": "exd6",
-            "cp": 28
+            "san": "Re1+",
+            "cp": 34
           }
         ],
         "sources": [
@@ -263,7 +491,7 @@ export default [
       },
       {
         "id": "ne4",
-        "name": "5...Ne4",
+        "name": "5...Ne4 6.Qe2 d5",
         "kind": "main",
         "moves": [
           "e4",
@@ -277,14 +505,14 @@ export default [
           "e5",
           "Ne4",
           "Qe2",
-          "Nc5",
-          "O-O",
-          "Ne6",
-          "c3",
-          "d5"
+          "d5",
+          "exd6",
+          "f5",
+          "dxc7",
+          "Qxc7"
         ],
         "deviatesAt": 9,
-        "cp": 9,
+        "cp": 196,
         "evals": [
           {
             "ply": 0,
@@ -314,17 +542,17 @@ export default [
           {
             "ply": 10,
             "san": "Qe2",
-            "cp": 14
+            "cp": 11
           },
           {
             "ply": 12,
-            "san": "O-O",
-            "cp": -3
+            "san": "exd6",
+            "cp": 173
           },
           {
             "ply": 14,
-            "san": "c3",
-            "cp": 9
+            "san": "dxc7",
+            "cp": 196
           }
         ],
         "sources": [
@@ -332,6 +560,148 @@ export default [
           "Games",
           "SF"
         ]
+      },
+      {
+        "id": "ne4-nc5",
+        "name": "5...Ne4 6.Qe2 Nc5",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Nf6",
+          "e5",
+          "Ne4",
+          "Qe2",
+          "Nc5",
+          "O-O",
+          "Ne6",
+          "Bxe6",
+          "dxe6"
+        ],
+        "deviatesAt": 9,
+        "cp": 8,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "e5",
+            "cp": 10
+          },
+          {
+            "ply": 10,
+            "san": "Qe2",
+            "cp": 11
+          },
+          {
+            "ply": 12,
+            "san": "O-O",
+            "cp": 19
+          },
+          {
+            "ply": 14,
+            "san": "Bxe6",
+            "cp": 8
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "qe7",
+        "name": "5...Qe7 (pin on the e-file)",
+        "kind": "side",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Nf6",
+          "e5",
+          "Qe7",
+          "O-O",
+          "Ng4",
+          "Bf4",
+          "d6",
+          "exd6"
+        ],
+        "deviatesAt": 9,
+        "cp": 143,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "e5",
+            "cp": 10
+          },
+          {
+            "ply": 10,
+            "san": "O-O",
+            "cp": 136
+          },
+          {
+            "ply": 12,
+            "san": "Bf4",
+            "cp": 149
+          },
+          {
+            "ply": 14,
+            "san": "exd6",
+            "cp": 143
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ],
+        "claim": "the queen blocks its own bishop; castle and the pin goes nowhere"
       },
       {
         "id": "haxo",
@@ -364,7 +734,7 @@ export default [
           "c6"
         ],
         "deviatesAt": 7,
-        "cp": 23,
+        "cp": 24,
         "evals": [
           {
             "ply": 0,
@@ -389,7 +759,7 @@ export default [
           {
             "ply": 8,
             "san": "c3",
-            "cp": -2
+            "cp": 0
           },
           {
             "ply": 10,
@@ -399,17 +769,17 @@ export default [
           {
             "ply": 12,
             "san": "Bd2",
-            "cp": 0
+            "cp": -1
           },
           {
             "ply": 14,
             "san": "Nbxd2",
-            "cp": 0
+            "cp": 15
           },
           {
             "ply": 16,
             "san": "exd5",
-            "cp": 0
+            "cp": 6
           },
           {
             "ply": 18,
@@ -419,17 +789,281 @@ export default [
           {
             "ply": 20,
             "san": "O-O",
-            "cp": 24
+            "cp": 18
           },
           {
             "ply": 22,
             "san": "Rfe1",
-            "cp": 23
+            "cp": 24
           }
         ],
         "sources": [
           "W-Scotch",
-          "CD"
+          "CD",
+          "Lichess"
+        ]
+      },
+      {
+        "id": "haxo-oo",
+        "name": "Giuoco Piano, 8...O-O",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Bc5",
+          "c3",
+          "Nf6",
+          "cxd4",
+          "Bb4+",
+          "Bd2",
+          "Bxd2+",
+          "Nbxd2",
+          "O-O",
+          "d5",
+          "Ne7"
+        ],
+        "deviatesAt": 7,
+        "cp": 58,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "c3",
+            "cp": 0
+          },
+          {
+            "ply": 10,
+            "san": "cxd4",
+            "cp": 0
+          },
+          {
+            "ply": 12,
+            "san": "Bd2",
+            "cp": -1
+          },
+          {
+            "ply": 14,
+            "san": "Nbxd2",
+            "cp": 15
+          },
+          {
+            "ply": 16,
+            "san": "d5",
+            "cp": 58
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "haxo-na5",
+        "name": "Giuoco Piano, 10...Na5",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Bc5",
+          "c3",
+          "Nf6",
+          "cxd4",
+          "Bb4+",
+          "Bd2",
+          "Bxd2+",
+          "Nbxd2",
+          "d5",
+          "exd5",
+          "Nxd5",
+          "Qb3",
+          "Na5",
+          "Qa4+",
+          "Nc6"
+        ],
+        "deviatesAt": 7,
+        "cp": 0,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "c3",
+            "cp": 0
+          },
+          {
+            "ply": 10,
+            "san": "cxd4",
+            "cp": 0
+          },
+          {
+            "ply": 12,
+            "san": "Bd2",
+            "cp": -1
+          },
+          {
+            "ply": 14,
+            "san": "Nbxd2",
+            "cp": 15
+          },
+          {
+            "ply": 16,
+            "san": "exd5",
+            "cp": 6
+          },
+          {
+            "ply": 18,
+            "san": "Qb3",
+            "cp": 0
+          },
+          {
+            "ply": 20,
+            "san": "Qa4+",
+            "cp": 0
+          }
+        ],
+        "sources": [
+          "W-Scotch",
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "haxo-nxe4",
+        "name": "Greco Gambit accepted, 7...Nxe4",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Bc5",
+          "c3",
+          "Nf6",
+          "cxd4",
+          "Bb4+",
+          "Bd2",
+          "Nxe4",
+          "Bxb4",
+          "Nxb4",
+          "Bxf7+",
+          "Kxf7",
+          "Qb3+",
+          "d5",
+          "Qxb4"
+        ],
+        "deviatesAt": 7,
+        "cp": -6,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "c3",
+            "cp": 0
+          },
+          {
+            "ply": 10,
+            "san": "cxd4",
+            "cp": 0
+          },
+          {
+            "ply": 12,
+            "san": "Bd2",
+            "cp": -1
+          },
+          {
+            "ply": 14,
+            "san": "Bxb4",
+            "cp": -7
+          },
+          {
+            "ply": 16,
+            "san": "Bxf7+",
+            "cp": -18
+          },
+          {
+            "ply": 18,
+            "san": "Qb3+",
+            "cp": -16
+          },
+          {
+            "ply": 20,
+            "san": "Qxb4",
+            "cp": -6
+          }
+        ],
+        "sources": [
+          "W-Scotch",
+          "Lichess",
+          "SF"
         ]
       },
       {
@@ -455,7 +1089,237 @@ export default [
           "d5"
         ],
         "deviatesAt": 7,
-        "cp": 154,
+        "cp": 161,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "c3",
+            "cp": 0
+          },
+          {
+            "ply": 10,
+            "san": "cxd4",
+            "cp": 0
+          },
+          {
+            "ply": 12,
+            "san": "e5",
+            "cp": 117
+          },
+          {
+            "ply": 14,
+            "san": "Qe2",
+            "cp": 161
+          }
+        ],
+        "sources": [
+          "W-Scotch",
+          "SF"
+        ]
+      },
+      {
+        "id": "haxo-trap",
+        "name": "Haxo accepted, 6.Bxf7+! Ke8",
+        "kind": "side",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Bc5",
+          "c3",
+          "dxc3",
+          "Bxf7+",
+          "Kxf7",
+          "Qd5+",
+          "Ke8",
+          "Qh5+",
+          "Kf8",
+          "Qxc5+"
+        ],
+        "deviatesAt": 7,
+        "cp": 78,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "c3",
+            "cp": 0
+          },
+          {
+            "ply": 10,
+            "san": "Bxf7+",
+            "cp": 77
+          },
+          {
+            "ply": 12,
+            "san": "Qd5+",
+            "cp": 86
+          },
+          {
+            "ply": 14,
+            "san": "Qh5+",
+            "cp": 77
+          },
+          {
+            "ply": 16,
+            "san": "Qxc5+",
+            "cp": 78
+          }
+        ],
+        "sources": [
+          "W-Scotch",
+          "CD",
+          "Lichess",
+          "SF"
+        ],
+        "claim": "the bishop comes back with the king stuck in the centre"
+      },
+      {
+        "id": "haxo-trap-kf8",
+        "name": "Haxo accepted, 6.Bxf7+! Kf8",
+        "kind": "side",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Bc5",
+          "c3",
+          "dxc3",
+          "Bxf7+",
+          "Kxf7",
+          "Qd5+",
+          "Kf8",
+          "Qxc5+",
+          "d6",
+          "Qxc3"
+        ],
+        "deviatesAt": 7,
+        "cp": 73,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "c3",
+            "cp": 0
+          },
+          {
+            "ply": 10,
+            "san": "Bxf7+",
+            "cp": 77
+          },
+          {
+            "ply": 12,
+            "san": "Qd5+",
+            "cp": 86
+          },
+          {
+            "ply": 14,
+            "san": "Qxc5+",
+            "cp": 90
+          },
+          {
+            "ply": 16,
+            "san": "Qxc3",
+            "cp": 73
+          }
+        ],
+        "sources": [
+          "W-Scotch",
+          "CD",
+          "SF"
+        ],
+        "claim": "the bishop comes back with the king stuck in the centre"
+      },
+      {
+        "id": "london",
+        "name": "London Defence (4...Bb4+)",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Bb4+",
+          "c3",
+          "dxc3",
+          "bxc3",
+          "Ba5",
+          "O-O",
+          "Nge7",
+          "Ng5",
+          "Ne5"
+        ],
+        "deviatesAt": 7,
+        "cp": 71,
         "evals": [
           {
             "ply": 0,
@@ -484,28 +1348,30 @@ export default [
           },
           {
             "ply": 10,
-            "san": "cxd4",
-            "cp": 0
+            "san": "bxc3",
+            "cp": 6
           },
           {
             "ply": 12,
-            "san": "e5",
-            "cp": 134
+            "san": "O-O",
+            "cp": 0
           },
           {
             "ply": 14,
-            "san": "Qe2",
-            "cp": 154
+            "san": "Ng5",
+            "cp": 71
           }
         ],
         "sources": [
           "W-Scotch",
+          "CD",
+          "Lichess",
           "SF"
         ]
       },
       {
-        "id": "london",
-        "name": "London Defence (4...Bb4+)",
+        "id": "london-nf6",
+        "name": "London Defence, 7...Nf6",
         "kind": "main",
         "moves": [
           "e4",
@@ -521,12 +1387,12 @@ export default [
           "bxc3",
           "Ba5",
           "O-O",
-          "d6",
-          "Qb3",
-          "Qd7"
+          "Nf6",
+          "e5",
+          "d5"
         ],
         "deviatesAt": 7,
-        "cp": 10,
+        "cp": 37,
         "evals": [
           {
             "ply": 0,
@@ -551,29 +1417,263 @@ export default [
           {
             "ply": 8,
             "san": "c3",
-            "cp": 0
+            "cp": -2
           },
           {
             "ply": 10,
             "san": "bxc3",
-            "cp": -8
+            "cp": 6
           },
           {
             "ply": 12,
             "san": "O-O",
-            "cp": -13
+            "cp": 0
           },
           {
             "ply": 14,
-            "san": "Qb3",
-            "cp": 10
+            "san": "e5",
+            "cp": 37
           }
         ],
         "sources": [
-          "W-Scotch",
-          "CD",
+          "Lichess",
           "SF"
         ]
+      },
+      {
+        "id": "london-be7",
+        "name": "London Defence, 6...Be7?",
+        "kind": "side",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Bb4+",
+          "c3",
+          "dxc3",
+          "bxc3",
+          "Be7",
+          "Qd5",
+          "Nh6",
+          "Bxh6"
+        ],
+        "deviatesAt": 7,
+        "cp": 350,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "c3",
+            "cp": -2
+          },
+          {
+            "ply": 10,
+            "san": "bxc3",
+            "cp": 6
+          },
+          {
+            "ply": 12,
+            "san": "Qd5",
+            "cp": 315
+          },
+          {
+            "ply": 14,
+            "san": "Bxh6",
+            "cp": 350
+          }
+        ],
+        "sources": [
+          "CD",
+          "Lichess",
+          "SF"
+        ],
+        "claim": "Qd5 hits f7 and b7 at once"
+      },
+      {
+        "id": "london-trap",
+        "name": "London Defence trap, 6...Bc5? (Ke8)",
+        "kind": "side",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Bb4+",
+          "c3",
+          "dxc3",
+          "bxc3",
+          "Bc5",
+          "Bxf7+",
+          "Kxf7",
+          "Qd5+",
+          "Ke8",
+          "Qxc5"
+        ],
+        "deviatesAt": 7,
+        "cp": 73,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "c3",
+            "cp": -2
+          },
+          {
+            "ply": 10,
+            "san": "bxc3",
+            "cp": 6
+          },
+          {
+            "ply": 12,
+            "san": "Bxf7+",
+            "cp": 75
+          },
+          {
+            "ply": 14,
+            "san": "Qd5+",
+            "cp": 62
+          },
+          {
+            "ply": 16,
+            "san": "Qxc5",
+            "cp": 73
+          }
+        ],
+        "sources": [
+          "CD",
+          "Lichess",
+          "SF"
+        ],
+        "claim": "Bxf7+ and Qd5+ win the bishop on c5"
+      },
+      {
+        "id": "london-trap-kf8",
+        "name": "London Defence trap, 6...Bc5? (Kf8)",
+        "kind": "side",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Bb4+",
+          "c3",
+          "dxc3",
+          "bxc3",
+          "Bc5",
+          "Bxf7+",
+          "Kxf7",
+          "Qd5+",
+          "Kf8",
+          "Qxc5+",
+          "d6",
+          "Qc4"
+        ],
+        "deviatesAt": 7,
+        "cp": 88,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "c3",
+            "cp": -2
+          },
+          {
+            "ply": 10,
+            "san": "bxc3",
+            "cp": 6
+          },
+          {
+            "ply": 12,
+            "san": "Bxf7+",
+            "cp": 75
+          },
+          {
+            "ply": 14,
+            "san": "Qd5+",
+            "cp": 62
+          },
+          {
+            "ply": 16,
+            "san": "Qxc5+",
+            "cp": 88
+          },
+          {
+            "ply": 18,
+            "san": "Qc4",
+            "cp": 88
+          }
+        ],
+        "sources": [
+          "CD"
+        ],
+        "claim": "Bxf7+ and Qd5+ win the bishop on c5"
       },
       {
         "id": "hungarian",
@@ -602,7 +1702,7 @@ export default [
           "fxe6"
         ],
         "deviatesAt": 7,
-        "cp": 35,
+        "cp": 48,
         "evals": [
           {
             "ply": 0,
@@ -627,37 +1727,108 @@ export default [
           {
             "ply": 8,
             "san": "Nxd4",
-            "cp": 45
+            "cp": 50
           },
           {
             "ply": 10,
             "san": "O-O",
-            "cp": 46
+            "cp": 50
           },
           {
             "ply": 12,
             "san": "Nc3",
-            "cp": 47
+            "cp": 46
           },
           {
             "ply": 14,
             "san": "h3",
-            "cp": 46
+            "cp": 43
           },
           {
             "ply": 16,
             "san": "Qxd4",
-            "cp": 37
+            "cp": 44
           },
           {
             "ply": 18,
             "san": "Bxe6",
-            "cp": 35
+            "cp": 48
           }
         ],
         "sources": [
           "W-Scotch",
           "CD"
+        ]
+      },
+      {
+        "id": "hungarian-nxd4",
+        "name": "Hungarian Defence, 5...Nxd4",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Be7",
+          "Nxd4",
+          "Nxd4",
+          "Qxd4",
+          "Nf6",
+          "Nc3",
+          "c6",
+          "Bf4",
+          "b5"
+        ],
+        "deviatesAt": 7,
+        "cp": 70,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "Nxd4",
+            "cp": 50
+          },
+          {
+            "ply": 10,
+            "san": "Qxd4",
+            "cp": 56
+          },
+          {
+            "ply": 12,
+            "san": "Nc3",
+            "cp": 67
+          },
+          {
+            "ply": 14,
+            "san": "Bf4",
+            "cp": 70
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
         ]
       },
       {
@@ -687,7 +1858,7 @@ export default [
           "fxe6"
         ],
         "deviatesAt": 7,
-        "cp": 24,
+        "cp": 42,
         "evals": [
           {
             "ply": 0,
@@ -712,32 +1883,32 @@ export default [
           {
             "ply": 8,
             "san": "Nxd4",
-            "cp": 46
+            "cp": 49
           },
           {
             "ply": 10,
             "san": "Nc3",
-            "cp": 43
+            "cp": 48
           },
           {
             "ply": 12,
             "san": "O-O",
-            "cp": 42
+            "cp": 48
           },
           {
             "ply": 14,
             "san": "h3",
-            "cp": 39
+            "cp": 38
           },
           {
             "ply": 16,
             "san": "Qxd4",
-            "cp": 28
+            "cp": 34
           },
           {
             "ply": 18,
             "san": "Bxe6",
-            "cp": 24
+            "cp": 42
           }
         ],
         "sources": [
@@ -745,8 +1916,8 @@ export default [
         ]
       },
       {
-        "id": "scotch-d6",
-        "name": "3...d6 (Scotch declined)",
+        "id": "declined-d6-nxd4",
+        "name": "4...d6 5.Nxd4 Nxd4",
         "kind": "main",
         "moves": [
           "e4",
@@ -754,21 +1925,20 @@ export default [
           "Nf3",
           "Nc6",
           "d4",
+          "exd4",
+          "Bc4",
           "d6",
-          "d5",
-          "Nce7",
-          "c4",
-          "Ng6",
-          "Nc3",
+          "Nxd4",
+          "Nxd4",
+          "Qxd4",
           "Nf6",
-          "Bd3",
+          "Bf4",
           "Be7",
-          "O-O",
-          "O-O",
-          "h3"
+          "Nc3",
+          "O-O"
         ],
-        "deviatesAt": 5,
-        "cp": 53,
+        "deviatesAt": 7,
+        "cp": 66,
         "evals": [
           {
             "ply": 0,
@@ -787,38 +1957,111 @@ export default [
           },
           {
             "ply": 6,
-            "san": "d5",
-            "cp": 78
+            "san": "Bc4",
+            "cp": 10
           },
           {
             "ply": 8,
-            "san": "c4",
-            "cp": 87
+            "san": "Nxd4",
+            "cp": 49
+          },
+          {
+            "ply": 10,
+            "san": "Qxd4",
+            "cp": 64
+          },
+          {
+            "ply": 12,
+            "san": "Bf4",
+            "cp": 58
+          },
+          {
+            "ply": 14,
+            "san": "Nc3",
+            "cp": 66
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "declined-d6-ne5",
+        "name": "4...d6, 8...Ne5",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "d6",
+          "Nxd4",
+          "Nf6",
+          "Nc3",
+          "Be7",
+          "O-O",
+          "O-O",
+          "h3",
+          "Ne5",
+          "Bb3",
+          "c5"
+        ],
+        "deviatesAt": 7,
+        "cp": 45,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "Nxd4",
+            "cp": 49
           },
           {
             "ply": 10,
             "san": "Nc3",
-            "cp": 96
+            "cp": 48
           },
           {
             "ply": 12,
-            "san": "Bd3",
-            "cp": 82
+            "san": "O-O",
+            "cp": 48
           },
           {
             "ply": 14,
-            "san": "O-O",
-            "cp": 52
+            "san": "h3",
+            "cp": 38
           },
           {
             "ply": 16,
-            "san": "h3",
-            "cp": 53
+            "san": "Bb3",
+            "cp": 45
           }
         ],
         "sources": [
-          "W-Scotch",
-          "Games"
+          "Lichess",
+          "SF"
         ]
       },
       {
@@ -843,7 +2086,7 @@ export default [
           "exf6"
         ],
         "deviatesAt": 7,
-        "cp": 39,
+        "cp": 31,
         "evals": [
           {
             "ply": 0,
@@ -873,28 +2116,29 @@ export default [
           {
             "ply": 10,
             "san": "Nxc6",
-            "cp": 55
+            "cp": 56
           },
           {
             "ply": 12,
             "san": "e5",
-            "cp": 43
+            "cp": 30
           },
           {
             "ply": 14,
             "san": "exf6",
-            "cp": 39
+            "cp": 31
           }
         ],
         "sources": [
           "Games",
+          "Lichess",
           "SF"
         ]
       },
       {
-        "id": "haxo-trap",
-        "name": "Haxo accepted, 6.Bxf7+!",
-        "kind": "side",
+        "id": "h6-nxd4",
+        "name": "4...h6 5.Nxd4 Nxd4",
+        "kind": "main",
         "moves": [
           "e4",
           "e5",
@@ -903,19 +2147,17 @@ export default [
           "d4",
           "exd4",
           "Bc4",
-          "Bc5",
-          "c3",
-          "dxc3",
-          "Bxf7+",
-          "Kxf7",
-          "Qd5+",
-          "Kf8",
-          "Qxc5+",
-          "d6",
-          "Qxc3"
+          "h6",
+          "Nxd4",
+          "Nxd4",
+          "Qxd4",
+          "Ne7",
+          "Nc3",
+          "Nc6",
+          "Qd5"
         ],
         "deviatesAt": 7,
-        "cp": 75,
+        "cp": 105,
         "evals": [
           {
             "ply": 0,
@@ -939,64 +2181,197 @@ export default [
           },
           {
             "ply": 8,
-            "san": "c3",
-            "cp": -2
+            "san": "Nxd4",
+            "cp": 56
           },
           {
             "ply": 10,
-            "san": "Bxf7+",
-            "cp": 74
+            "san": "Qxd4",
+            "cp": 109
           },
           {
             "ply": 12,
-            "san": "Qd5+",
-            "cp": 73
+            "san": "Nc3",
+            "cp": 104
           },
           {
             "ply": 14,
-            "san": "Qxc5+",
-            "cp": 75
+            "san": "Qd5",
+            "cp": 105
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "qf6-4",
+        "name": "4...Qf6?!",
+        "kind": "side",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "exd4",
+          "Bc4",
+          "Qf6",
+          "O-O",
+          "Bc5",
+          "e5",
+          "Qg6",
+          "Re1",
+          "Nh6",
+          "Bd3"
+        ],
+        "deviatesAt": 7,
+        "cp": 169,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
           },
           {
-            "ply": 16,
-            "san": "Qxc3",
-            "cp": 75
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "Bc4",
+            "cp": 10
+          },
+          {
+            "ply": 8,
+            "san": "O-O",
+            "cp": 95
+          },
+          {
+            "ply": 10,
+            "san": "e5",
+            "cp": 154
+          },
+          {
+            "ply": 12,
+            "san": "Re1",
+            "cp": 167
+          },
+          {
+            "ply": 14,
+            "san": "Bd3",
+            "cp": 169
+          }
+        ],
+        "sources": [
+          "Games",
+          "Lichess",
+          "SF"
+        ],
+        "claim": "early queen: develop with tempo"
+      },
+      {
+        "id": "scotch-d6",
+        "name": "3...d6 (Scotch declined)",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "d6",
+          "d5",
+          "Nce7",
+          "c4",
+          "Nf6",
+          "Nc3",
+          "g6",
+          "c5",
+          "Bg7",
+          "cxd6",
+          "cxd6"
+        ],
+        "deviatesAt": 5,
+        "cp": 92,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "d5",
+            "cp": 77
+          },
+          {
+            "ply": 8,
+            "san": "c4",
+            "cp": 80
+          },
+          {
+            "ply": 10,
+            "san": "Nc3",
+            "cp": 87
+          },
+          {
+            "ply": 12,
+            "san": "c5",
+            "cp": 85
+          },
+          {
+            "ply": 14,
+            "san": "cxd6",
+            "cp": 92
           }
         ],
         "sources": [
           "W-Scotch",
-          "CD",
+          "Games",
+          "Lichess",
           "SF"
-        ],
-        "claim": "the bishop comes back with the king dragged out; White ahead in development"
+        ]
       },
       {
-        "id": "london-trap",
-        "name": "London Defence trap, 6...Bc5?",
-        "kind": "side",
+        "id": "scotch-d6-nb8",
+        "name": "3...d6 4.d5 Nb8",
+        "kind": "main",
         "moves": [
           "e4",
           "e5",
           "Nf3",
           "Nc6",
           "d4",
-          "exd4",
-          "Bc4",
-          "Bb4+",
-          "c3",
-          "dxc3",
-          "bxc3",
-          "Bc5",
-          "Bxf7+",
-          "Kxf7",
-          "Qd5+",
-          "Kf8",
-          "Qxc5+",
           "d6",
-          "Qc4"
+          "d5",
+          "Nb8",
+          "c4",
+          "Nd7",
+          "Nc3",
+          "g6",
+          "g4",
+          "a5"
         ],
-        "deviatesAt": 7,
-        "cp": 94,
+        "deviatesAt": 5,
+        "cp": 90,
         "evals": [
           {
             "ply": 0,
@@ -1015,44 +2390,94 @@ export default [
           },
           {
             "ply": 6,
-            "san": "Bc4",
-            "cp": 10
+            "san": "d5",
+            "cp": 77
           },
           {
             "ply": 8,
-            "san": "c3",
-            "cp": 0
+            "san": "c4",
+            "cp": 86
           },
           {
             "ply": 10,
-            "san": "bxc3",
-            "cp": -8
+            "san": "Nc3",
+            "cp": 80
           },
           {
             "ply": 12,
-            "san": "Bxf7+",
-            "cp": 66
-          },
-          {
-            "ply": 14,
-            "san": "Qd5+",
-            "cp": 76
-          },
-          {
-            "ply": 16,
-            "san": "Qxc5+",
+            "san": "g4",
             "cp": 90
-          },
-          {
-            "ply": 18,
-            "san": "Qc4",
-            "cp": 94
           }
         ],
         "sources": [
-          "CD"
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "scotch-d6-nd4",
+        "name": "3...d6 4.d5 Nd4?!",
+        "kind": "side",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "Nc6",
+          "d4",
+          "d6",
+          "d5",
+          "Nd4",
+          "Nxd4",
+          "exd4",
+          "Qxd4",
+          "Nf6",
+          "Bb5+",
+          "Bd7"
         ],
-        "claim": "the same Bxf7+ fork wins a piece"
+        "deviatesAt": 5,
+        "cp": 180,
+        "evals": [
+          {
+            "ply": 0,
+            "san": "e4",
+            "cp": 35
+          },
+          {
+            "ply": 2,
+            "san": "Nf3",
+            "cp": 38
+          },
+          {
+            "ply": 4,
+            "san": "d4",
+            "cp": 33
+          },
+          {
+            "ply": 6,
+            "san": "d5",
+            "cp": 77
+          },
+          {
+            "ply": 8,
+            "san": "Nxd4",
+            "cp": 179
+          },
+          {
+            "ply": 10,
+            "san": "Qxd4",
+            "cp": 184
+          },
+          {
+            "ply": 12,
+            "san": "Bb5+",
+            "cp": 180
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ],
+        "claim": "the knight is traded and the queen lands on d4 for free"
       },
       {
         "id": "lolli",
@@ -1068,17 +2493,15 @@ export default [
           "Nxd4",
           "exd4",
           "Qxd4",
-          "Ne7",
-          "Bc4",
-          "Nc6",
-          "Qd5",
-          "Qf6",
-          "O-O",
-          "Ne5",
-          "Be2"
+          "d6",
+          "Nc3",
+          "Nf6",
+          "Bf4",
+          "Be7",
+          "O-O-O"
         ],
         "deviatesAt": 5,
-        "cp": 66,
+        "cp": 101,
         "evals": [
           {
             "ply": 0,
@@ -1098,109 +2521,35 @@ export default [
           {
             "ply": 6,
             "san": "Nxd4",
-            "cp": 49
+            "cp": 60
           },
           {
             "ply": 8,
             "san": "Qxd4",
-            "cp": 62
+            "cp": 55
           },
           {
             "ply": 10,
-            "san": "Bc4",
-            "cp": 74
+            "san": "Nc3",
+            "cp": 97
           },
           {
             "ply": 12,
-            "san": "Qd5",
-            "cp": 58
+            "san": "Bf4",
+            "cp": 107
           },
           {
             "ply": 14,
-            "san": "O-O",
-            "cp": 71
-          },
-          {
-            "ply": 16,
-            "san": "Be2",
-            "cp": 66
+            "san": "O-O-O",
+            "cp": 101
           }
         ],
         "sources": [
-          "W-Scotch"
-        ],
-        "claim": "centralised queen Black cannot chase; small but lasting plus"
-      },
-      {
-        "id": "qf6-4",
-        "name": "4...Qf6?!",
-        "kind": "side",
-        "moves": [
-          "e4",
-          "e5",
-          "Nf3",
-          "Nc6",
-          "d4",
-          "exd4",
-          "Bc4",
-          "Qf6",
-          "O-O",
-          "d6",
-          "c3",
-          "d3",
-          "Qxd3",
-          "Qg6",
-          "Na3"
-        ],
-        "deviatesAt": 7,
-        "cp": 80,
-        "evals": [
-          {
-            "ply": 0,
-            "san": "e4",
-            "cp": 35
-          },
-          {
-            "ply": 2,
-            "san": "Nf3",
-            "cp": 38
-          },
-          {
-            "ply": 4,
-            "san": "d4",
-            "cp": 33
-          },
-          {
-            "ply": 6,
-            "san": "Bc4",
-            "cp": 10
-          },
-          {
-            "ply": 8,
-            "san": "O-O",
-            "cp": 85
-          },
-          {
-            "ply": 10,
-            "san": "c3",
-            "cp": 92
-          },
-          {
-            "ply": 12,
-            "san": "Qxd3",
-            "cp": 73
-          },
-          {
-            "ply": 14,
-            "san": "Na3",
-            "cp": 80
-          }
-        ],
-        "sources": [
-          "Games",
+          "W-Scotch",
+          "Lichess",
           "SF"
         ],
-        "claim": "early queen: develop with tempo"
+        "claim": "centralised queen Black cannot chase; small but lasting plus"
       },
       {
         "id": "f5",
@@ -1224,7 +2573,7 @@ export default [
           "bxc3"
         ],
         "deviatesAt": 5,
-        "cp": 245,
+        "cp": 249,
         "evals": [
           {
             "ply": 0,
@@ -1244,27 +2593,27 @@ export default [
           {
             "ply": 6,
             "san": "Nxe5",
-            "cp": 164
+            "cp": 133
           },
           {
             "ply": 8,
             "san": "dxe5",
-            "cp": 194
+            "cp": 204
           },
           {
             "ply": 10,
             "san": "Nc3",
-            "cp": 198
+            "cp": 209
           },
           {
             "ply": 12,
             "san": "Qd4",
-            "cp": 218
+            "cp": 237
           },
           {
             "ply": 14,
             "san": "bxc3",
-            "cp": 245
+            "cp": 249
           }
         ],
         "sources": [
@@ -1290,12 +2639,12 @@ export default [
           "Bb4+",
           "Nbd2",
           "Nf6",
-          "Nxe5",
-          "Nxe4",
-          "Qf3"
+          "Qc2",
+          "Bxd2+",
+          "Bxd2"
         ],
         "deviatesAt": 5,
-        "cp": 59,
+        "cp": 66,
         "evals": [
           {
             "ply": 0,
@@ -1315,27 +2664,27 @@ export default [
           {
             "ply": 6,
             "san": "d5",
-            "cp": 82
+            "cp": 66
           },
           {
             "ply": 8,
             "san": "c4",
-            "cp": 76
+            "cp": 74
           },
           {
             "ply": 10,
             "san": "Nbd2",
-            "cp": 67
+            "cp": 72
           },
           {
             "ply": 12,
-            "san": "Nxe5",
-            "cp": 60
+            "san": "Qc2",
+            "cp": 65
           },
           {
             "ply": 14,
-            "san": "Qf3",
-            "cp": 59
+            "san": "Bxd2",
+            "cp": 66
           }
         ],
         "sources": [
@@ -1361,13 +2710,13 @@ export default [
           "Be3",
           "d6",
           "h3",
-          "Qd8",
-          "Bd3",
+          "a6",
+          "a4",
           "g6",
-          "Nc3"
+          "g4"
         ],
         "deviatesAt": 5,
-        "cp": 106,
+        "cp": 127,
         "evals": [
           {
             "ply": 0,
@@ -1387,27 +2736,27 @@ export default [
           {
             "ply": 6,
             "san": "d5",
-            "cp": 107
+            "cp": 112
           },
           {
             "ply": 8,
             "san": "Be3",
-            "cp": 116
+            "cp": 115
           },
           {
             "ply": 10,
             "san": "h3",
-            "cp": 111
+            "cp": 121
           },
           {
             "ply": 12,
-            "san": "Bd3",
-            "cp": 102
+            "san": "a4",
+            "cp": 120
           },
           {
             "ply": 14,
-            "san": "Nc3",
-            "cp": 106
+            "san": "g4",
+            "cp": 127
           }
         ],
         "sources": [
@@ -1428,17 +2777,17 @@ export default [
           "d4",
           "Bb4+",
           "c3",
-          "Ba5",
-          "d5",
-          "Nce7",
-          "Nxe5",
+          "Bd6",
+          "Bd3",
           "Nf6",
-          "Nc4",
-          "Bb6",
-          "d6"
+          "O-O",
+          "O-O",
+          "Re1",
+          "Ne8",
+          "Qc2"
         ],
         "deviatesAt": 5,
-        "cp": 264,
+        "cp": 145,
         "evals": [
           {
             "ply": 0,
@@ -1458,31 +2807,32 @@ export default [
           {
             "ply": 6,
             "san": "c3",
-            "cp": 162
+            "cp": 147
           },
           {
             "ply": 8,
-            "san": "d5",
-            "cp": 200
+            "san": "Bd3",
+            "cp": 154
           },
           {
             "ply": 10,
-            "san": "Nxe5",
-            "cp": 225
+            "san": "O-O",
+            "cp": 160
           },
           {
             "ply": 12,
-            "san": "Nc4",
-            "cp": 248
+            "san": "Re1",
+            "cp": 152
           },
           {
             "ply": 14,
-            "san": "d6",
-            "cp": 264
+            "san": "Qc2",
+            "cp": 145
           }
         ],
         "sources": [
           "Games",
+          "Lichess",
           "SF"
         ],
         "claim": "the bishop is kicked around while White develops"
@@ -1519,7 +2869,7 @@ export default [
           "Qxe4",
           "Nxe4"
         ],
-        "cp": -52,
+        "cp": -37,
         "evals": [
           {
             "ply": 1,
@@ -1529,42 +2879,42 @@ export default [
           {
             "ply": 3,
             "san": "d5",
-            "cp": -84
+            "cp": -64
           },
           {
             "ply": 5,
             "san": "e4",
-            "cp": -92
+            "cp": -76
           },
           {
             "ply": 7,
             "san": "Nf6",
-            "cp": -83
+            "cp": -96
           },
           {
             "ply": 9,
             "san": "Qxd5",
-            "cp": -87
+            "cp": -84
           },
           {
             "ply": 11,
             "san": "Be7",
-            "cp": -118
+            "cp": -129
           },
           {
             "ply": 13,
             "san": "Qe6",
-            "cp": -120
+            "cp": -124
           },
           {
             "ply": 15,
             "san": "Qxe4",
-            "cp": -49
+            "cp": -35
           },
           {
             "ply": 17,
             "san": "Nxe4",
-            "cp": -52
+            "cp": -37
           }
         ],
         "sources": [
@@ -1576,7 +2926,87 @@ export default [
       },
       {
         "id": "nc3-5",
-        "name": "5.Nc3 (avoids the pin)",
+        "name": "5.Nc3 Be7 6.Nxe4 O-O 7.d3",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "exd5",
+          "e4",
+          "Qe2",
+          "Nf6",
+          "Nc3",
+          "Be7",
+          "Nxe4",
+          "O-O",
+          "d3",
+          "Re8",
+          "c3",
+          "Nxd5",
+          "Qc2",
+          "c5"
+        ],
+        "deviatesAt": 8,
+        "cp": -63,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "e4",
+            "cp": -76
+          },
+          {
+            "ply": 7,
+            "san": "Nf6",
+            "cp": -96
+          },
+          {
+            "ply": 9,
+            "san": "Be7",
+            "cp": -78
+          },
+          {
+            "ply": 11,
+            "san": "O-O",
+            "cp": -103
+          },
+          {
+            "ply": 13,
+            "san": "Re8",
+            "cp": -80
+          },
+          {
+            "ply": 15,
+            "san": "Nxd5",
+            "cp": -64
+          },
+          {
+            "ply": 17,
+            "san": "c5",
+            "cp": -63
+          }
+        ],
+        "sources": [
+          "W-Eleph",
+          "CM",
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "nc3-5-nxf6",
+        "name": "5.Nc3 … 7.Nxf6+",
         "kind": "main",
         "moves": [
           "e4",
@@ -1593,13 +3023,13 @@ export default [
           "O-O",
           "Nxf6+",
           "Bxf6",
-          "Qc4",
-          "Re8+",
-          "Be2",
-          "b5"
+          "d4",
+          "Qxd5",
+          "Be3",
+          "Nc6"
         ],
         "deviatesAt": 8,
-        "cp": 46,
+        "cp": -98,
         "evals": [
           {
             "ply": 1,
@@ -1609,27 +3039,27 @@ export default [
           {
             "ply": 3,
             "san": "d5",
-            "cp": -84
+            "cp": -64
           },
           {
             "ply": 5,
             "san": "e4",
-            "cp": -92
+            "cp": -76
           },
           {
             "ply": 7,
             "san": "Nf6",
-            "cp": -83
+            "cp": -96
           },
           {
             "ply": 9,
             "san": "Be7",
-            "cp": -75
+            "cp": -78
           },
           {
             "ply": 11,
             "san": "O-O",
-            "cp": -98
+            "cp": -103
           },
           {
             "ply": 13,
@@ -1638,18 +3068,18 @@ export default [
           },
           {
             "ply": 15,
-            "san": "Re8+",
-            "cp": 52
+            "san": "Qxd5",
+            "cp": -95
           },
           {
             "ply": 17,
-            "san": "b5",
-            "cp": 46
+            "san": "Nc6",
+            "cp": -98
           }
         ],
         "sources": [
-          "W-Eleph",
           "CM",
+          "Lichess",
           "SF"
         ]
       },
@@ -1674,10 +3104,10 @@ export default [
           "Bxc3",
           "Bxc3",
           "O-O",
-          "dxe4"
+          "Bxf6"
         ],
         "deviatesAt": 10,
-        "cp": 0,
+        "cp": -8,
         "evals": [
           {
             "ply": 1,
@@ -1687,42 +3117,43 @@ export default [
           {
             "ply": 3,
             "san": "d5",
-            "cp": -84
+            "cp": -64
           },
           {
             "ply": 5,
             "san": "e4",
-            "cp": -92
+            "cp": -76
           },
           {
             "ply": 7,
             "san": "Nf6",
-            "cp": -83
+            "cp": -96
           },
           {
             "ply": 9,
             "san": "Qxd5",
-            "cp": -87
+            "cp": -84
           },
           {
             "ply": 11,
             "san": "Bb4",
-            "cp": -77
+            "cp": -81
           },
           {
             "ply": 13,
             "san": "Bxc3",
-            "cp": -17
+            "cp": -9
           },
           {
             "ply": 15,
             "san": "O-O",
-            "cp": 0
+            "cp": -8
           }
         ],
         "sources": [
           "CM",
           "Games",
+          "Lichess",
           "SF"
         ]
       },
@@ -1747,13 +3178,11 @@ export default [
           "Nxe4",
           "Bd3",
           "Nc5",
-          "Bb5+",
-          "c6",
-          "Be2",
-          "Nba6"
+          "Bc4",
+          "Be6"
         ],
         "deviatesAt": 10,
-        "cp": -33,
+        "cp": -5,
         "evals": [
           {
             "ply": 1,
@@ -1763,193 +3192,47 @@ export default [
           {
             "ply": 3,
             "san": "d5",
-            "cp": -84
+            "cp": -64
           },
           {
             "ply": 5,
             "san": "e4",
-            "cp": -92
+            "cp": -76
           },
           {
             "ply": 7,
             "san": "Nf6",
-            "cp": -83
+            "cp": -96
           },
           {
             "ply": 9,
             "san": "Qxd5",
-            "cp": -87
+            "cp": -84
           },
           {
             "ply": 11,
             "san": "Qxe4",
-            "cp": -37
+            "cp": -47
           },
           {
             "ply": 13,
             "san": "Nxe4",
-            "cp": -25
+            "cp": -21
           },
           {
             "ply": 15,
             "san": "Nc5",
-            "cp": -27
+            "cp": -31
           },
           {
             "ply": 17,
-            "san": "c6",
-            "cp": -33
-          },
-          {
-            "ply": 19,
-            "san": "Nba6",
-            "cp": -33
-          }
-        ],
-        "sources": [
-          "Games"
-        ]
-      },
-      {
-        "id": "ne5",
-        "name": "4.Ne5",
-        "kind": "main",
-        "moves": [
-          "e4",
-          "e5",
-          "Nf3",
-          "d5",
-          "exd5",
-          "e4",
-          "Ne5",
-          "Qxd5",
-          "d4",
-          "exd3",
-          "Nxd3",
-          "Nc6",
-          "Nc3",
-          "Qa5",
-          "Be2",
-          "Bf5"
-        ],
-        "deviatesAt": 6,
-        "cp": -20,
-        "evals": [
-          {
-            "ply": 1,
-            "san": "e5",
-            "cp": -39
-          },
-          {
-            "ply": 3,
-            "san": "d5",
-            "cp": -84
-          },
-          {
-            "ply": 5,
-            "san": "e4",
-            "cp": -92
-          },
-          {
-            "ply": 7,
-            "san": "Qxd5",
-            "cp": -19
-          },
-          {
-            "ply": 9,
-            "san": "exd3",
-            "cp": -23
-          },
-          {
-            "ply": 11,
-            "san": "Nc6",
-            "cp": -28
-          },
-          {
-            "ply": 13,
-            "san": "Qa5",
-            "cp": -6
-          },
-          {
-            "ply": 15,
-            "san": "Bf5",
-            "cp": -20
-          }
-        ],
-        "sources": [
-          "W-Eleph",
-          "Games",
-          "SF"
-        ]
-      },
-      {
-        "id": "nd4",
-        "name": "4.Nd4",
-        "kind": "main",
-        "moves": [
-          "e4",
-          "e5",
-          "Nf3",
-          "d5",
-          "exd5",
-          "e4",
-          "Nd4",
-          "Qxd5",
-          "c3",
-          "Nc6",
-          "Nb5",
-          "Qe5",
-          "Qe2",
-          "Qe7",
-          "d4",
-          "a6"
-        ],
-        "deviatesAt": 6,
-        "cp": 45,
-        "evals": [
-          {
-            "ply": 1,
-            "san": "e5",
-            "cp": -39
-          },
-          {
-            "ply": 3,
-            "san": "d5",
-            "cp": -84
-          },
-          {
-            "ply": 5,
-            "san": "e4",
-            "cp": -92
-          },
-          {
-            "ply": 7,
-            "san": "Qxd5",
-            "cp": 10
-          },
-          {
-            "ply": 9,
-            "san": "Nc6",
-            "cp": 52
-          },
-          {
-            "ply": 11,
-            "san": "Qe5",
-            "cp": 65
-          },
-          {
-            "ply": 13,
-            "san": "Qe7",
-            "cp": 61
-          },
-          {
-            "ply": 15,
-            "san": "a6",
-            "cp": 45
+            "san": "Be6",
+            "cp": -5
           }
         ],
         "sources": [
           "Games",
+          "Lichess",
           "SF"
         ]
       },
@@ -1976,7 +3259,7 @@ export default [
           "Re8+"
         ],
         "deviatesAt": 8,
-        "cp": -39,
+        "cp": -44,
         "evals": [
           {
             "ply": 1,
@@ -1986,47 +3269,394 @@ export default [
           {
             "ply": 3,
             "san": "d5",
-            "cp": -84
+            "cp": -64
           },
           {
             "ply": 5,
             "san": "e4",
-            "cp": -92
+            "cp": -76
           },
           {
             "ply": 7,
             "san": "Nf6",
-            "cp": -83
+            "cp": -96
           },
           {
             "ply": 9,
             "san": "Be7",
-            "cp": -8
+            "cp": -34
           },
           {
             "ply": 11,
             "san": "O-O",
-            "cp": -43
+            "cp": -40
           },
           {
             "ply": 13,
             "san": "Bxf6",
-            "cp": -47
+            "cp": -32
           },
           {
             "ply": 15,
             "san": "Re8+",
-            "cp": -39
+            "cp": -44
           }
         ],
         "sources": [
+          "Games",
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "nd4",
+        "name": "4.Nd4 Qxd5 5.Nb3",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "exd5",
+          "e4",
+          "Nd4",
+          "Qxd5",
+          "Nb3",
+          "Qe5",
+          "Nc3",
+          "Nf6",
+          "Bb5+",
+          "Bd7",
+          "Be2",
+          "Nc6"
+        ],
+        "deviatesAt": 6,
+        "cp": 52,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "e4",
+            "cp": -76
+          },
+          {
+            "ply": 7,
+            "san": "Qxd5",
+            "cp": 15
+          },
+          {
+            "ply": 9,
+            "san": "Qe5",
+            "cp": 40
+          },
+          {
+            "ply": 11,
+            "san": "Nf6",
+            "cp": 43
+          },
+          {
+            "ply": 13,
+            "san": "Bd7",
+            "cp": 41
+          },
+          {
+            "ply": 15,
+            "san": "Nc6",
+            "cp": 52
+          }
+        ],
+        "sources": [
+          "Games",
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "nd4-c3",
+        "name": "4.Nd4 Qxd5 5.c3 Nc6 6.Nxc6",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "exd5",
+          "e4",
+          "Nd4",
+          "Qxd5",
+          "c3",
+          "Nc6",
+          "Nxc6",
+          "Qxc6",
+          "d3",
+          "exd3",
+          "Qxd3",
+          "Bd7"
+        ],
+        "deviatesAt": 6,
+        "cp": 73,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "e4",
+            "cp": -76
+          },
+          {
+            "ply": 7,
+            "san": "Qxd5",
+            "cp": 15
+          },
+          {
+            "ply": 9,
+            "san": "Nc6",
+            "cp": 53
+          },
+          {
+            "ply": 11,
+            "san": "Qxc6",
+            "cp": 66
+          },
+          {
+            "ply": 13,
+            "san": "exd3",
+            "cp": 62
+          },
+          {
+            "ply": 15,
+            "san": "Bd7",
+            "cp": 73
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "ne5",
+        "name": "4.Ne5",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "exd5",
+          "e4",
+          "Ne5",
+          "Qxd5",
+          "d4",
+          "exd3",
+          "Nxd3",
+          "Nc6",
+          "Nc3",
+          "Qa5",
+          "Be2",
+          "Bf5"
+        ],
+        "deviatesAt": 6,
+        "cp": -25,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "e4",
+            "cp": -76
+          },
+          {
+            "ply": 7,
+            "san": "Qxd5",
+            "cp": -16
+          },
+          {
+            "ply": 9,
+            "san": "exd3",
+            "cp": -16
+          },
+          {
+            "ply": 11,
+            "san": "Nc6",
+            "cp": -21
+          },
+          {
+            "ply": 13,
+            "san": "Qa5",
+            "cp": -15
+          },
+          {
+            "ply": 15,
+            "san": "Bf5",
+            "cp": -25
+          }
+        ],
+        "sources": [
+          "W-Eleph",
           "Games",
           "SF"
         ]
       },
       {
+        "id": "ng1",
+        "name": "4.Ng1 full retreat",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "exd5",
+          "e4",
+          "Ng1",
+          "Qxd5",
+          "Nc3",
+          "Qe6",
+          "Qe2",
+          "Nf6",
+          "b3",
+          "Nc6"
+        ],
+        "deviatesAt": 6,
+        "cp": 13,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "e4",
+            "cp": -76
+          },
+          {
+            "ply": 7,
+            "san": "Qxd5",
+            "cp": -2
+          },
+          {
+            "ply": 9,
+            "san": "Qe6",
+            "cp": 8
+          },
+          {
+            "ply": 11,
+            "san": "Nf6",
+            "cp": 14
+          },
+          {
+            "ply": 13,
+            "san": "Nc6",
+            "cp": 13
+          }
+        ],
+        "sources": [
+          "Games",
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "bb5",
+        "name": "4.Bb5+ c6",
+        "kind": "side",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "exd5",
+          "e4",
+          "Bb5+",
+          "c6",
+          "dxc6",
+          "bxc6",
+          "Qe2",
+          "cxb5",
+          "d3",
+          "Nf6"
+        ],
+        "deviatesAt": 6,
+        "cp": 225,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "e4",
+            "cp": -76
+          },
+          {
+            "ply": 7,
+            "san": "c6",
+            "cp": 184
+          },
+          {
+            "ply": 9,
+            "san": "bxc6",
+            "cp": 201
+          },
+          {
+            "ply": 11,
+            "san": "cxb5",
+            "cp": 221
+          },
+          {
+            "ply": 13,
+            "san": "Nf6",
+            "cp": 225
+          }
+        ],
+        "sources": [
+          "Games",
+          "Lichess",
+          "SF"
+        ],
+        "claim": "the check achieves nothing; Black is fully developed a pawn up in activity"
+      },
+      {
         "id": "nxe5",
-        "name": "3.Nxe5 Bd6",
+        "name": "3.Nxe5 Bd6 4.d4 dxe4 5.Bc4",
         "kind": "main",
         "moves": [
           "e4",
@@ -2047,7 +3677,7 @@ export default [
           "Nc6"
         ],
         "deviatesAt": 4,
-        "cp": -70,
+        "cp": -68,
         "evals": [
           {
             "ply": 1,
@@ -2057,37 +3687,37 @@ export default [
           {
             "ply": 3,
             "san": "d5",
-            "cp": -84
+            "cp": -64
           },
           {
             "ply": 5,
             "san": "Bd6",
-            "cp": -68
+            "cp": -74
           },
           {
             "ply": 7,
             "san": "dxe4",
-            "cp": -74
+            "cp": -71
           },
           {
             "ply": 9,
             "san": "Bxe5",
-            "cp": -64
+            "cp": -71
           },
           {
             "ply": 11,
             "san": "Qe7",
-            "cp": -74
+            "cp": -73
           },
           {
             "ply": 13,
             "san": "Qxe5",
-            "cp": -73
+            "cp": -87
           },
           {
             "ply": 15,
             "san": "Nc6",
-            "cp": -70
+            "cp": -68
           }
         ],
         "sources": [
@@ -2095,6 +3725,148 @@ export default [
           "CM",
           "Lichess",
           "Games",
+          "SF"
+        ]
+      },
+      {
+        "id": "nxe5-nc4",
+        "name": "3.Nxe5 Bd6 4.d4 dxe4 5.Nc4",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "Nxe5",
+          "Bd6",
+          "d4",
+          "dxe4",
+          "Nc4",
+          "Be7",
+          "Bf4",
+          "Nf6",
+          "Ne3",
+          "O-O",
+          "Be2",
+          "Bd6"
+        ],
+        "deviatesAt": 4,
+        "cp": -21,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "Bd6",
+            "cp": -74
+          },
+          {
+            "ply": 7,
+            "san": "dxe4",
+            "cp": -71
+          },
+          {
+            "ply": 9,
+            "san": "Be7",
+            "cp": -30
+          },
+          {
+            "ply": 11,
+            "san": "Nf6",
+            "cp": -32
+          },
+          {
+            "ply": 13,
+            "san": "O-O",
+            "cp": -24
+          },
+          {
+            "ply": 15,
+            "san": "Bd6",
+            "cp": -21
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "nxe5-nc3",
+        "name": "3.Nxe5 Bd6 4.d4 dxe4 5.Nc3",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "Nxe5",
+          "Bd6",
+          "d4",
+          "dxe4",
+          "Nc3",
+          "Bxe5",
+          "dxe5",
+          "Qxd1+",
+          "Nxd1",
+          "Nc6",
+          "Nc3",
+          "Bf5"
+        ],
+        "deviatesAt": 4,
+        "cp": -35,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "Bd6",
+            "cp": -74
+          },
+          {
+            "ply": 7,
+            "san": "dxe4",
+            "cp": -71
+          },
+          {
+            "ply": 9,
+            "san": "Bxe5",
+            "cp": -38
+          },
+          {
+            "ply": 11,
+            "san": "Qxd1+",
+            "cp": -46
+          },
+          {
+            "ply": 13,
+            "san": "Nc6",
+            "cp": -40
+          },
+          {
+            "ply": 15,
+            "san": "Bf5",
+            "cp": -35
+          }
+        ],
+        "sources": [
+          "Lichess",
           "SF"
         ]
       },
@@ -2112,14 +3884,14 @@ export default [
           "Nf3",
           "dxe4",
           "Nd4",
-          "Nf6",
-          "d3",
-          "O-O",
-          "dxe4",
-          "Nxe4"
+          "Be5",
+          "c3",
+          "Bxd4",
+          "cxd4",
+          "Nc6"
         ],
         "deviatesAt": 4,
-        "cp": 74,
+        "cp": 92,
         "evals": [
           {
             "ply": 1,
@@ -2129,445 +3901,38 @@ export default [
           {
             "ply": 3,
             "san": "d5",
-            "cp": -84
+            "cp": -64
           },
           {
             "ply": 5,
             "san": "Bd6",
-            "cp": -68
+            "cp": -74
           },
           {
             "ply": 7,
             "san": "dxe4",
+            "cp": 93
+          },
+          {
+            "ply": 9,
+            "san": "Be5",
+            "cp": 88
+          },
+          {
+            "ply": 11,
+            "san": "Bxd4",
+            "cp": 94
+          },
+          {
+            "ply": 13,
+            "san": "Nc6",
             "cp": 92
-          },
-          {
-            "ply": 9,
-            "san": "Nf6",
-            "cp": 84
-          },
-          {
-            "ply": 11,
-            "san": "O-O",
-            "cp": 72
-          },
-          {
-            "ply": 13,
-            "san": "Nxe4",
-            "cp": 74
           }
         ],
         "sources": [
           "Games",
           "SF"
         ]
-      },
-      {
-        "id": "d4",
-        "name": "3.d4 (Elephant declined)",
-        "kind": "main",
-        "moves": [
-          "e4",
-          "e5",
-          "Nf3",
-          "d5",
-          "d4",
-          "dxe4",
-          "Nxe5",
-          "Nd7",
-          "Nxd7",
-          "Bxd7",
-          "Bc4",
-          "Nf6",
-          "Nc3",
-          "Be7",
-          "O-O",
-          "Bg4"
-        ],
-        "deviatesAt": 4,
-        "cp": -3,
-        "evals": [
-          {
-            "ply": 1,
-            "san": "e5",
-            "cp": -39
-          },
-          {
-            "ply": 3,
-            "san": "d5",
-            "cp": -84
-          },
-          {
-            "ply": 5,
-            "san": "dxe4",
-            "cp": -52
-          },
-          {
-            "ply": 7,
-            "san": "Nd7",
-            "cp": -61
-          },
-          {
-            "ply": 9,
-            "san": "Bxd7",
-            "cp": -27
-          },
-          {
-            "ply": 11,
-            "san": "Nf6",
-            "cp": -20
-          },
-          {
-            "ply": 13,
-            "san": "Be7",
-            "cp": -5
-          },
-          {
-            "ply": 15,
-            "san": "Bg4",
-            "cp": -3
-          }
-        ],
-        "sources": [
-          "Games",
-          "SF"
-        ]
-      },
-      {
-        "id": "d3",
-        "name": "3.d3 (quiet)",
-        "kind": "main",
-        "moves": [
-          "e4",
-          "e5",
-          "Nf3",
-          "d5",
-          "d3",
-          "dxe4",
-          "dxe4",
-          "Qxd1+",
-          "Kxd1",
-          "Nf6",
-          "Nc3",
-          "Bc5",
-          "Nxe5",
-          "Bxf2",
-          "Nd5",
-          "Nxd5"
-        ],
-        "deviatesAt": 4,
-        "cp": 29,
-        "evals": [
-          {
-            "ply": 1,
-            "san": "e5",
-            "cp": -39
-          },
-          {
-            "ply": 3,
-            "san": "d5",
-            "cp": -84
-          },
-          {
-            "ply": 5,
-            "san": "dxe4",
-            "cp": 2
-          },
-          {
-            "ply": 7,
-            "san": "Qxd1+",
-            "cp": 8
-          },
-          {
-            "ply": 9,
-            "san": "Nf6",
-            "cp": 16
-          },
-          {
-            "ply": 11,
-            "san": "Bc5",
-            "cp": 13
-          },
-          {
-            "ply": 13,
-            "san": "Bxf2",
-            "cp": 9
-          },
-          {
-            "ply": 15,
-            "san": "Nxd5",
-            "cp": 29
-          }
-        ],
-        "sources": [
-          "Games",
-          "SF"
-        ]
-      },
-      {
-        "id": "nc3-3",
-        "name": "3.Nc3",
-        "kind": "main",
-        "moves": [
-          "e4",
-          "e5",
-          "Nf3",
-          "d5",
-          "Nc3",
-          "dxe4",
-          "Nxe4",
-          "Nc6",
-          "Bb5",
-          "Bd7",
-          "O-O",
-          "Nf6",
-          "Re1",
-          "Nxe4",
-          "Rxe4",
-          "Be7"
-        ],
-        "deviatesAt": 4,
-        "cp": -65,
-        "evals": [
-          {
-            "ply": 1,
-            "san": "e5",
-            "cp": -39
-          },
-          {
-            "ply": 3,
-            "san": "d5",
-            "cp": -84
-          },
-          {
-            "ply": 5,
-            "san": "dxe4",
-            "cp": 0
-          },
-          {
-            "ply": 7,
-            "san": "Nc6",
-            "cp": -35
-          },
-          {
-            "ply": 9,
-            "san": "Bd7",
-            "cp": -75
-          },
-          {
-            "ply": 11,
-            "san": "Nf6",
-            "cp": -67
-          },
-          {
-            "ply": 13,
-            "san": "Nxe4",
-            "cp": -64
-          },
-          {
-            "ply": 15,
-            "san": "Be7",
-            "cp": -65
-          }
-        ],
-        "sources": [
-          "W-Eleph",
-          "SF"
-        ]
-      },
-      {
-        "id": "ng1",
-        "name": "4.Ng1 full retreat",
-        "kind": "main",
-        "moves": [
-          "e4",
-          "e5",
-          "Nf3",
-          "d5",
-          "exd5",
-          "e4",
-          "Ng1",
-          "Qxd5",
-          "d4",
-          "Nc6",
-          "Be3",
-          "Nf6",
-          "c4",
-          "Qf5"
-        ],
-        "deviatesAt": 6,
-        "cp": -34,
-        "evals": [
-          {
-            "ply": 1,
-            "san": "e5",
-            "cp": -39
-          },
-          {
-            "ply": 3,
-            "san": "d5",
-            "cp": -84
-          },
-          {
-            "ply": 5,
-            "san": "e4",
-            "cp": -92
-          },
-          {
-            "ply": 7,
-            "san": "Qxd5",
-            "cp": -9
-          },
-          {
-            "ply": 9,
-            "san": "Nc6",
-            "cp": 0
-          },
-          {
-            "ply": 11,
-            "san": "Nf6",
-            "cp": -17
-          },
-          {
-            "ply": 13,
-            "san": "Qf5",
-            "cp": -34
-          }
-        ],
-        "sources": [
-          "Games",
-          "SF"
-        ]
-      },
-      {
-        "id": "bb5",
-        "name": "4.Bb5+ c6!",
-        "kind": "side",
-        "moves": [
-          "e4",
-          "e5",
-          "Nf3",
-          "d5",
-          "exd5",
-          "e4",
-          "Bb5+",
-          "c6",
-          "dxc6",
-          "bxc6",
-          "Bc4",
-          "exf3",
-          "Qxf3",
-          "Nf6"
-        ],
-        "deviatesAt": 6,
-        "cp": 195,
-        "evals": [
-          {
-            "ply": 1,
-            "san": "e5",
-            "cp": -39
-          },
-          {
-            "ply": 3,
-            "san": "d5",
-            "cp": -84
-          },
-          {
-            "ply": 5,
-            "san": "e4",
-            "cp": -92
-          },
-          {
-            "ply": 7,
-            "san": "c6",
-            "cp": 196
-          },
-          {
-            "ply": 9,
-            "san": "bxc6",
-            "cp": 199
-          },
-          {
-            "ply": 11,
-            "san": "exf3",
-            "cp": 194
-          },
-          {
-            "ply": 13,
-            "san": "Nf6",
-            "cp": 195
-          }
-        ],
-        "sources": [
-          "Games",
-          "Lichess"
-        ],
-        "claim": "the check achieves nothing; ...exf3 follows and Black is better"
-      },
-      {
-        "id": "bd3",
-        "name": "3.Bd3?! blocks the d-pawn",
-        "kind": "side",
-        "moves": [
-          "e4",
-          "e5",
-          "Nf3",
-          "d5",
-          "Bd3",
-          "dxe4",
-          "Bxe4",
-          "f5",
-          "Bd3",
-          "e4",
-          "Bb5+",
-          "c6",
-          "Bc4",
-          "exf3"
-        ],
-        "deviatesAt": 4,
-        "cp": 188,
-        "evals": [
-          {
-            "ply": 1,
-            "san": "e5",
-            "cp": -39
-          },
-          {
-            "ply": 3,
-            "san": "d5",
-            "cp": -84
-          },
-          {
-            "ply": 5,
-            "san": "dxe4",
-            "cp": 205
-          },
-          {
-            "ply": 7,
-            "san": "f5",
-            "cp": 209
-          },
-          {
-            "ply": 9,
-            "san": "e4",
-            "cp": 215
-          },
-          {
-            "ply": 11,
-            "san": "c6",
-            "cp": 162
-          },
-          {
-            "ply": 13,
-            "san": "exf3",
-            "cp": 188
-          }
-        ],
-        "sources": [
-          "Games",
-          "SF"
-        ],
-        "claim": "take with tempo; White’s development is knotted"
       },
       {
         "id": "nc4",
@@ -2583,14 +3948,14 @@ export default [
           "Nc4",
           "dxc4",
           "Bxc4",
-          "Qh4",
-          "d3",
           "Nf6",
-          "h3",
-          "Nc6"
+          "Nc3",
+          "O-O",
+          "O-O",
+          "Bc5"
         ],
         "deviatesAt": 4,
-        "cp": 250,
+        "cp": 210,
         "evals": [
           {
             "ply": 1,
@@ -2600,32 +3965,32 @@ export default [
           {
             "ply": 3,
             "san": "d5",
-            "cp": -84
+            "cp": -64
           },
           {
             "ply": 5,
             "san": "Bd6",
-            "cp": -68
+            "cp": -74
           },
           {
             "ply": 7,
             "san": "dxc4",
-            "cp": 224
+            "cp": 215
           },
           {
             "ply": 9,
-            "san": "Qh4",
-            "cp": 238
+            "san": "Nf6",
+            "cp": 210
           },
           {
             "ply": 11,
-            "san": "Nf6",
-            "cp": 242
+            "san": "O-O",
+            "cp": 209
           },
           {
             "ply": 13,
-            "san": "Nc6",
-            "cp": 250
+            "san": "Bc5",
+            "cp": 210
           }
         ],
         "sources": [
@@ -2647,15 +4012,15 @@ export default [
           "Bd6",
           "Nxf7",
           "Kxf7",
-          "e5",
-          "Bxe5",
+          "d4",
+          "dxe4",
+          "Bc4+",
+          "Be6",
           "Qh5+",
-          "Ke6",
-          "Qe2",
-          "Kd6"
+          "g6"
         ],
         "deviatesAt": 4,
-        "cp": 159,
+        "cp": 161,
         "evals": [
           {
             "ply": 1,
@@ -2665,32 +4030,32 @@ export default [
           {
             "ply": 3,
             "san": "d5",
-            "cp": -84
+            "cp": -64
           },
           {
             "ply": 5,
             "san": "Bd6",
-            "cp": -68
+            "cp": -74
           },
           {
             "ply": 7,
             "san": "Kxf7",
-            "cp": 131
+            "cp": 111
           },
           {
             "ply": 9,
-            "san": "Bxe5",
-            "cp": 162
+            "san": "dxe4",
+            "cp": 158
           },
           {
             "ply": 11,
-            "san": "Ke6",
-            "cp": 150
+            "san": "Be6",
+            "cp": 158
           },
           {
             "ply": 13,
-            "san": "Kd6",
-            "cp": 159
+            "san": "g6",
+            "cp": 161
           }
         ],
         "sources": [
@@ -2698,7 +4063,353 @@ export default [
           "Lichess",
           "SF"
         ],
-        "claim": "the knight fork gets a rook for two pieces? no — Black scores 60% here in practice"
+        "claim": "the fork gets nothing; Black scores 60% here in practice"
+      },
+      {
+        "id": "d4",
+        "name": "3.d4 (Elephant declined)",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "d4",
+          "dxe4",
+          "Nxe5",
+          "Nd7",
+          "Nxd7",
+          "Bxd7",
+          "Nc3",
+          "Bb4",
+          "Bc4",
+          "Qh4",
+          "Qd2",
+          "f5"
+        ],
+        "deviatesAt": 4,
+        "cp": -18,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "dxe4",
+            "cp": -52
+          },
+          {
+            "ply": 7,
+            "san": "Nd7",
+            "cp": -58
+          },
+          {
+            "ply": 9,
+            "san": "Bxd7",
+            "cp": -25
+          },
+          {
+            "ply": 11,
+            "san": "Bb4",
+            "cp": -16
+          },
+          {
+            "ply": 13,
+            "san": "Qh4",
+            "cp": -18
+          },
+          {
+            "ply": 15,
+            "san": "f5",
+            "cp": -18
+          }
+        ],
+        "sources": [
+          "Games",
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "d3",
+        "name": "3.d3 dxe4 4.dxe4 (quiet)",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "d3",
+          "dxe4",
+          "dxe4",
+          "Qxd1+",
+          "Kxd1",
+          "Nf6",
+          "Bd3",
+          "Nc6",
+          "Nbd2",
+          "Nd7",
+          "c3",
+          "a5"
+        ],
+        "deviatesAt": 4,
+        "cp": 13,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "dxe4",
+            "cp": -1
+          },
+          {
+            "ply": 7,
+            "san": "Qxd1+",
+            "cp": 16
+          },
+          {
+            "ply": 9,
+            "san": "Nf6",
+            "cp": 13
+          },
+          {
+            "ply": 11,
+            "san": "Nc6",
+            "cp": 6
+          },
+          {
+            "ply": 13,
+            "san": "Nd7",
+            "cp": 13
+          },
+          {
+            "ply": 15,
+            "san": "a5",
+            "cp": 13
+          }
+        ],
+        "sources": [
+          "Games",
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "d3-nxe5",
+        "name": "3.d3 dxe4 4.Nxe5",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "d3",
+          "dxe4",
+          "Nxe5",
+          "Nf6",
+          "Be3",
+          "Qe7",
+          "Nc4",
+          "Nc6",
+          "Nc3",
+          "Bg4"
+        ],
+        "deviatesAt": 4,
+        "cp": 24,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "dxe4",
+            "cp": -1
+          },
+          {
+            "ply": 7,
+            "san": "Nf6",
+            "cp": -1
+          },
+          {
+            "ply": 9,
+            "san": "Qe7",
+            "cp": 16
+          },
+          {
+            "ply": 11,
+            "san": "Nc6",
+            "cp": 5
+          },
+          {
+            "ply": 13,
+            "san": "Bg4",
+            "cp": 24
+          }
+        ],
+        "sources": [
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "nc3-3",
+        "name": "3.Nc3",
+        "kind": "main",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "Nc3",
+          "dxe4",
+          "Nxe4",
+          "Nc6",
+          "Bc4",
+          "Bf5",
+          "Ng3",
+          "Bg6",
+          "O-O",
+          "Qd7",
+          "Re1",
+          "O-O-O"
+        ],
+        "deviatesAt": 4,
+        "cp": -49,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "dxe4",
+            "cp": 19
+          },
+          {
+            "ply": 7,
+            "san": "Nc6",
+            "cp": -48
+          },
+          {
+            "ply": 9,
+            "san": "Bf5",
+            "cp": -48
+          },
+          {
+            "ply": 11,
+            "san": "Bg6",
+            "cp": -56
+          },
+          {
+            "ply": 13,
+            "san": "Qd7",
+            "cp": -57
+          },
+          {
+            "ply": 15,
+            "san": "O-O-O",
+            "cp": -49
+          }
+        ],
+        "sources": [
+          "W-Eleph",
+          "Lichess",
+          "SF"
+        ]
+      },
+      {
+        "id": "bd3",
+        "name": "3.Bd3?! blocks the d-pawn",
+        "kind": "side",
+        "moves": [
+          "e4",
+          "e5",
+          "Nf3",
+          "d5",
+          "Bd3",
+          "dxe4",
+          "Bxe4",
+          "f5",
+          "Bd3",
+          "e4",
+          "Qe2",
+          "Be7",
+          "Bb5+",
+          "c6"
+        ],
+        "deviatesAt": 4,
+        "cp": 248,
+        "evals": [
+          {
+            "ply": 1,
+            "san": "e5",
+            "cp": -39
+          },
+          {
+            "ply": 3,
+            "san": "d5",
+            "cp": -64
+          },
+          {
+            "ply": 5,
+            "san": "dxe4",
+            "cp": 196
+          },
+          {
+            "ply": 7,
+            "san": "f5",
+            "cp": 203
+          },
+          {
+            "ply": 9,
+            "san": "e4",
+            "cp": 213
+          },
+          {
+            "ply": 11,
+            "san": "Be7",
+            "cp": 243
+          },
+          {
+            "ply": 13,
+            "san": "c6",
+            "cp": 248
+          }
+        ],
+        "sources": [
+          "Games",
+          "Lichess",
+          "SF"
+        ],
+        "claim": "take with tempo; White’s development is knotted"
       }
     ]
   }

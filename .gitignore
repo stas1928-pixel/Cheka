@@ -12,3 +12,8 @@ exports/
 # OS / editor
 Thumbs.db
 .DS_Store
+
+# any secret-looking file, whatever the extension
+*.env
+*.env.*
+secret*
