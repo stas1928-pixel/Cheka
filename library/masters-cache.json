@@ -1,0 +1,505 @@
+{
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3 Ng5 f4 Ne4 Be3 O-O": {
+  "total": 164,
+  "opening": "Italian Game: Scotch Gambit, Max Lange Attack",
+  "top": [
+   "Nd2 164"
+  ],
+  "games": [
+   "Sanal, V. – Kazhgaleyev, M. (2019)",
+   "Turov, Maxim – Marin, Mihail (2004, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bd7 Bxc6 bxc6 O-O O-O": {
+  "total": 82,
+  "opening": "Italian Game: Scotch Gambit, Max Lange Attack",
+  "top": [
+   "f3 59",
+   "Nd2 22",
+   "Nc3 1"
+  ],
+  "games": [
+   "Karpatchev, Aleksandr – Vajda, Levente (2008, 0-1)",
+   "Karim, Ismael – Gupta, Abhijeet (2012, 0-1)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4": {
+  "total": 274,
+  "opening": "Scotch Game: Scotch Gambit, Kingside Variation",
+  "top": [
+   "O-O 139",
+   "Qe2 115",
+   "Bxf7+ 14"
+  ],
+  "games": [
+   "Petrosian, TL. – Carlsen, M. (2016, 0-1)",
+   "Mamedov, Rau – Inarkiev, E. (2018)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4": {
+  "total": 354,
+  "opening": "Scotch Game: Scotch Gambit, Advance Variation",
+  "top": [
+   "Qe2 197",
+   "O-O 101",
+   "Bd5 54"
+  ],
+  "games": [
+   "Shevchenko, Kirill – Carlsen, M. (2023, 0-1)",
+   "Shevchenko, Kirill – Giri, A. (2023)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 cxd4 Bb4+ Bd2 Bxd2+ Nbxd2 d5 exd5 Nxd5 Qb3 Nce7": {
+  "total": 272,
+  "opening": "Italian Game: Classical Variation, Greco Gambit, Traditional Line",
+  "top": [
+   "O-O 272"
+  ],
+  "games": [
+   "Aronian, L. – Mamedyarov, S. (2021)",
+   "Jones, G. – Karjakin, Sergey (2018)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 cxd4 Bb4+ Bd2 Bxd2+ Nbxd2 d5 exd5 Nxd5 Qb3 Na5 Qa4+ Nc6": {
+  "total": 134,
+  "opening": "Italian Game: Classical Variation, Greco Gambit, Traditional Line",
+  "top": [
+   "Qb3 79",
+   "Bb5 16",
+   "Qa3 16"
+  ],
+  "games": [
+   "Vachier Lagrave, M. – Le Quang Liem (2013, 1-0)",
+   "Jones, G. – Karjakin, Sergey (2018)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 d6 d5 Nce7 c4": {
+  "total": 47,
+  "opening": "Scotch Game",
+  "top": [
+   "f5 14",
+   "g6 14",
+   "Ng6 9"
+  ],
+  "games": [
+   "Baburin, Alexander – Miles, Anthony J (1999, 0-1)",
+   "Postny, E. – Sanal, V. (2019, 0-1)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7": {
+  "total": 219,
+  "opening": "Italian Game: Scotch Gambit, Max Lange Attack",
+  "top": [
+   "f3 211",
+   "Be3 3",
+   "Nb3 2"
+  ],
+  "games": [
+   "Carlsen, M. – Le, Quang Liem (2022)",
+   "Nepomniachtchi, I. – Vachier Lagrave, M. (2024)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7": {
+  "total": 309,
+  "opening": "Scotch Game: Scotch Gambit, Advance Variation",
+  "top": [
+   "O-O 290",
+   "Bxc6 17",
+   "c3 1"
+  ],
+  "games": [
+   "Duda, J. – Aronian, L. (2022)",
+   "Mamedov, Rau – Keymer, Vincent (2025, 0-1)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 cxd4 Bb4+ Bd2 Nxe4 Bxb4 Nxb4 Bxf7+ Kxf7 Qb3+ d5 Qxb4": {
+  "total": 23,
+  "opening": "Italian Game: Classical Variation, Greco Gambit, Traditional Line",
+  "top": [
+   "Rf8 19",
+   "Re8 4"
+  ],
+  "games": [
+   "Petrov, Marij – Goganov, A. (2017, 0-1)",
+   "Ahmadzada, Ahmad – Safarli, E. (2017, 0-1)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qe7 e5": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit, London Defense",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6": {
+  "total": 93,
+  "opening": "Scotch Game: Benima Defense",
+  "top": [
+   "O-O 49",
+   "Nc3 32",
+   "Nxc6 12"
+  ],
+  "games": [
+   "Van Foreest, Jorden – Ernst, S. (2023)",
+   "Jones, Gawain C – Turner, Matthew (2011)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6": {
+  "total": 78,
+  "opening": "Scotch Game: Scotch Gambit",
+  "top": [
+   "Nc3 63",
+   "O-O 11",
+   "Nxc6 4"
+  ],
+  "games": [
+   "Abdusattorov, Nodirbek – Sadhwani, Raunak (2022, 1-0)",
+   "Volokitin, And – Sadhwani, Raunak (2022, 0-1)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 cxd4 Bb4+ Nc3 Nxe4 O-O Bxc3 d5 Bf6 Re1 Ne7 Rxe4 d6 Bg5 Bxg5 Nxg5 h6 Qe2 hxg5 Re1 Be6": {
+  "total": 64,
+  "opening": "Italian Game: Classical Variation, Greco Gambit, Moeller-Therkatz Attack",
+  "top": [
+   "dxe6 56",
+   "Re3 3",
+   "h3 3"
+  ],
+  "games": [
+   "Felgaer, Ruben – Lafuente, Pablo (2009, 0-1)",
+   "Kurenkov, Nikolai – Turov, Maxim (2007, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 O-O Be3": {
+  "total": 1138,
+  "opening": "Italian Game: Classical Variation, Greco Gambit, Modern Line",
+  "top": [
+   "Bg4 853",
+   "f5 115",
+   "Ne7 50"
+  ],
+  "games": [
+   "Nepomniachtchi, I. – Carlsen, M. (2021)",
+   "So, W.. – Carlsen, M.. (2021, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+ Be6 Ng5 Qd5 Nc3 Qf5 Nce4 O-O-O": {
+  "total": 38,
+  "opening": "Italian Game: Scotch Gambit, Max Lange Attack, Long Variation",
+  "top": [
+   "g4 28",
+   "fxg7 7",
+   "Nxe6 3"
+  ],
+  "games": [
+   "Bergez, Luc – Flear, Glenn C (2000, 1-0)",
+   "Cueto Chajtur, Johny – Soppe, Guillermo (2000, 0-1)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O d6": {
+  "total": 96,
+  "opening": "Scotch Game: Haxo Gambit",
+  "top": [
+   "c3 73",
+   "h3 12",
+   "Ng5 5"
+  ],
+  "games": [
+   "Vachier Lagrave, M. – Kramnik, V. (2017, 0-1)",
+   "Ponkratov, P. – Goryachkina, A. (2021)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Nxe4 Re1 d5 Bxd5 Qxd5 Nc3 Qa5": {
+  "total": 391,
+  "opening": "Italian Game: Scotch Gambit, Anderssen Attack",
+  "top": [
+   "Nxe4 380",
+   "Nxd4 10",
+   "Rxe4+ 1"
+  ],
+  "games": [
+   "Jones, G.. – So, W.. (2021, 1-0)",
+   "Savchenko, Boris – Karjakin, Sergey (2010, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 Nxd4 Nxd4 exd4 Qxd4 Ne7 Bc4 Nc6 Qd5 Qf6 O-O Ne5 Be2 c6 Qb3": {
+  "total": 8,
+  "opening": "Scotch Game: Lolli Variation",
+  "top": [
+   "h5 4",
+   "Bc5 4"
+  ],
+  "games": [
+   "Van der Wiel, John – Sokolov, Ivan (1994, 0-1)",
+   "Palac, Mladen – Degraeve, Jean Marc (1997)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 f5": {
+  "total": 0,
+  "opening": "Scotch Game",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6 O-O": {
+  "total": 9,
+  "opening": "Scotch Game: Scotch Gambit",
+  "top": [
+   "d6 3",
+   "Bc5 3",
+   "Nf6 2"
+  ],
+  "games": [
+   "Fossan, Erik – Blatny, Pavel (1993, 0-1)",
+   "Guizar, Dr. Clemente – Segalla, José Getulio Martin (2007, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 Nf6 dxe5 Nxe4 Bc4": {
+  "total": 10,
+  "opening": "Scotch Game",
+  "top": [
+   "Nc5 7",
+   "Qe7 2",
+   "d6 1"
+  ],
+  "games": [
+   "Regan, Kenneth – Lein, Anatoly (1977, 1-0)",
+   "Gaponenko, Inna – Misanovic, Vesna (2002, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 Ng5 Nh6 Nxf7 Nxf7 Bxf7+ Kxf7 Qh5+ g6 Qxc5": {
+  "total": 93,
+  "opening": "Scotch Game: Scotch Gambit, Sarratt Variation",
+  "top": [
+   "d5 68",
+   "d6 23",
+   "Qe7 1"
+  ],
+  "games": [
+   "Grischuk, A. – Karjakin, Sergey (2018)",
+   "Grischuk, A. – Dominguez Perez, L. (2018, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Ke8 Qh5+ g6 Qxc5 cxb2 Bxb2": {
+  "total": 0,
+  "opening": "Scotch Game: Haxo Gambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6 Qxc3": {
+  "total": 2,
+  "opening": "Scotch Game: Haxo Gambit",
+  "top": [
+   "Nf6 2"
+  ],
+  "games": [
+   "Hadzimanolis, Antonios – Stefanova, Antoaneta (2005, 1-0)",
+   "Bargan, Sergei – Nedev, Tanio (2011, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Bc5 Bxf7+ Kxf7 Qd5+ Ke8 Qxc5": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit, London Defense",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6 O-O Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Ke8 Qh5+ Kf8 Qxc5+ Ke8 Qxc3": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Ngxe5 Nxe5 Nxe5 Re1 d6 f4": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit, Kingside Variation",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Qe7 O-O Nxe5 Nxe5 Qxe5 Re1 Ne4 f4 Qf5 g4 Qg6 f5": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit, Advance Variation",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+ Nbd7 Bg5 O-O Bxd7 Bxd7 Bxf6 gxf6 Nxd7 Qxd7 O-O": {
+  "total": 2,
+  "opening": "Elephant Gambit: Maróczy Gambit",
+  "top": [
+   "Kh8 1",
+   "f5 1"
+  ],
+  "games": [
+   "Hoffmann, Michael – Smit, Erik (2007)",
+   "Balabaev, Farit – Blauert, Joerg (2006, 0-1)"
+  ]
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nbd2 Be7 dxe4 Qe6": {
+  "total": 1,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [
+   "Qc4 1"
+  ],
+  "games": [
+   "Rusche, Johannes – Schramm, Christian (2013, 0-1)"
+  ]
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4": {
+  "total": 64,
+  "opening": "Elephant Gambit",
+  "top": [
+   "Nc4 25",
+   "Qe2 9",
+   "Nc3 9"
+  ],
+  "games": [
+   "Jenni, Florian – Skatchkov, Pavel (2007, 0-1)",
+   "Demchenko, A. – Chizhikov, V. (2018, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5": {
+  "total": 1,
+  "opening": "Elephant Gambit",
+  "top": [
+   "Nc6 1"
+  ],
+  "games": [
+   "Zambrana, Oswaldo – Nogueira, Ivan Kuhlmann (2009, 0-1)"
+  ]
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O d3 Nxd5 Qd1 Nc6 Be2 Bf5 O-O Qd7": {
+  "total": 1,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [
+   "Bd2 1"
+  ],
+  "games": [
+   "Movsesian, Sergei – Vachier Lagrave, Maxime (2010, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4": {
+  "total": 1,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [
+   "Nd2 1"
+  ],
+  "games": [
+   "Rodi, Luis Ernesto – Porto, Cristiano Nogueira (2012, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 d5 d4 dxe4 Nxe5 Nd7": {
+  "total": 36,
+  "opening": "Elephant Gambit",
+  "top": [
+   "Nd2 19",
+   "Qe2 7",
+   "Be3 4"
+  ],
+  "games": [
+   "Matyukhin, Sergey Konstantinov – Schweer, Carsten (2021, 1-0)",
+   "Matyukhin, Sergey Konstantinov – Pecka, Josef (2021, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Bb4+ c3 O-O cxb4 exf3 Qxf3 Nxd5": {
+  "total": 0,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc4 Be7 Nc3 Nf6 Bg5 O-O Be2 Nc6": {
+  "total": 0,
+  "opening": "Elephant Gambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 Nc3 d4 Ne2 Bd6 Ng3 Nf6 Bc4 O-O O-O c5": {
+  "total": 5,
+  "opening": "Elephant Gambit",
+  "top": [
+   "d3 5"
+  ],
+  "games": [
+   "Mestrovic, Zvonimir – Romanishin, Oleg M (1988, 0-1)",
+   "Schmaltz, Roland – Schneider, Bernd2 (1992, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Be7 dxe4 O-O Nc3 Re8 Bd2 Bb4 O-O-O": {
+  "total": 1,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [
+   "Bxc3 1"
+  ],
+  "games": [
+   "Muhutdinov, Marat – Belov, Igor (1992)"
+  ]
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 f5 d3 Nf6 dxe4 fxe4 Nc3 Bb4 Qb5+": {
+  "total": 0,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 exd5 Qxd5 Nc3": {
+  "total": 4,
+  "opening": "Elephant Gambit",
+  "top": [
+   "Qe6 2",
+   "Qd6 1",
+   "Qa5 1"
+  ],
+  "games": [
+   "Turov, Maxim – Gashimov, Vugar (2006)",
+   "Predojevic, Borki – Runic, Zoran (2007)"
+  ]
+ },
+ "e4 e5 Nf3 d5 Nxe5 dxe4 d4": {
+  "total": 8,
+  "opening": "Elephant Gambit",
+  "top": [
+   "Nd7 3",
+   "Bd6 3",
+   "exd3 2"
+  ],
+  "games": [
+   "Abramovic, Bosko – Skembris, Spyridon (1983, 1-0)",
+   "Jukic, Branimir – Zelcic, Robert (1994)"
+  ]
+ },
+ "e4 e5 Nf3 d5 Nxe5": {
+  "total": 79,
+  "opening": "Elephant Gambit",
+  "top": [
+   "Bd6 50",
+   "Nf6 19",
+   "dxe4 9"
+  ],
+  "games": [
+   "Jenni, Florian – Skatchkov, Pavel (2007, 0-1)",
+   "Demchenko, A. – Chizhikov, V. (2018, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Bb5+ c6": {
+  "total": 3,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [
+   "dxc6 3"
+  ],
+  "games": [
+   "Kurilin, Alexander – Kalinichev, Andrey (2006, 0-1)",
+   "Eliseev, Nikolay Yakovlevich – Matyukhin, Sergey Konstantinov (2022, 0-1)"
+  ]
+ },
+ "e4 e5 Nf3 d5 Nxe5 dxe4 Bc4 Qg5 Bxf7+ Ke7 d4 Qxg2 Rf1 Bh3 Qe2 Qxf1+ Qxf1 Bxf1 Kxf1 Nf6": {
+  "total": 0,
+  "opening": "Elephant Gambit: Wasp Variation",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 Nxf7 Kxf7": {
+  "total": 1,
+  "opening": "Elephant Gambit",
+  "top": [
+   "Qh5+ 1"
+  ],
+  "games": [
+   "Varga, Zsolt – Ivan, Zoltan (1999, 0-1)"
+  ]
+ }
+}

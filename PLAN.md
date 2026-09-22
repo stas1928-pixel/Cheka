@@ -237,11 +237,56 @@ Rules for every job:
 - Engine re-verification found and fixed: Giuoco 9.O-O (−0.5 → 9.d5),
   3...Bb4+ 5.d5 (−0.6 → 5.Bd3).
 
+### Fifth round, 2026-09-22 — audit + line library (research only, app untouched)
+- Owner: lines still "strange, bot-like"; map exactly which moves are
+  engine vs theory and from which source; research masters, books,
+  platforms, videos; build a library file sorted with names, sources and
+  weight tags. Nothing in the app was changed this round.
+- **`docs/AUDIT.md`** (from `tools/audit-repertoire.mjs`): per shipped line,
+  how many moves came from the hand seed and how many Stockfish appended.
+  Totals: 59 lines, 767 seed plies vs 210 engine plies (21%); but in the
+  Elephant most lines are 7-9 seed plies + 7 engine plies, i.e. **half
+  engine**, and 6 lines have ≤ 1 human reply after the deviation. That is
+  the "bot-like" feel, confirmed.
+- **`library/lines.mjs` → `docs/LIBRARY.md`** (via `tools/build-library.mjs`):
+  ~50 lines across both openings, each with name, kind (main / alt / side /
+  trap), weight (A theory · B known · C community · E engine), sources,
+  a note quoting the source, the number of MASTER games reaching the end
+  of the line, masters' top reply and two example games. Plus the masters'
+  own tree (`tools/masters-tree.mjs`): every branch with ≥ 30 (Scotch) /
+  ≥ 12 (Elephant) master games.
+- Sources actually read: Fishbein "The Scotch Gambit" 2017 (sample: intro,
+  contents, ch.1 main line to 9...Bc5); Bezgodov & Barsky "The Scotch Game"
+  2023 (contents + ch.2); Wikipedia Scotch / Two Knights / Giuoco / Max
+  Lange / Elephant (raw wikitext); Chess Doctrine; ChessMood article +
+  GM Grigoryan video; Chessable IronStone course chapter list; Chessfactor
+  videos (IM Astaneh ×4, IM Ostrovskiy); Hanging Pawns; seven public
+  Lichess studies exported as PGN; Kenilworthian Elephant bibliography;
+  Quality Chess book description (Aabling-Thomsen & Jensen 2020).
+  Not readable: TheChessWorld (403), YouTube pages (JS), Chessable course
+  bodies (login), the Elephant books' text.
+- **Key findings for the next rebuild:**
+  1. Masters meet 4...Bc5 5.c3 Nf6 with **6.e5! d5 7.Bb5 Ne4 8.cxd4 Bb6
+     9.Nc3 O-O 10.Be3** (Greco Gambit Modern Line, 1,138 master games,
+     Nepomniachtchi–Carlsen 2021), not our 6.cxd4 (272). Both are theory.
+  2. 5...Ng4 masters' line is **6.O-O d6 7.exd6 Bxd6 8.Re1+ Kf8**
+     ("Kingside Variation", 42 games) — my first draft had this and I
+     replaced it wrongly; the check that failed was on 6.Qe2, not 6.O-O.
+  3. The Elephant barely exists at master level (≤ 19 games per branch).
+     The 2020 book builds Black's repertoire on **3.exd5 Bd6** (Maróczy /
+     Rogers line), not our 3...e4. Deciding between them is the owner's
+     call and the biggest open question.
+  4. Community studies (SoNy, EXOprimal, BunnyMommy) are rich in traps and
+     club-level replies but carry weight C until a book or the masters DB
+     agrees.
+
 ### Next candidates (owner picks, one per session)
-- Rotate the Lichess token (owner) — then the explorer panel in Review
-  mode works on the phone with the new one.
-- Re-run `explorer-check` monthly; the seed should follow what people play.
-- Trim: if "My games" data shows a rare line never occurs, untick it.
+- **Decide the Elephant system**: keep 3...e4 (Paulsen, our trunk, MCO
+  line) or switch to the book's 3...Bd6 (Maróczy). See LIBRARY.md.
+- **Rebuild the seed from the library**: only weight A/B lines as main,
+  masters' moves for the opponent where ≥ 30 games exist, engine only to
+  verify and to finish rare sidelines — and say so per line in the note.
+- Rotate the Lichess token (owner); re-run `explorer-check` monthly.
 - Analyse more than 60 games on the phone in the background, or run
   `tools/analyse-games.mjs` on the PC and import the JSON.
 - A "Lines" screen on the home page (all openings at once) once there are

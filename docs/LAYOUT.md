@@ -26,6 +26,12 @@ js/weakness.js          blunder finder over your own games + aggregation (tested
 sw.js                   service worker: offline + instant loads (bump VERSION when vendor/ changes)
 icon-192.png, icon-512.png   Android install icons (generated with Pillow)
 tools/nodeEngine.mjs    the same Stockfish under Node, evaluate() contract as js/engine.js
+library/lines.mjs            THE LIBRARY: every known line with name, kind, weight, sources (research; not drilled)
+library/masters-cache.json   cached Lichess masters lookups used by build-library
+docs/LIBRARY.md              rendered library + masters' own tree (node tools/build-library.mjs)
+docs/AUDIT.md                which shipped moves are theory vs engine (node tools/audit-repertoire.mjs)
+tools/masters-tree.mjs       walk the masters DB from a root; branches with >= N games; example games
+tools/explorer-check.mjs     cross-check the seed against masters + amateur frequencies
 tools/repertoire.seed.mjs    THE REPERTOIRE, hand-curated from theory with sources — edit this
 tools/verify-repertoire.mjs  Stockfish check of every seed line; writes js/repertoire.data.js
 tools/build-repertoire.mjs   research tool: what a user's opponents actually play (not shipped)
