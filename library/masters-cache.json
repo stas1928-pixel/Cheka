@@ -501,5 +501,155 @@
   "games": [
    "Varga, Zsolt – Ivan, Zoltan (1999, 0-1)"
   ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qd7 Rd1": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit, London Defense",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 O-O Be3 Bg4 Bxc6 bxc6 Qc2": {
+  "total": 2,
+  "opening": "Italian Game: Classical Variation, Greco Gambit, Modern Line",
+  "top": [
+   "f5 1",
+   "Rb8 1"
+  ],
+  "games": [
+   "Valvo, Michael J – Brooks, Michael A (1990, 0-1)",
+   "Istvanovszki, M. – Krstulovic, Alex (2017)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3 Ng5 f4 Ne4 Be3 O-O Nd2 Nxd2 Qxd2": {
+  "total": 111,
+  "opening": "Italian Game: Scotch Gambit, Max Lange Attack",
+  "top": [
+   "f6 46",
+   "Bb6 41",
+   "Qe7 20"
+  ],
+  "games": [
+   "Sanal, V. – Kazhgaleyev, M. (2019)",
+   "Mueller, Karsten – Slobodjan, Roman (1998)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4 a3 Ba5 Qd5 Ng5 Nxg5 Qxg5 Qxf7+ Kd8 e6": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit, London Defense",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Nxe4 Re1 d5 Bxd5 Qxd5 Nc3 Qf5 Nxe4": {
+  "total": 12,
+  "opening": "Italian Game: Scotch Gambit, Anderssen Attack",
+  "top": [
+   "Be6 9",
+   "Be7 3"
+  ],
+  "games": [
+   "Ozgibcev, A. – Kryakvin, D. (2017, 0-1)",
+   "Zude, Arno – Arkhipov, Sergey (1991)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Bc5 e5 Ng4 Bf4 O-O h3 Nh6 Bxh6 gxh6": {
+  "total": 1,
+  "opening": "Italian Game: Scotch Gambit, Max Lange Attack, Spielmann Defense",
+  "top": [
+   "c3 1"
+  ],
+  "games": [
+   "Leygue, Dominique – Flear, Glenn C (2001, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 Nc6 d4 Nf6 d5 Ne7 Nxe5 Nxe4 Qe2 Nf6 d6 cxd6 Nc4": {
+  "total": 0,
+  "opening": "Scotch Game",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 d6 dxe5 dxe5 Qxd8+ Kxd8 Bb5 Bd7 Bxc6 Bxc6 Nxe5 Bxe4 Nxf7+": {
+  "total": 0,
+  "opening": "Scotch Game",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6 c3 dxc3 Nxc3": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Qe7 O-O Ne4 Qe2": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit, Advance Variation",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Ke8 Qh5+ g6 Qxc5 d6 Qxc3 Nf6 Bg5": {
+  "total": 0,
+  "opening": "Scotch Game: Haxo Gambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 Bxf7+ Kxf7 Ng5+ Kg8 Qxg4 Nxe5 Qf3": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit, Kingside Variation",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 O-O Bc5 Qe2 d5 exd6": {
+  "total": 0,
+  "opening": "Scotch Game: Scotch Gambit, Advance Variation",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3 O-O Bxf6 exf3": {
+  "total": 0,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Ng1 Qxd5 Nc3 Qe5": {
+  "total": 0,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 d4 Nf6 dxe5 Nxe4 Bd3 Bd6 O-O O-O Re1 f5": {
+  "total": 0,
+  "opening": "Petrov's Defense: Modern Attack, Symmetrical Variation",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 exd5 e4": {
+  "total": 69,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [
+   "Qe2 52",
+   "Ne5 10",
+   "Nd4 4"
+  ],
+  "games": [
+   "Movsesian, Sergei – Vachier Lagrave, Maxime (2010, 1-0)",
+   "Ivanchuk, V.. – Gadimbayli, Abdulla (2021, 1-0)"
+  ]
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Be7 Qxe4 Nf6 Bb5+ c6 dxc6 Nxc6 Bxc6+ bxc6 Qxc6+ Bd7 Qa6 Rb8 Nc3 Rb4": {
+  "total": 0,
+  "opening": "Elephant Gambit: Paulsen Countergambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4 e4 Nd4 O-O O-O Bxh2+ Kxh2 Ng4+ Kg1 Qh4": {
+  "total": 0,
+  "opening": "Elephant Gambit: Maróczy Gambit",
+  "top": [],
+  "games": []
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Nf6 Bg5 O-O Nxe4 Nxe4": {
+  "total": 0,
+  "opening": "Elephant Gambit",
+  "top": [],
+  "games": []
  }
 }

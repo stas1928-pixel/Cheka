@@ -280,6 +280,21 @@ Rules for every job:
      club-level replies but carry weight C until a book or the masters DB
      agrees.
 
+### Round 5b — owner's videos folded into the library (2026-09-22)
+- 20 new library lines (`v-*`), weight B for the titled coaches (Smirnov,
+  Chess Vibes), C for streamers (Akeem, Tushi). Library now 88 lines.
+- Smirnov's Scotch video agrees with the masters on the big fork: vs
+  4...Bc5 5.c3 Nf6 play **6.e5** (not 6.cxd4). His end-of-line PLAN text
+  for the Modern Attack (kingside pawn majority f5/f6, Re1; Nb3+Qc3
+  blockade vs ...c5/...d4) is the first sourced "what now" message.
+- Smirnov's Elephant "68% queen trap" (3.exd5 e4 4.Qe2 Be7?!) is **unsound**
+  by engine (+1.4 to +2.0 for White). Kept as a trap to recognise only.
+- Confirmed by two videos and the amateur DB: Paulsen 4.Qe2 Nf6 5.d3 Qxd5
+  6.Nc3 Bb4 7.Bd2 Bxc3 8.Bxc3 O-O and the 9.Bxf6? exf3! punishment
+  (amateurs play 9.Bxf6 about half the time).
+- Not done, awaiting owner: seed rebuild from the library, `plan` field
+  per line, prefix-duplicate test, Elephant system decision.
+
 ### Next candidates (owner picks, one per session)
 - **Decide the Elephant system**: keep 3...e4 (Paulsen, our trunk, MCO
   line) or switch to the book's 3...Bd6 (Maróczy). See LIBRARY.md.
