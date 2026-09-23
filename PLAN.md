@@ -161,7 +161,7 @@ Rules for every job:
   side) and plays our moves; opponent moves inside lines are what YOUR
   opponents most often play, else engine. Trunk is never changed by data.
   Output → `js/repertoire.data.js` (generated, never hand-edited);
-  explanations live in `js/notes.js` keyed by line id.
+  explanations lived in `js/notes.js` keyed by line id (removed in round 6).
   Result: Scotch 5 main + 3 side lines, Elephant 7 main + 6 side lines.
 - **Tabs open into a tickable line list** (Chess Reps-style): under
   Main lines / Side lines / My games, a list shows every line with its
@@ -198,6 +198,8 @@ Rules for every job:
   ≥ 0.5 drop, flags a side line that ends below +0.5 (or its `minCp`), and
   flags two lines playing different moves in the same position. Output →
   `js/repertoire.data.js`. Notes in `js/notes.js` by explicit line id.
+  (Superseded in round 6: the seed is now a selection over the library,
+  `extendTo` and `js/notes.js` are gone, the verifier fails closed.)
 - **What the verifier rejected on the first pass** (all replaced): 5...Ng4
   6.Qe2 (−0.7 → 6.O-O); the old Møller 7.Nc3 (−0.5 → classical 7.Bd2);
   Haxo 6...Bb6 7.e5 Ng4 8.O-O (−0.6); London 9.Ng5/10.Ba3 (−1.5, a web
@@ -282,7 +284,9 @@ Rules for every job:
 
 ### Round 5b — owner's videos folded into the library (2026-09-22)
 - 20 new library lines (`v-*`), weight B for the titled coaches (Smirnov,
-  Chess Vibes), C for streamers (Akeem, Tushi). Library now 88 lines.
+  Chess Vibes), C for streamers (Akeem, Tushi). Library then held 67
+  curated lines (Scotch 42, Elephant 25); the "88" quoted at the time
+  wrongly added the 21 masters'-tree rows, which are a database dump.
 - Smirnov's Scotch video agrees with the masters on the big fork: vs
   4...Bc5 5.c3 Nf6 play **6.e5** (not 6.cxd4). His end-of-line PLAN text
   for the Modern Attack (kingside pawn majority f5/f6, Re1; Nb3+Qc3
@@ -295,12 +299,127 @@ Rules for every job:
 - Not done, awaiting owner: seed rebuild from the library, `plan` field
   per line, prefix-duplicate test, Elephant system decision.
 
+### Round 6 — repertoire rebuilt from the library (2026-09-22)
+- **Ownership fixed.** `library/lines.mjs` is the single source of truth
+  for SAN, sources, notes and end-of-line plans. `tools/repertoire.seed.mjs`
+  no longer holds moves: it SELECTS library lines by id and gives them
+  stable app ids. `js/notes.js` is gone (notes and plans ride inside the
+  generated data). `extendTo` is gone: **0 engine plies ship**.
+- **Verifier fails closed** (`tools/verify-lib.mjs` + CLI): structural
+  rules (legal/canonical SAN, weight A/B, kind main/side/trap, plan with
+  sources, deviation at an opponent ply, line ends after our move with
+  ≥ 4 of our moves after the deviation, no exact/prefix duplicates, one
+  move per position) plus Stockfish DROP ≥ 0.5 and SIDE?/trap < +0.5.
+  Any flag → exit 1 and the data file is not written. Tested with a fake
+  engine (`tests/verify.test.mjs`).
+- **Locked choices (owner):** Scotch 4...Nf6 5.e5; 4...Bc5 5.c3 and after
+  5...Nf6 **6.e5** (masters, Smirnov) not 6.cxd4; 5...Ng4 6.O-O; Møller,
+  Nakhmanson/5.O-O, Perreux, Max Lange library-only. Elephant 3.exd5 e4
+  (Paulsen); 3.Nxe5 Bd6; Smirnov's 4...Be7 queen trap excluded (unsound);
+  Maróczy 3...Bd6 library-only.
+- **Shipped: Scotch 18 lines (10 main, 2 side, 6 trap), Elephant 4 lines
+  (3 main, 1 trap)** — 22 in all, down from 59; 9 weight A, 13 weight B;
+  418 sourced plies, **0 engine plies** (docs/AUDIT.md). Stockfish depth 18
+  passed all 22 with no DROP after the signature and every side/trap line
+  ending ≥ +0.5. Rejected by the engine on the way: Smirnov's London
+  8...Qd7 9.Rd1 (−1.66 vs Re1 — transcript reconstruction doubtful), the
+  ECO Lolli line 6.Bc4 (−0.53), Chess Vibes' final 14.f4 (−0.58, line cut
+  at 13.Nxe6), Ostrovskiy's 9...Bf5 (−0.50, trunk cut at 8...Nc6). The
+  verifier ignores the cost of the signature itself (2...d5 is −0.54 by
+  engine; it is the chosen opening). Removed: everything that was engine
+  after the deviation (all 4...h6, 4...Qf6, 3rd-move oddities, Elephant
+  4.Nd4/4.Ng1/4.Ne5/4.Bb5+/6.dxe4/5.Ng5/3.d3/3.Nc3/3.Bd3 lines, 4...Be7
+  Hungarian and 4...d6 Paris whose 20-ply "theory" had no source beyond
+  the first two moves), the 6.cxd4 Giuoco family (replaced by the Greco
+  Gambit 6.e5 family), duplicates/prefixes (Ke8 trap with and without
+  10...cxb2, 6.Bxf7+ Kf8 short form).
+- **Master practice as a source.** Where a book stops short, the Lichess
+  masters tree (already dumped in round 5) supplies the exact moves, with
+  the game count quoted in the note (e.g. 7...Bc5 8.Be3 O-O 9.Nxc6 … 116
+  games; 6...Nd7 line 41; Greco Gambit 11.h3 813; Elephant 3.d4 line 13).
+  Smirnov's 11.Bxc6 in the Greco Gambit lost to the masters' 11.h3 and is
+  kept as an alternative. Master-tree data ends at 22 plies / < 30 games,
+  which is exactly why several common replies could not be drilled yet.
+- **Plans**: every drilled line has a `plan` in the words of its sources
+  (Smirnov's f5/f6 majority plan, Ostrovskiy's set-up, Wikipedia's
+  assessments, masters' next moves). Line completion opens a focused plan
+  dialog with **Review board** and **Next line**; the same plan remains in
+  the note area after closing the dialog and clears on the next line.
+- **Honest gaps — common replies with no drillable A/B line yet** (each
+  needs one or two more sourced moves, not an engine): Scotch 5...Ne4
+  (masters 6.Qe2 Nc5 7.O-O Be7 8.Rd1 — 3 of our moves), 5...Ng4 sound
+  6...d6 line (8.Re1+ Kf8 — 3 moves), 9...Be7 (masters 10.f3 Nc5 11.f4 —
+  2 moves), 4...h6 (18% of club games), 4...Be7, 4...d6, 3...d6 4.d5 (book
+  move, kept library-only; Smirnov's 4.dxe5 is drilled instead). Elephant
+  6.Nbd2 (MCO main, 3 moves), 6.dxe4 (49% of club games, no source),
+  3.Nxe5 Bd6 4.d4 dxe4 5.Bc4 (ChessMood line ends on White's move) and
+  5.Nc4 (masters' top, 3 moves), 4.Nd4 / 4.Ng1 (29% / 19% of club games).
+  Fix path: re-run `tools/masters-tree.mjs` deeper (maxPlies 26, min 15)
+  or read the ChessMood/Fishbein pages for those exact moves, add them to
+  the library with the count, then select.
+
+### Round 7 — traps, surprises, and the gaps filled from human practice (2026-09-23)
+- **Owner's rules for "crazier" lines** (agreed 2026-09-23): our moves must
+  be engine-sound (no drop ≥ 0.5); the opponent's mistake must be COMMON
+  (≥ 10% of Lichess 1400-1800 players at that node, ≥ 200 games) and REAL
+  (engine swing ≥ +1.0 for a trap, ≥ +0.5 for a side line); the line ends
+  with the gain locked in (trap ≥ +1.5, side ≥ +0.75); no stupid blunders.
+  Trap/side/surprise lines may come from any source (YouTube, studies —
+  weight C allowed); main lines stay A/B. Our own offbeat choices live in
+  a separate **surprise** set (Surprises tab), never mixed with the main
+  repertoire. Depth rule: main lines stop where theory stops and the plan
+  popup carries the middlegame; side/trap lines run until the tactic is
+  finished; stop once material is won.
+- **Verifier** (`tools/verify-lib.mjs`): side/trap lines carry `mistakeAt`;
+  checks RARE (club share from `library/explorer-cache.json`, offline),
+  NOT-A-MISTAKE (swing), SIDE? (end eval), plus the existing DROP /
+  structure rules; surprise lines are checked as their own consistent set.
+  Labels are defined by severity, not by where the mistake sits.
+- **Three databases** via `tools/explorer-cache.mjs` (token read from
+  `.env`, never printed): masters; club 1400-1800; strong 2200-2500.
+  `tools/human-tree.mjs` walks a tree of HUMAN moves (masters/strong at our
+  nodes, club replies ≥ 15% at theirs) — this filled the gaps books left:
+  Elephant 6.dxe4 Qxe4 7.Qxe4+ Nxe4 8.Bd3 Nc5 (strong 729/795), 6.Nc3 Bb4
+  … 9.dxe4 Nxe4 10.Rd1/Qd3 Nxc3, 4.Nd4 Qxd5 5.Nb3 Nf6 6.Nc3 Qe5 7.Be2
+  Nc6, 5.Bc4 Bxe5 6.dxe5 Qxd1+ (67% of club players), 5.Nc4 Nf6; Scotch
+  4...h6 5.Nxd4, London 7...Nge7 8.Ng5 and 8.Qb3 Qf6 9.Bg5, 9...Be7 10.f3
+  (masters to 13.Nc3), 5...Ng4 6.O-O Bc5 7.Bf4 and 8...Kf8 9.h3, the
+  Hungarian 4...Be7 5.Nxd4 family.
+- **Web research (subagent)** added annotated master games
+  (ianchessgambits: 5...Ne4 6.Qe2 lines, 4...d6 5.Nxd4 Nf6 6.Nc3), the
+  Quality Chess excerpt (3.Nxe5 Bd6 4.d4 dxe4 5.Nc3 Bxe5 … Swan–Greet;
+  4.Nxf7 Kxf7 5.Qh5+ g6 6.Qxd5+ Kg7!), Harding/Karker and ChessMood for
+  5.Bc4 Bxe5 6.Qh5 Qe7, Kenilworthian for 5...Ng4.
+- **Engine rejections this round** (all replaced or dropped, see library
+  notes): 9.Na3 vs 5...Ng4 (−0.60 → strong players' 9.h3); 7...Bd6 in the
+  4.Nd4 line (−0.55 → 7...Nc6); 8...Bg4+ after 7.Kxd1 (−0.50 → 8...Bf5);
+  Smirnov's 10.Qxc3 in the Haxo Ke8 line (−0.51 → line stops at 9.Qxc5);
+  10.Nbd2 in London 8...Qf6 (−0.87 → stops at 9.Bg5); 8.O-O in the 4...h6
+  line (−0.81 → stops at 8.Bf4); the 4...h6 Bxf7+ "trap" (swing 0.00 —
+  not a trap, dropped); strong players' 8...Ne5 9.Nxf7 sacrifice in the
+  London (swing −0.05 — fun, not a punishment, dropped).
+- **Labels corrected by severity**: Haxo accepted 5...dxc3 (swing +0.8)
+  and 5...Qe7 (the deviation itself costs ~2) are SIDE lines; 3...d6 and
+  3...Nf6 lines are TRAPS (the big gain comes from a later mistake: 6...Bd7
+  and 6...Nf6); 6.Nc3 Bb4 … 9.Bxf6? exf3 is a TRAP with the sound 9.dxe4
+  as separate main lines; 4.Nxf7 is SIDE (+1.1 at the end).
+- **Shipped (final verification 2026-09-23, Stockfish depth 18, 0 flags,
+  86 tests green)**: **63 lines** — Scotch 39 (30 main, 9 side/trap) + 3
+  surprises, Elephant 19 (17 main, 2 side/trap) + 2 surprises; weight
+  A 16, B 47, C 0; 1,260 sourced plies, **0 engine plies**. Every drilled
+  line has a plan popup with a `planBasis` (quoted / interpreted) and a
+  credit line ("Source: …" or "Based on: …"). Library: 119 curated lines.
+  Three engine passes were needed; each borderline drop (0.50-0.59) was
+  replaced by the strong players' or the book's alternative, never by an
+  engine move.
+- **Remaining gaps** (no four sound sourced moves anywhere): Elephant
+  4.Nd4 Qxd5 5.c3 (62% of club players at that node), 5.Bc4 Bxe5 6.Qh5
+  Qe7 7.dxe5 (52%), 3.d3 / 3.Nc3 / 4.Ng1 / 4.Ne5 (each < 15% of club
+  games); Scotch London 7...Bb6 (9%).
+
 ### Next candidates (owner picks, one per session)
-- **Decide the Elephant system**: keep 3...e4 (Paulsen, our trunk, MCO
-  line) or switch to the book's 3...Bd6 (Maróczy). See LIBRARY.md.
-- **Rebuild the seed from the library**: only weight A/B lines as main,
-  masters' moves for the opponent where ≥ 30 games exist, engine only to
-  verify and to finish rare sidelines — and say so per line in the note.
+- Use the app for a few weeks; then re-run `tools/fetch-club.mjs` and
+  `tools/explorer-check.mjs` to see which drilled lines actually occur.
 - Rotate the Lichess token (owner); re-run `explorer-check` monthly.
 - Analyse more than 60 games on the phone in the background, or run
   `tools/analyse-games.mjs` on the PC and import the JSON.
@@ -310,9 +429,11 @@ Rules for every job:
 ---
 
 ## Testing
-- `npm test` runs `node --test` over `tests/*.test.mjs`: 41 tests covering
-  repertoire legality/canonical SAN, tree helpers, settings, progress,
-  explorer client, Chess.com parsing/walk/aggregation. DOM code (`app.js`,
+- `npm test` runs `node --test` over `tests/*.test.mjs`: repertoire
+  legality/canonical SAN and provenance (seed = library SAN, 0 engine
+  plies, no prefix lines, depth rule, sourced plans), the fail-closed
+  verifier with a fake engine, library legality, tree helpers, settings,
+  progress, explorer client, Chess.com parsing/walk/aggregation. DOM code (`app.js`,
   `feedback.js`) is checked by hand in the browser preview.
 - Coverage target ≥ 90 % on the pure modules; not measured yet (node's
   `--experimental-test-coverage` can report it when wanted).

@@ -97,6 +97,7 @@
   <div id="line-mode" class="segmented small" role="radiogroup" aria-label="Which lines to train">
     <button data-line="main" role="radio">Main lines</button>
     <button data-line="side" role="radio">Side lines</button>
+    <button data-line="surprise" role="radio">Surprises</button>
     <button data-line="mine" role="radio">My games</button>
   </div>
 
@@ -159,6 +160,22 @@
     </div>
   </div>
 </main>
+
+<dialog id="plan-dialog" class="plan-dialog" aria-labelledby="plan-dialog-title">
+  <div class="plan-dialog-head">
+    <span>Line complete</span>
+    <button id="plan-dialog-close" class="icon-btn" aria-label="Review completed position">×</button>
+  </div>
+  <div class="plan-dialog-body">
+    <h2 id="plan-dialog-title"></h2>
+    <p id="plan-dialog-text"></p>
+    <p id="plan-dialog-credit" class="plan-credit"></p>
+  </div>
+  <div class="plan-dialog-actions">
+    <button id="plan-dialog-review">Review board</button>
+    <button id="plan-dialog-next" class="primary">Next line</button>
+  </div>
+</dialog>
 
 <!-- type="module" lets app.js import the other files and the vendored chess.js -->
 <script type="module" src="js/app.js"></script>

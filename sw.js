@@ -11,12 +11,12 @@
 
    Bump VERSION whenever vendor/ changes so the old cache is dropped.
 --------------------------------------------------------------- */
-const VERSION = 'v4';
+const VERSION = 'v6';
 const CACHE = `opening-trainer-${VERSION}`;
 
 const PRECACHE = [
   './', './index.html', './css/style.css', './manifest.webmanifest', './icon.svg',
-  './js/app.js', './js/repertoire.js', './js/repertoire.data.js', './js/notes.js', './js/tree.js', './js/progress.js', './js/settings.js',
+  './js/app.js', './js/repertoire.js', './js/repertoire.data.js', './js/tree.js', './js/progress.js', './js/settings.js',
   './js/feedback.js', './js/explorer.js', './js/chesscom.js', './js/engine.js',
   './js/branchBuilder.js', './js/weakness.js',
   './vendor/chess.js',

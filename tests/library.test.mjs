@@ -22,6 +22,14 @@ test('library: every line is legal, canonical SAN, has weight/kind/sources that 
         assert.equal(m.san, san, `${label}: ply ${ply} write "${m.san}"`);
       });
       assert.ok(l.theoryTo <= l.moves.length + 0, `${label}: theoryTo beyond the moves given`);
+      if (l.plan) {
+        assert.ok(l.planSources?.length && l.planSources.every((k) => SOURCES[k]), `${label}: plan needs known sources`);
+        assert.ok(['quoted', 'interpreted'].includes(l.planBasis), `${label}: planBasis`);
+      }
+      if (l.mistakeAt !== undefined) {
+        assert.ok(Number.isInteger(l.mistakeAt) && l.mistakeAt < l.moves.length, `${label}: mistakeAt in range`);
+        assert.ok((l.mistakeAt % 2 === 0) !== (o.side === 'w'), `${label}: mistakeAt must be an opponent ply`);
+      }
     }
   }
 });

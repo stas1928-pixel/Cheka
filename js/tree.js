@@ -31,8 +31,14 @@ export function mainLine(opening) {
   return opening.lines[0].moves;
 }
 
+/** Find a line by id in the main repertoire or in the separate surprise set. */
 export function lineById(opening, id) {
-  return opening.lines.find((l) => l.id === id) ?? null;
+  return opening.lines.find((l) => l.id === id) ?? (opening.surprise ?? []).find((l) => l.id === id) ?? null;
+}
+
+/** OUR offbeat alternatives (kind 'surprise'), drilled apart from the main repertoire. */
+export function surpriseLines(opening) {
+  return opening.surprise ?? [];
 }
 
 export function linesOfKind(opening, kind) {

@@ -5,17 +5,21 @@
    appends the masters' own tree (tools/masters-tree.mjs output) so the
    reader can compare "what books say" with "what masters play".
 
-     node tools/build-library.mjs [scotch-tree.json] [elephant-tree.json] > docs/LIBRARY.md
+     node tools/build-library.mjs [scotch-tree.json] [elephant-tree.json] [--offline] > docs/LIBRARY.md
 
-   Needs the Lichess token in .env for the annotations; without it the
-   document is still produced, minus the masters columns.
+   Needs the Lichess token in .env for the annotations; without it, or
+   with --offline, only library/masters-cache.json is used (uncached
+   lines show "?").
 --------------------------------------------------------------- */
 import fs from 'node:fs';
 import { Chess } from '../vendor/chess.js';
 import { LIBRARY, SOURCES } from '../library/lines.mjs';
+import { SELECTION } from '../tools/repertoire.seed.mjs';
 import { moveLabel } from '../js/tree.js';
 
-const TOKEN = fs.existsSync('.env') ? fs.readFileSync('.env', 'utf8').match(/lip_[A-Za-z0-9]+/)?.[0] : null;
+const OFFLINE = process.argv.includes('--offline');
+const TOKEN = !OFFLINE && fs.existsSync('.env') ? fs.readFileSync('.env', 'utf8').match(/lip_[A-Za-z0-9]+/)?.[0] : null;
+const DRILLED = new Map(SELECTION.flatMap((o) => [...o.lines.map((l) => [`${o.id}/${l.use}`, l.id]), ...(o.surprise ?? []).map((l) => [`${o.id}/${l.use}`, `${l.id} (surprise)`])]));
 const CACHE_FILE = 'library/masters-cache.json';
 const cache = fs.existsSync(CACHE_FILE) ? JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8')) : {};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -48,7 +52,9 @@ const K = { main: 'Main lines (sound opponent choices you must know)', alt: 'Alt
 
 const out = [];
 out.push(`# Line library — Scotch Gambit (White) and Elephant Gambit (Black)\n`);
-out.push(`Generated ${new Date().toISOString().slice(0, 10)} from \`library/lines.mjs\` by \`tools/build-library.mjs\`. Research only: nothing here is drilled until it is copied into \`tools/repertoire.seed.mjs\`.\n`);
+const nLines = LIBRARY.reduce((n, o) => n + o.lines.length, 0);
+const nDrilled = DRILLED.size;
+out.push(`Generated ${new Date().toISOString().slice(0, 10)} from \`library/lines.mjs\` by \`tools/build-library.mjs\`. **${nLines} curated lines** (${LIBRARY.map((o) => `${o.name} ${o.lines.length}`).join(', ')}); the masters' tree at the end is a separate database dump, not part of that count. **${nDrilled} of them are drilled** in the app — marked ✓ with their app id; \`tools/repertoire.seed.mjs\` selects them by id, so the moves the app drills are exactly the moves printed here. Everything else is research to recognise, not to play.\n`);
 out.push(`**Weight** says how much a line can be trusted:\n\n${Object.values(W).map((w) => `- ${w}`).join('\n')}\n`);
 out.push(`**Masters** = number of OTB master games (Lichess masters DB) that reach the END of the quoted moves; "top" = what masters play next. A line with 0 master games at its end is club practice or a trap, whatever its source says.\n`);
 
@@ -59,8 +65,8 @@ for (const o of LIBRARY) {
     const lines = o.lines.filter((l) => l.kind === kind).sort((a, b) => a.weight.localeCompare(b.weight));
     if (!lines.length) continue;
     out.push(`\n### ${K[kind]}\n`);
-    out.push('| # | line | weight | moves (theory part in bold) | masters at end | top reply | example games | sources |');
-    out.push('|---|---|---|---|---|---|---|---|');
+    out.push('| # | drilled | line | weight | moves (theory part in bold) | masters at end | top reply | example games | sources |');
+    out.push('|---|---|---|---|---|---|---|---|---|');
     let n = 0;
     for (const l of lines) {
       n++;
@@ -69,10 +75,14 @@ for (const o of LIBRARY) {
       const tail = l.moves.slice(l.theoryTo);
       const movesTxt = `**${fmt(l.moves, o.root.length).split(' ').slice(0, theory.length).join(' ')}**${tail.length ? ' ' + fmt(l.moves, l.theoryTo) : ''}`;
       const src = l.sources.map((s) => `[${s}](#src-${s})`).join(', ');
-      out.push(`| ${n} | **${l.name}** | ${l.weight} | ${movesTxt} | ${m ? m.total.toLocaleString() : '?'} | ${m?.top?.[0] ?? ''} | ${m?.games?.join('; ') ?? ''} | ${src} |`);
+      const drilled = DRILLED.has(`${o.id}/${l.id}`) ? `✓ \`${DRILLED.get(`${o.id}/${l.id}`)}\`` : '';
+      out.push(`| ${n} | ${drilled} | **${l.name}** | ${l.weight} | ${movesTxt} | ${m ? m.total.toLocaleString() : '?'} | ${m?.top?.[0] ?? ''} | ${m?.games?.join('; ') ?? ''} | ${src} |`);
     }
     out.push('');
-    for (const l of lines) out.push(`- **${l.name}** — ${l.note}`);
+    for (const l of lines) {
+      out.push(`- **${l.name}** — ${l.note}`);
+      if (l.plan) out.push(`  - *Plan (${l.planSources.join(', ')}):* ${l.plan}`);
+    }
   }
 }
 

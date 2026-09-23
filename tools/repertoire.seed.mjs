@@ -1,263 +1,174 @@
 /* ---------------------------------------------------------------
-   CURATED REPERTOIRE SEED — hand-written from theory, cross-checked
-   against the Lichess databases, then verified with Stockfish by
-   tools/verify-repertoire.mjs (which writes js/repertoire.data.js).
+   REPERTOIRE SELECTION — which library lines the app drills.
 
-   Rules:
-   - `moves` is the theory part: sourced, named, human. A line ends where
-     the theory (and the idea) ends — no engine tails for their own sake.
-   - `extendTo` (optional) lets the engine add best play for BOTH sides up
-     to that many plies where a line would otherwise stop too early to be
-     drilled (min 4 of our moves).
-   - kind 'main' = a sound choice by the opponent that you must know.
-     kind 'side' = an inferior move with the punishment; `claim` says what
-     the line wins, and the verifier flags it if the engine disagrees
-     (final eval below `minCp`, default +0.5).
-   - Our side plays ONE move per position across all lines (verifier
-     flags a REPEAT otherwise).
-   - Opponent moves inside a line follow the Lichess 1400-1800 blitz/rapid
-     database where it is thick (tools/explorer-check.mjs, 2026-09-17);
-     percentages in comments are that database's share at the node.
-   - Comments "tested" record moves the engine rejected and what replaced
-     them.
+   library/lines.mjs is the single source of truth for moves (SAN),
+   sources, notes and end-of-line plans. This file only SELECTS library
+   lines by id and gives each a stable app id (progress records hang off
+   it). Nothing is copied or extended here:
+   - no `extendTo`, no engine-created plies: what ships is exactly the
+     sourced moves of the library line;
+   - main lines are weight A (book / MCO / master practice) or B (course,
+     titled player on video, cited Wikipedia, strong-online-player
+     practice); side/trap/surprise lines may also be C (YouTube, studies)
+     because the verifier checks them harder (below); E (engine) never;
+   - one repertoire move per position for our side; conflicting
+     alternatives (Møller, Smirnov's 11.Bxc6, 6.cxd4 Giuoco …) stay
+     library-only. OUR own offbeat choices (Max Lange, Nakhmanson, the
+     book's 3...Bd6 Elephant …) go in `surprise`, a separate set the app
+     drills apart from the main repertoire (Surprises tab);
+   - kind comes from the library: main = sound opponent choice you must
+     know; side = the deviation itself is a mistake; trap = a later
+     opponent move is the mistake. side/trap lines name `mistakeAt`; the
+     mistake must be played by ≥ 10% of club players (Lichess 1400-1800)
+     and swing the engine ≥ +1.0 (side +0.5), and the line ends with the
+     gain locked in (≥ +1.5; side +1.0) — no stupid blunders drilled;
+   - every non-trunk line ends after OUR move and has at least four of
+     our moves after the defining point; lines the sources do not carry
+     that far are omitted, not padded.
+   tools/verify-repertoire.mjs checks all of this plus Stockfish and
+   writes js/repertoire.data.js only when nothing is flagged.
 
-   Sources (see docs/sources.md):
-   [W-Scotch]  Wikipedia "Scotch Game" — Scotch Gambit section, citing
-               Wells (1998), Lane (1993), Dembo & Palliser (2011)
-   [W-MaxL]    Wikipedia "Max Lange Attack"
-   [W-Eleph]   Wikipedia "Elephant Gambit" (de Firmian; Tal–Lutikov 1964)
-   [CD]        chessdoctrine.com Scotch Gambit variations & traps
-   [CM]        chessmood.com "Refute the Elephant Gambit" (White's best tries)
-   [CB]        chessable.com Elephant Gambit guide
-   [Lichess]   Lichess masters + amateur (1400-1800) explorer, 2026-09-17
-   [Games]     stas1928's Chess.com games (last 6 months, 427 games)
-   [SF]        Stockfish 18 depth 18 — our move where theory is silent
+   Locked choices (owner, 2026-09-22/23): Scotch 4...Nf6 5.e5; 4...Bc5 5.c3
+   and after 5...Nf6 6.e5 (not 6.cxd4); 5...Ng4 6.O-O (not 6.Bxf7+);
+   Elephant 3.exd5 e4 (Paulsen), 3.Nxe5 Bd6; Smirnov's 4...Be7 queen trap
+   excluded as unsound; crazier human lines welcome as traps/surprises
+   under the rules above.
 --------------------------------------------------------------- */
+import { LIBRARY, SOURCES } from '../library/lines.mjs';
+import { cached } from './explorer-cache.mjs';
 
-const S = ['e4', 'e5', 'Nf3', 'Nc6', 'd4'];                 // Scotch root
-const SG = [...S, 'exd4', 'Bc4'];                          // Scotch Gambit
-const ML = [...SG, 'Nf6', 'e5', 'd5', 'Bb5', 'Ne4', 'Nxd4'];   // Max Lange stem
-const HX = [...SG, 'Bc5', 'c3'];                           // Haxo Gambit stem
-const E = ['e4', 'e5', 'Nf3', 'd5'];                        // Elephant root
-const PC = [...E, 'exd5', 'e4'];                            // Paulsen Countergambit stem
-
-export const SEED = [
+export const SELECTION = [
   {
-    id: 'scotch', name: 'Scotch Gambit', side: 'w', signaturePlies: 5,
+    id: 'scotch', signaturePlies: 5,
     lines: [
-      /* ----- TRUNK ----- */
-      { id: 'main', name: 'Max Lange Attack', kind: 'main',
-        moves: [...ML, 'Bd7', 'Bxc6', 'bxc6', 'O-O', 'Bc5', 'f3', 'Ng5', 'Be3'],
-        sources: ['W-Scotch', 'CD', 'Lichess'] },
-
-      /* ----- Max Lange family (4...Nf6 5.e5) ----- */
-      { id: 'max-lange-be7', name: 'Max Lange, 9...Be7', kind: 'main',        // 17% here
-        moves: [...ML, 'Bd7', 'Bxc6', 'bxc6', 'O-O', 'Be7'], extendTo: 20,
-        sources: ['Lichess', 'SF'] },
-      { id: 'max-lange-bxc6', name: 'Max Lange, 8...Bxc6', kind: 'main',      // 19% here
-        moves: [...ML, 'Bd7', 'Bxc6', 'Bxc6'], extendTo: 18,
-        sources: ['Lichess', 'SF'] },
-      { id: 'max-lange-bc5', name: 'Max Lange, 7...Bc5', kind: 'main',        // 23%; then 8...O-O 51%
-        moves: [...ML, 'Bc5', 'Be3', 'O-O', 'Bxc6', 'bxc6', 'O-O'], extendTo: 20,
-        sources: ['Lichess', 'SF'] },
-      { id: 'max-lange-nd7', name: 'Max Lange, 6...Nd7', kind: 'main',        // 12% here
-        moves: [...SG, 'Nf6', 'e5', 'd5', 'Bb5', 'Nd7'], extendTo: 16,
-        sources: ['Lichess', 'SF'] },
-      { id: 'ng4', name: '5...Ng4', kind: 'main',                              // 23%
-        moves: [...SG, 'Nf6', 'e5', 'Ng4', 'O-O'], extendTo: 16,             // tested: 6.Qe2 −0.7
-        sources: ['W-Scotch', 'Lichess', 'SF'] },
-      { id: 'ne4', name: '5...Ne4 6.Qe2 d5', kind: 'main',                     // 12%; then 6...d5 34%
-        moves: [...SG, 'Nf6', 'e5', 'Ne4', 'Qe2', 'd5'], extendTo: 16,
-        sources: ['Lichess', 'Games', 'SF'] },
-      { id: 'ne4-nc5', name: '5...Ne4 6.Qe2 Nc5', kind: 'main',
-        moves: [...SG, 'Nf6', 'e5', 'Ne4', 'Qe2', 'Nc5', 'O-O'], extendTo: 16,
-        sources: ['Lichess', 'SF'] },
-      { id: 'qe7', name: '5...Qe7 (pin on the e-file)', kind: 'side', minCp: 30,   // 12% amateur, 0% masters
-        claim: 'the queen blocks its own bishop; castle and the pin goes nowhere',
-        moves: [...SG, 'Nf6', 'e5', 'Qe7', 'O-O'], extendTo: 15,
-        sources: ['Lichess', 'SF'] },
-
-      /* ----- Haxo Gambit family (4...Bc5 5.c3) ----- */
-      { id: 'haxo', name: 'Haxo Gambit → Giuoco Piano, 7.Bd2', kind: 'main',  // 5...Nf6 27%; 8...d5 22%
-        // tested: 7.Nc3 (Møller Attack) −0.5 vs 7.Bd2 — the classical main line
-        moves: [...HX, 'Nf6', 'cxd4', 'Bb4+', 'Bd2', 'Bxd2+', 'Nbxd2', 'd5', 'exd5', 'Nxd5', 'Qb3', 'Nce7', 'O-O', 'O-O', 'Rfe1', 'c6'],
-        sources: ['W-Scotch', 'CD', 'Lichess'] },
-      { id: 'haxo-oo', name: 'Giuoco Piano, 8...O-O', kind: 'main',             // 42% here
-        moves: [...HX, 'Nf6', 'cxd4', 'Bb4+', 'Bd2', 'Bxd2+', 'Nbxd2', 'O-O', 'd5'], extendTo: 18,   // tested: 9.O-O −0.5 vs 9.d5
-        sources: ['Lichess', 'SF'] },
-      { id: 'haxo-na5', name: 'Giuoco Piano, 10...Na5', kind: 'main',           // 30% here
-        moves: [...HX, 'Nf6', 'cxd4', 'Bb4+', 'Bd2', 'Bxd2+', 'Nbxd2', 'd5', 'exd5', 'Nxd5', 'Qb3', 'Na5', 'Qa4+', 'Nc6'], extendTo: 20,
-        sources: ['W-Scotch', 'Lichess', 'SF'] },
-      { id: 'haxo-nxe4', name: 'Greco Gambit accepted, 7...Nxe4', kind: 'main', // 28% here
-        moves: [...HX, 'Nf6', 'cxd4', 'Bb4+', 'Bd2', 'Nxe4', 'Bxb4', 'Nxb4', 'Bxf7+', 'Kxf7', 'Qb3+', 'd5', 'Qxb4'], extendTo: 20,
-        sources: ['W-Scotch', 'Lichess', 'SF'] },
-      { id: 'haxo-bb6', name: 'Haxo Gambit, 6...Bb6', kind: 'main',
-        moves: [...HX, 'Nf6', 'cxd4', 'Bb6', 'e5'], extendTo: 16,             // tested: 7.Nc3 −0.7
-        sources: ['W-Scotch', 'SF'] },
-      { id: 'haxo-trap', name: 'Haxo accepted, 6.Bxf7+! Ke8', kind: 'side', minCp: 30,   // 5...dxc3 55%!, 7...Ke8 78%
-        claim: 'the bishop comes back with the king stuck in the centre',
-        moves: [...HX, 'dxc3', 'Bxf7+', 'Kxf7', 'Qd5+', 'Ke8', 'Qh5+'], extendTo: 17,
-        sources: ['W-Scotch', 'CD', 'Lichess', 'SF'] },
-      { id: 'haxo-trap-kf8', name: 'Haxo accepted, 6.Bxf7+! Kf8', kind: 'side', minCp: 30,   // 7...Kf8 22%
-        claim: 'the bishop comes back with the king stuck in the centre',
-        moves: [...HX, 'dxc3', 'Bxf7+', 'Kxf7', 'Qd5+', 'Kf8', 'Qxc5+', 'd6', 'Qxc3'], extendTo: 17,   // tested: 10.O-O −0.5
-        sources: ['W-Scotch', 'CD', 'SF'] },
-
-      /* ----- other 4th moves ----- */
-      { id: 'london', name: 'London Defence (4...Bb4+)', kind: 'main',       // 7.7%; then 7...Nge7 29%
-        moves: [...SG, 'Bb4+', 'c3', 'dxc3', 'bxc3', 'Ba5', 'O-O', 'Nge7'], extendTo: 16,   // tested: 9.Ng5?/10.Ba3? −1.5
-        sources: ['W-Scotch', 'CD', 'Lichess', 'SF'] },
-      { id: 'london-nf6', name: 'London Defence, 7...Nf6', kind: 'main',      // 20% here
-        moves: [...SG, 'Bb4+', 'c3', 'dxc3', 'bxc3', 'Ba5', 'O-O', 'Nf6'], extendTo: 16,
-        sources: ['Lichess', 'SF'] },
-      { id: 'london-be7', name: 'London Defence, 6...Be7?', kind: 'side', minCp: 30,   // 16% here
-        claim: 'Qd5 hits f7 and b7 at once',
-        moves: [...SG, 'Bb4+', 'c3', 'dxc3', 'bxc3', 'Be7', 'Qd5'], extendTo: 15,
-        sources: ['CD', 'Lichess', 'SF'] },
-      { id: 'london-trap', name: 'London Defence trap, 6...Bc5? (Ke8)', kind: 'side',   // 8...Ke8 75%
-        claim: 'Bxf7+ and Qd5+ win the bishop on c5',
-        moves: [...SG, 'Bb4+', 'c3', 'dxc3', 'bxc3', 'Bc5', 'Bxf7+', 'Kxf7', 'Qd5+', 'Ke8', 'Qxc5'], extendTo: 17,
-        sources: ['CD', 'Lichess', 'SF'] },
-      { id: 'london-trap-kf8', name: 'London Defence trap, 6...Bc5? (Kf8)', kind: 'side',
-        claim: 'Bxf7+ and Qd5+ win the bishop on c5',
-        moves: [...SG, 'Bb4+', 'c3', 'dxc3', 'bxc3', 'Bc5', 'Bxf7+', 'Kxf7', 'Qd5+', 'Kf8', 'Qxc5+', 'd6', 'Qc4'],
-        sources: ['CD'] },
-      { id: 'hungarian', name: 'Hungarian Defence (4...Be7)', kind: 'main',   // 8%
-        moves: [...SG, 'Be7', 'Nxd4', 'd6', 'O-O', 'Nf6', 'Nc3', 'O-O', 'h3', 'Nxd4', 'Qxd4', 'Be6', 'Bxe6', 'fxe6'],
-        sources: ['W-Scotch', 'CD'] },
-      { id: 'hungarian-nxd4', name: 'Hungarian Defence, 5...Nxd4', kind: 'main',   // 32% here
-        moves: [...SG, 'Be7', 'Nxd4', 'Nxd4', 'Qxd4'], extendTo: 16,
-        sources: ['Lichess', 'SF'] },
-      { id: 'declined-d6', name: '4...d6 (gambit declined)', kind: 'main',     // 13%
-        moves: [...SG, 'd6', 'Nxd4', 'Nf6', 'Nc3', 'Be7', 'O-O', 'O-O', 'h3', 'Nxd4', 'Qxd4', 'Be6', 'Bxe6', 'fxe6'],
-        sources: ['CD'] },
-      { id: 'declined-d6-nxd4', name: '4...d6 5.Nxd4 Nxd4', kind: 'main',       // 52% here
-        moves: [...SG, 'd6', 'Nxd4', 'Nxd4', 'Qxd4'], extendTo: 16,
-        sources: ['Lichess', 'SF'] },
-      { id: 'declined-d6-ne5', name: '4...d6, 8...Ne5', kind: 'main',           // 28% here
-        moves: [...SG, 'd6', 'Nxd4', 'Nf6', 'Nc3', 'Be7', 'O-O', 'O-O', 'h3', 'Ne5'], extendTo: 18,
-        sources: ['Lichess', 'SF'] },
-      { id: 'h6', name: '4...h6 (passive)', kind: 'main',                      // 18% amateur
-        moves: [...SG, 'h6', 'Nxd4', 'Nf6', 'Nxc6', 'bxc6', 'e5'], extendTo: 15,
-        sources: ['Games', 'Lichess', 'SF'] },
-      { id: 'h6-nxd4', name: '4...h6 5.Nxd4 Nxd4', kind: 'main',               // 49% here
-        moves: [...SG, 'h6', 'Nxd4', 'Nxd4', 'Qxd4'], extendTo: 15,
-        sources: ['Lichess', 'SF'] },
-      { id: 'qf6-4', name: '4...Qf6?!', kind: 'side', claim: 'early queen: develop with tempo',   // 5...Bc5 47%
-        moves: [...SG, 'Qf6', 'O-O', 'Bc5'], extendTo: 15,
-        sources: ['Games', 'Lichess', 'SF'] },
-
-      /* ----- 3rd-move alternatives ----- */
-      { id: 'scotch-d6', name: '3...d6 (Scotch declined)', kind: 'main',      // 7%; 4...Nce7 then 5...Nf6 21%
-        moves: [...S, 'd6', 'd5', 'Nce7', 'c4', 'Nf6'], extendTo: 16,
-        sources: ['W-Scotch', 'Games', 'Lichess', 'SF'] },
-      { id: 'scotch-d6-nb8', name: '3...d6 4.d5 Nb8', kind: 'main',             // 13% here
-        moves: [...S, 'd6', 'd5', 'Nb8', 'c4'], extendTo: 14,
-        sources: ['Lichess', 'SF'] },
-      { id: 'scotch-d6-nd4', name: '3...d6 4.d5 Nd4?!', kind: 'side', minCp: 30,   // 12% here
-        claim: 'the knight is traded and the queen lands on d4 for free',
-        moves: [...S, 'd6', 'd5', 'Nd4', 'Nxd4', 'exd4', 'Qxd4'], extendTo: 14,
-        sources: ['Lichess', 'SF'] },
-      { id: 'lolli', name: 'Lolli Variation, 3...Nxd4', kind: 'side',          // 1.7%; 5...d6 35%
-        claim: 'centralised queen Black cannot chase; small but lasting plus',
-        moves: [...S, 'Nxd4', 'Nxd4', 'exd4', 'Qxd4', 'd6'], extendTo: 15,
-        sources: ['W-Scotch', 'Lichess', 'SF'] },
-      { id: 'f5', name: '3...f5?!', kind: 'side', claim: 'wins a pawn and exposes the king',   // rare (0.5%), 2 of your games
-        moves: [...S, 'f5', 'Nxe5', 'Nxe5', 'dxe5', 'fxe4'], extendTo: 15,   // tested: 6.Qh5+ −0.7
-        sources: ['Games', 'SF'] },
-      { id: 'bd6', name: '3...Bd6?!', kind: 'side', minCp: 30, claim: 'the bishop blocks its own d-pawn; d5 cramps Black',   // rare, 2 of your games; tested +0.47
-        moves: [...S, 'Bd6', 'd5', 'Nce7', 'c4'], extendTo: 15,
-        sources: ['W-Scotch', 'Games', 'SF'] },
-      { id: 'qf6-3', name: '3...Qf6?!', kind: 'side', minCp: 30, claim: 'd5 hits the knight and the queen is misplaced',   // rare
-        moves: [...S, 'Qf6', 'd5'], extendTo: 15,                           // tested: 4.Bg5 −0.8
-        sources: ['Games', 'SF'] },
-      { id: 'bb4-3', name: '3...Bb4+?!', kind: 'side', claim: 'the bishop is kicked around while White develops',   // rare; 4...Bd6 27%
-        moves: [...S, 'Bb4+', 'c3', 'Bd6', 'Bd3'], extendTo: 15,                 // tested: 5.d5 −0.6 vs 5.Bd3
-        sources: ['Games', 'Lichess', 'SF'] },
+      /* trunk */
+      { use: 'v-rca-mainline-plan', id: 'main', name: 'Modern Attack (Advance Variation), main line' },
+      /* 4...Nf6 5.e5 family */
+      { use: 'modern-attack-bc5', id: 'bc5', name: 'Modern Attack, 7...Bc5 8.Be3 Bd7 (Ntirlis line)' },
+      { use: 'masters-bc5-oo', id: 'bc5-oo', name: 'Modern Attack, 7...Bc5 8.Be3 O-O' },
+      { use: 'masters-bc5-bxd4', id: 'bc5-bxd4', name: 'Modern Attack, 7...Bc5 8.Be3 Bxd4' },
+      { use: 'masters-nd7', id: 'nd7', name: 'Modern Attack, 6...Nd7' },
+      { use: 'masters-be7-f5', id: 'be7-9', name: 'Modern Attack, 9...Be7 10.f3 Nc5 11.f4 O-O 12.f5' },
+      { use: 'masters-be7-ne4', id: 'be7-9-ne4', name: 'Modern Attack, 9...Be7 10.f3 Nc5 11.f4 Ne4' },
+      { use: 'strong-be7-ng5-ne4', id: 'be7-9-ng5', name: 'Modern Attack, 9...Be7 10.f3 Ng5 11.f4 Ne4' },
+      { use: 'strong-be7-ng5-ne6', id: 'be7-9-ng5-ne6', name: 'Modern Attack, 9...Be7 10.f3 Ng5 11.f4 Ne6 12.f5' },
+      { use: 'strong-ng4-kf8-h3', id: 'ng4', name: '5...Ng4 6.O-O d6 7.exd6 Bxd6 8.Re1+ Kf8 9.h3 (Kingside Variation)' },
+      { use: 'ian-ng4-be7-8', id: 'ng4-be7-8', name: '5...Ng4 6.O-O d6 … 8.Re1+ Be7' },
+      { use: 'ian-ng4-be7-6', id: 'ng4-be7', name: '5...Ng4 6.O-O Be7 7.Re1 d6' },
+      { use: 'strong-ng4-bc5', id: 'ng4-bc5', name: '5...Ng4 6.O-O Bc5 7.Bf4 O-O 8.h3 Nh6 9.Bxh6' },
+      { use: 'ng4-trap', id: 'ng4-trap', name: '5...Ng4 6.O-O Ngxe5? — the pinned knight' },
+      { use: 'ian-ne4-ne6', id: 'ne4', name: '5...Ne4 6.Qe2 Nc5 7.O-O Ne6' },
+      { use: 'ian-ne4-be7', id: 'ne4-be7', name: '5...Ne4 6.Qe2 Nc5 7.O-O Be7 8.Rd1 d5 9.exd6' },
+      { use: 'strong-ne4-oo', id: 'ne4-be7-oo', name: '5...Ne4 6.Qe2 Nc5 7.O-O Be7 8.Rd1 O-O 9.Nxd4' },
+      { use: 'qe7-trap', id: 'qe7-trap', name: '5...Qe7?! 6.O-O — the pinned queen' },
+      /* 4...Bc5 5.c3 family (Haxo / Greco Gambit) */
+      { use: 'greco-gambit-e5', id: 'haxo', name: 'Greco Gambit, 5...Nf6 6.e5 d5 (masters’ main line)' },
+      { use: 'masters-haxo-bg4', id: 'haxo-bg4', name: 'Greco Gambit, 9...Bg4 first' },
+      { use: 'masters-haxo-f5', id: 'haxo-f5', name: 'Greco Gambit, 10...f5' },
+      { use: 'masters-haxo-bb4', id: 'haxo-bb4', name: 'Greco Gambit, 8...Bb4+' },
+      { use: 'v-rca-haxo-ke8', id: 'haxo-trap', name: 'Haxo accepted 5...dxc3?! 6.Bxf7+ … 7...Ke8' },
+      { use: 'v-cv-haxo-kf8', id: 'haxo-trap-kf8', name: 'Haxo accepted 5...dxc3?! 6.Bxf7+ … 7...Kf8' },
+      /* 4...Bb4+ London Defence */
+      { use: 'london', id: 'london', name: 'London Defence, 7...d6 8.Qb3 Qe7 9.e5 dxe5 10.Ba3' },
+      { use: 'strong-london-qf6', id: 'london-qf6', name: 'London Defence, 7...d6 8.Qb3 Qf6 9.Bg5' },
+      { use: 'strong-london-nge7', id: 'london-nge7', name: 'London Defence, 7...Nge7 8.Ng5 O-O 9.Qh5' },
+      // strong-london-ne5 (8...Ne5 9.Nxf7 …) not selected: engine says 8...Ne5 costs nothing and the line ends +0.69
+      // v-rca-london (8...Qd7 9.Rd1) not selected: Stockfish −1.66 for 9.Rd1 vs 9.Re1 — transcript reconstruction doubtful
+      { use: 'london-trap', id: 'london-trap', name: 'London Defence 6...Bc5?! 7.Bxf7+' },
+      { use: 'v-rca-london-be7', id: 'london-be7', name: 'London Defence trap, 6...Be7?' },
+      /* other 4th moves */
+      { use: 'ian-d6-nxd4', id: 'declined-d6', name: 'Paris Defence 4...d6 5.Nxd4 Nf6 6.Nc3' },
+      { use: 'paris-nxd4-oo', id: 'declined-d6-nxd4', name: 'Paris Defence 4...d6 5.Nxd4 Nxd4 6.Qxd4 Nf6 7.Nc3 Be7 8.O-O' },
+      { use: 'paris-nxd4-be6', id: 'declined-d6-be6', name: 'Paris Defence 4...d6 5.Nxd4 Nxd4 6.Qxd4 Nf6 7.Nc3 Be6 8.Bg5' },
+      { use: 'strong-h6-nxd4', id: 'h6', name: '4...h6 5.Nxd4 Nxd4 6.Qxd4 d6 7.Nc3' },
+      { use: 'hun-d6-nf6', id: 'hungarian', name: 'Hungarian 4...Be7 5.Nxd4 d6 6.O-O Nf6 7.Nc3 O-O 8.Re1' },
+      { use: 'hun-d6-nxd4', id: 'hungarian-nxd4', name: 'Hungarian 4...Be7 5.Nxd4 d6 6.O-O Nxd4 7.Qxd4 Nf6 8.Nc3' },
+      // hun-d6-bf6 (7...Bf6 8.Qd3) not selected: Stockfish −0.57 for 8.Qd3 vs 8.Qd5
+      { use: 'hun-nxd4-bf6-trap', id: 'hungarian-bxe5', name: 'Hungarian 4...Be7 5.Nxd4 Nxd4 6.Qxd4 Bf6 7.e5 … 10...Bxe5?! 11.Bxf7+' },
+      { use: 'hun-nxd4-nf6', id: 'hungarian-nf6', name: 'Hungarian 4...Be7 5.Nxd4 Nxd4 6.Qxd4 Nf6 7.e5' },
+      // ian-h6-trap (4...h6 5.O-O Bc5 6.c3 dxc3 7.Bxf7+) not selected: engine says 6...dxc3 costs nothing (+0.75 at the end) — not a trap
+      /* 3rd-move alternatives */
+      { use: 'v-rca-d6-fork', id: 'scotch-d6', name: '3...d6 4.dxe5 — queens off, king stuck on d8' },
+      { use: 'v-rca-nf6-3', id: 'nf6-3', name: '3...Nf6?! 4.d5 Ne7 5.Nxe5 Nxe4?' },
+      // lolli (ECO line) not selected: Stockfish −0.53 for 6.Bc4 vs 6.Nc3, and the sourced line is too short without it
+    ],
+    /* OUR offbeat alternatives — drilled apart from the main repertoire (Surprises tab) */
+    surprise: [
+      { use: 'max-lange', id: 'sur-max-lange', name: 'Max Lange Attack: 4...Bc5 5.O-O!? Nf6 6.e5 d5 7.exf6' },
+      { use: 'v-cv-nakhmanson', id: 'sur-nakhmanson', name: '4...Nf6 5.O-O!? Nxe4 6.Re1 d5 7.Bxd5 (Chess Vibes)' },
+      { use: 'v-cv-london-oo', id: 'sur-london-oo', name: 'London 6.O-O!? cxb2 7.Bxb2 (Chess Vibes)' },
+      // v-rca-ng4-trap (5.e5 Ng4 6.Bxf7+!?) cannot join: the surprise set already plays 5.O-O after 4...Nf6 (one move per position)
     ],
   },
-
   {
-    id: 'elephant', name: 'Elephant Gambit', side: 'b', signaturePlies: 4,
+    id: 'elephant', signaturePlies: 4,
     lines: [
-      /* ----- TRUNK: Paulsen Countergambit vs White's best ----- */
-      { id: 'main', name: 'Paulsen Countergambit', kind: 'main',
-        moves: [...PC, 'Qe2', 'Nf6', 'd3', 'Qxd5', 'Nbd2', 'Be7', 'dxe4', 'Qe6', 'Nb3'], extendTo: 18,   // tested: 8...O-O −0.5, 9...Rd8 −1.1
-        sources: ['W-Eleph', 'CM', 'Lichess', 'SF'] },
-
-      /* ----- 4.Qe2 family ----- */
-      { id: 'nc3-5', name: '5.Nc3 Be7 6.Nxe4 O-O 7.d3', kind: 'main',          // 5.Nc3 34% (masters 47%); 7.d3 masters 70%
-        moves: [...PC, 'Qe2', 'Nf6', 'Nc3', 'Be7', 'Nxe4', 'O-O', 'd3'], extendTo: 18,
-        sources: ['W-Eleph', 'CM', 'Lichess', 'SF'] },
-      { id: 'nc3-5-nxf6', name: '5.Nc3 … 7.Nxf6+', kind: 'main',
-        moves: [...PC, 'Qe2', 'Nf6', 'Nc3', 'Be7', 'Nxe4', 'O-O', 'Nxf6+', 'Bxf6'], extendTo: 18,
-        sources: ['CM', 'Lichess', 'SF'] },
-      { id: 'nc3-6', name: '6.Nc3 Bb4!', kind: 'main',                          // 39%; 9.Bxf6 51%
-        moves: [...PC, 'Qe2', 'Nf6', 'd3', 'Qxd5', 'Nc3', 'Bb4', 'Bd2', 'Bxc3', 'Bxc3', 'O-O', 'Bxf6'], extendTo: 16,
-        sources: ['CM', 'Games', 'Lichess', 'SF'] },
-      { id: 'dxe4-6', name: '6.dxe4 queen trade', kind: 'main',                 // 49%; 9.Bc4 40%
-        moves: [...PC, 'Qe2', 'Nf6', 'd3', 'Qxd5', 'dxe4', 'Qxe4', 'Qxe4+', 'Nxe4', 'Bd3', 'Nc5', 'Bc4'], extendTo: 18,
-        sources: ['Games', 'Lichess', 'SF'] },
-      { id: 'ng5', name: '5.Ng5', kind: 'main',                                  // 10%
-        moves: [...PC, 'Qe2', 'Nf6', 'Ng5', 'Be7', 'Nxe4', 'O-O'], extendTo: 16,
-        sources: ['Games', 'Lichess', 'SF'] },
-
-      /* ----- 4th-move knight moves ----- */
-      { id: 'nd4', name: '4.Nd4 Qxd5 5.Nb3', kind: 'main',                       // 4.Nd4 29%; 5.Nb3 32% (masters 100%)
-        moves: [...PC, 'Nd4', 'Qxd5', 'Nb3'], extendTo: 16,
-        sources: ['Games', 'Lichess', 'SF'] },
-      { id: 'nd4-c3', name: '4.Nd4 Qxd5 5.c3 Nc6 6.Nxc6', kind: 'main',          // 6.Nxc6 60%
-        moves: [...PC, 'Nd4', 'Qxd5', 'c3', 'Nc6', 'Nxc6', 'Qxc6'], extendTo: 16,
-        sources: ['Lichess', 'SF'] },
-      { id: 'ne5', name: '4.Ne5', kind: 'main',                                  // 7%
-        moves: [...PC, 'Ne5', 'Qxd5', 'd4', 'exd3', 'Nxd3', 'Nc6', 'Nc3', 'Qa5'], extendTo: 16,
-        sources: ['W-Eleph', 'Games', 'SF'] },
-      { id: 'ng1', name: '4.Ng1 full retreat', kind: 'main',                     // 19% amateur!; 5.Nc3 70%
-        moves: [...PC, 'Ng1', 'Qxd5', 'Nc3'], extendTo: 14,
-        sources: ['Games', 'Lichess', 'SF'] },
-      { id: 'bb5', name: '4.Bb5+ c6', kind: 'side', minCp: 30,                    // 6.Qe2 49% (masters 100%)
-        claim: 'the check achieves nothing; Black is fully developed a pawn up in activity',
-        moves: [...PC, 'Bb5+', 'c6', 'dxc6', 'bxc6', 'Qe2'], extendTo: 14,
-        sources: ['Games', 'Lichess', 'SF'] },
-
-      /* ----- 3rd-move alternatives ----- */
-      { id: 'nxe5', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Bc4', kind: 'main',            // 3.Nxe5 19% (masters 30%)
-        // tested at depth 22: 3...dxe4 −0.87 (4.Bc4! best; the "Wasp" 4...Qg5 −1.16) vs 3...Bd6 −0.65
-        moves: [...E, 'Nxe5', 'Bd6', 'd4', 'dxe4', 'Bc4'], extendTo: 16,
-        sources: ['W-Eleph', 'CM', 'Lichess', 'Games', 'SF'] },
-      { id: 'nxe5-nc4', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Nc4', kind: 'main',        // 17% (masters 39%)
-        moves: [...E, 'Nxe5', 'Bd6', 'd4', 'dxe4', 'Nc4'], extendTo: 16,
-        sources: ['Lichess', 'SF'] },
-      { id: 'nxe5-nc3', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Nc3', kind: 'main',        // 22%
-        moves: [...E, 'Nxe5', 'Bd6', 'd4', 'dxe4', 'Nc3'], extendTo: 16,
-        sources: ['Lichess', 'SF'] },
-      { id: 'nxe5-nf3', name: '3.Nxe5 Bd6 4.Nf3 (retreat)', kind: 'main',
-        moves: [...E, 'Nxe5', 'Bd6', 'Nf3', 'dxe4'], extendTo: 14,
-        sources: ['Games', 'SF'] },
-      { id: 'nc4', name: '3.Nxe5 Bd6 4.Nc4?!', kind: 'side', minCp: 30,
-        claim: 'the knight wanders to c4 and gets hit; Black develops with tempo',
-        moves: [...E, 'Nxe5', 'Bd6', 'Nc4'], extendTo: 14,
-        sources: ['CB', 'SF'] },
-      { id: 'nxf7', name: '3.Nxe5 Bd6 4.Nxf7?! (greedy)', kind: 'side',
-        claim: 'the fork gets nothing; Black scores 60% here in practice',
-        moves: [...E, 'Nxe5', 'Bd6', 'Nxf7'], extendTo: 14,
-        sources: ['Games', 'Lichess', 'SF'] },
-      { id: 'd4', name: '3.d4 (Elephant declined)', kind: 'main',               // 5% (masters 21%); 6.Nc3 35%
-        moves: [...E, 'd4', 'dxe4', 'Nxe5', 'Nd7', 'Nxd7', 'Bxd7', 'Nc3'], extendTo: 16,
-        sources: ['Games', 'Lichess', 'SF'] },
-      { id: 'd3', name: '3.d3 dxe4 4.dxe4 (quiet)', kind: 'main',                // 6.Bd3 41%
-        moves: [...E, 'd3', 'dxe4', 'dxe4', 'Qxd1+', 'Kxd1', 'Nf6', 'Bd3'], extendTo: 16,
-        sources: ['Games', 'Lichess', 'SF'] },
-      { id: 'd3-nxe5', name: '3.d3 dxe4 4.Nxe5', kind: 'main',                   // 30% here
-        moves: [...E, 'd3', 'dxe4', 'Nxe5'], extendTo: 14,
-        sources: ['Lichess', 'SF'] },
-      { id: 'nc3-3', name: '3.Nc3', kind: 'main',                                // 5%; 5.Bc4 23%
-        moves: [...E, 'Nc3', 'dxe4', 'Nxe4', 'Nc6', 'Bc4'], extendTo: 16,
-        sources: ['W-Eleph', 'Lichess', 'SF'] },
-      { id: 'bd3', name: '3.Bd3?! blocks the d-pawn', kind: 'side',              // rare (0.7%), 2 of your games; 6.Qe2 66%
-        claim: 'take with tempo; White’s development is knotted',
-        moves: [...E, 'Bd3', 'dxe4', 'Bxe4', 'f5', 'Bd3', 'e4', 'Qe2'], extendTo: 14,
-        sources: ['Games', 'Lichess', 'SF'] },
+      /* trunk: Paulsen vs the masters' 5.Nc3 */
+      { use: 'paulsen-nc3-5', id: 'main', name: 'Paulsen Countergambit, 4.Qe2 Nf6 5.Nc3' },
+      { use: 'strong-nc3-5-nxf6', id: 'nc3-5-nxf6', name: '5.Nc3 Be7 6.Nxe4 O-O 7.Nxf6+ Bxf6 8.d3' },
+      /* 5.d3 Qxd5 family */
+      { use: 'strong-nc3-rd1', id: 'nc3-6-rd1', name: '5.d3 Qxd5 6.Nc3 Bb4! 7.Bd2 Bxc3 8.Bxc3 O-O 9.dxe4 Nxe4 10.Rd1' },
+      { use: 'strong-nc3-qd3', id: 'nc3-6-qd3', name: '5.d3 Qxd5 6.Nc3 Bb4! … 9.dxe4 Nxe4 10.Qd3' },
+      { use: 'v-rca-nf6-nc3-bb4', id: 'nc3-6', name: '5.d3 Qxd5 6.Nc3 Bb4! 7.Bd2 Bxc3 8.Bxc3 O-O 9.Bxf6? exf3!' },
+      { use: 'strong-nc3-dxe4-7', id: 'nc3-6-dxe4', name: '5.d3 Qxd5 6.Nc3 Bb4! 7.dxe4 Qxe4' },
+      { use: 'strong-dxe4-bc4', id: 'dxe4-6', name: '5.d3 Qxd5 6.dxe4 Qxe4 7.Qxe4+ Nxe4 8.Bd3 Nc5' },
+      { use: 'strong-dxe4-nc3', id: 'dxe4-6-nc3', name: '5.d3 Qxd5 6.dxe4 Qxe4 7.Nc3 Bb4' },
+      /* 4th-move knight moves */
+      { use: 'strong-nd4', id: 'nd4', name: '4.Nd4 Qxd5 5.Nb3 Nf6 6.Nc3 Qe5 7.Be2 Nc6 8.O-O Bd6' },
+      /* 3rd-move alternatives */
+      { use: 'declined-d4', id: 'd4', name: '3.d4 (Elephant declined)' },
+      { use: 'strong-bc4-dxe5-ke1', id: 'nxe5-bc4-dxe5', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Bc4 Bxe5 6.dxe5 Qxd1+ … 9.Ke1 Nge7' },
+      { use: 'strong-bc4-dxe5-be2', id: 'nxe5-bc4-dxe5-be2', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Bc4 Bxe5 6.dxe5 Qxd1+ … 9.Be2' },
+      { use: 'strong-nc3-bf4', id: 'nxe5-nc3-bf4', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Nc3 Bxe5 6.dxe5 Qxd1+ 7.Nxd1 Nc6 8.Bf4 Be6' },
+      { use: 'strong-nc3-kxd1', id: 'nxe5-nc3-kxd1', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Nc3 Bxe5 6.dxe5 Qxd1+ 7.Kxd1' },
+      { use: 'strong-nc4', id: 'nxe5-nc4', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Nc4 Nf6' },
+      { use: 'qc-nxe5-nc3', id: 'nxe5-nc3', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Nc3 Bxe5 (the book)' },
+      { use: 'karker-bc4-bf4', id: 'nxe5-bc4', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Bc4 Bxe5 6.Qh5 Qe7 … 9.Bf4' },
+      { use: 'cm-bc4-nc3', id: 'nxe5-bc4-nc3', name: '3.Nxe5 Bd6 4.d4 dxe4 5.Bc4 Bxe5 6.Qh5 Qe7 … 9.Nc3' },
+      { use: 'qc-nxf7', id: 'nxf7', name: '3.Nxe5 Bd6 4.Nxf7?! — the greedy fork' },
+      // v-rca-nxe5-puzzle (5...Nf6 6.Bg5 O-O) not selected: the book plays 5...Bxe5 — one move per position
+    ],
+    surprise: [
+      { use: 'maroczy-bd6', id: 'sur-maroczy', name: 'The book’s system: 3.exd5 Bd6!? 4.d4 e4 5.Ne5 Nf6' },
+      { use: 'v-rca-maroczy-greek', id: 'sur-maroczy-greek', name: '3.exd5 Bd6!? 4.Nc3 Nf6 5.Bc4 e4 6.Nd4 O-O 7.O-O? Bxh2+ (Smirnov)' },
     ],
   },
 ];
+
+/** Short credit for the plan popup: the part of each source's ref before the first comma/quote. */
+export function credit(keys, sources = SOURCES) {
+  return [...new Set(keys.map((k) => (sources[k]?.short ?? sources[k]?.ref ?? k).split(/[,"“]/)[0].trim()))].join('; ');
+}
+
+/** Resolve the selection against the library: exact SAN, sources, note, plan, mistake ply, club frequency. */
+export function resolveSelection(selection = SELECTION, library = LIBRARY, clubShare = null) {
+  return selection.map((sel) => {
+    const opening = library.find((o) => o.id === sel.id);
+    if (!opening) throw new Error(`selection: unknown opening ${sel.id}`);
+    const pick = (s, kindOverride) => {
+      const lib = opening.lines.find((l) => l.id === s.use);
+      if (!lib) throw new Error(`selection ${sel.id}/${s.id}: library line "${s.use}" not found`);
+      const club = clubShare && Number.isInteger(lib.mistakeAt) ? clubShare(lib.moves.slice(0, lib.mistakeAt), lib.moves[lib.mistakeAt]) : null;
+      return {
+        id: s.id, libraryId: lib.id, name: s.name ?? lib.name, kind: kindOverride ?? lib.kind, weight: lib.weight,
+        moves: [...lib.moves], sources: [...lib.sources], note: lib.note, mistakeAt: lib.mistakeAt,
+        plan: lib.plan ?? null, planSources: lib.planSources ? [...lib.planSources] : [], planBasis: lib.planBasis ?? null,
+        planCredit: lib.planSources ? credit(lib.planSources) : '',
+        club: club ? { share: club.share, games: club.total } : undefined,
+      };
+    };
+    const lines = sel.lines.map((s) => pick(s));
+    const surprise = (sel.surprise ?? []).map((s) => pick(s, 'surprise'));
+    return { id: opening.id, name: opening.name, side: opening.side, signaturePlies: sel.signaturePlies, lines, surprise };
+  });
+}
+
+/** Club frequency (Lichess 1400-1800 blitz/rapid) of `san` after `prefix`, from library/explorer-cache.json only. */
+export function clubShare(prefix, san) {
+  const n = cached('amateur', prefix);
+  if (!n) return null;
+  return { share: n.moves.find((m) => m.san === san)?.share ?? 0, total: n.total };
+}
+
+export const SEED = resolveSelection(SELECTION, LIBRARY, clubShare);
+export { SOURCES };

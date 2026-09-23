@@ -87,6 +87,13 @@ const els = {
   stepPrev: $('#step-prev'),
   stepNext: $('#step-next'),
   stepLast: $('#step-last'),
+  planDialog: $('#plan-dialog'),
+  planDialogTitle: $('#plan-dialog-title'),
+  planDialogText: $('#plan-dialog-text'),
+  planDialogCredit: $('#plan-dialog-credit'),
+  planDialogClose: $('#plan-dialog-close'),
+  planDialogReview: $('#plan-dialog-review'),
+  planDialogNext: $('#plan-dialog-next'),
 };
 
 const state = {
@@ -120,7 +127,7 @@ function renderHome() {
     const preview = tree.formatMoves(tree.mainLine(o), 6).map((m) => m.text).join(' ');
     const sideText = o.side === 'w' ? 'You play White' : 'You play Black';
     const main = tree.linesOfKind(o, 'main').length;
-    const side = tree.linesOfKind(o, 'side').length;
+    const side = o.lines.filter((l) => l.kind === 'side' || l.kind === 'trap').length;
     const due = progress.dueCount(prog, o.id, visibleLines(o, o.lines).map((l) => l.id));
     const tiers = o.lines.map((l) => progress.lineTier(prog, o.id, l.id).tier).filter(Boolean);
     const tierText = tiers.length ? ' · ' + ['Master', 'Gold', 'Silver', 'Bronze'].map((t) => { const n = tiers.filter((x) => x === t).length; return n ? `${n} ${t.toLowerCase()}` : null; }).filter(Boolean).join(', ') : '';
@@ -130,7 +137,7 @@ function renderHome() {
           <h2>${o.name}</h2>
           <span class="pill ${o.side}">${sideText}</span>
         </div>
-        <p class="card-sub">${main} main line${main === 1 ? '' : 's'} · ${side} side line${side === 1 ? '' : 's'} · <b>${due} due</b>${tierText}</p>
+        <p class="card-sub">${main} main line${main === 1 ? '' : 's'} · ${side} side/trap line${side === 1 ? '' : 's'} · <b>${due} due</b>${tierText}</p>
         <p class="card-line">${preview} …</p>
         <div class="card-actions">
           <button class="primary" data-train="${o.id}">Train</button>
@@ -314,9 +321,13 @@ function renderMoves() {
 
   const l = state.lineObj;
   const dev = l ? tree.deviation(state.opening, l) : null;
+  // At the end of a trained line the sourced PLAN takes over the note area;
+  // resetLine() clears state.finished, so the next line starts clean.
+  const showPlan = l && state.finished && !review && l.plan;
   const showNote = l && (review || (dev && state.ply > dev.ply) || l.draft);
-  els.note.hidden = !showNote;
-  els.note.textContent = showNote ? `${lineTitle(l)} — ${l.note ?? ''}` : '';
+  els.note.classList.toggle('plan', Boolean(showPlan));
+  els.note.hidden = !(showPlan || showNote);
+  els.note.textContent = showPlan ? `Plan: ${l.plan}` : showNote ? `${lineTitle(l)} — ${l.note ?? ''}` : '';
 }
 
 els.moves.addEventListener('click', (e) => {
@@ -342,7 +353,8 @@ function visibleLines(opening, lines) {
 /** The lines behind the current tab, before ticking. */
 function tabLines(opening, mode = settings.lineMode) {
   if (mode === 'main') return tree.linesOfKind(opening, 'main');
-  if (mode === 'side') return tree.linesOfKind(opening, 'side');
+  if (mode === 'side') return opening.lines.filter((l) => l.kind === 'side' || l.kind === 'trap');   // side tab = punishments and traps
+  if (mode === 'surprise') return tree.surpriseLines(opening);                                        // our own offbeat weapons, kept apart
   const hits = loadGapReport()?.report?.[opening.id]?.lineHits ?? {};
   const mine = opening.lines.filter((l) => (hits[l.id] ?? 0) > 0).sort((a, b) => hits[b.id] - hits[a.id]);
   return mine.length ? mine : opening.lines;
@@ -369,6 +381,7 @@ function planLine() {
 }
 
 function resetLine(lineObj = null) {
+  if (els.planDialog.open) els.planDialog.close();
   state.session += 1;
   state.lineObj = lineObj ?? planLine();
   state.line = state.lineObj.moves;
@@ -485,7 +498,7 @@ function playOpponentMove() {
 
   if (state.ply >= state.line.length) { finishLine(); return; }
   if (leftBook) {
-    const kind = state.lineObj.kind === 'side' ? 'punish it!' : 'a real variation — know your reply.';
+    const kind = state.lineObj.kind === 'side' ? 'punish it!' : state.lineObj.kind === 'trap' ? 'a real variation — this line shows a trap they may fall into.' : 'a real variation — know your reply.';
     setStatus(`Opponent left the main line with ${san} — ${kind}`, 'warn');
   } else {
     setStatus('Your move');
@@ -496,6 +509,7 @@ function finishLine() {
   state.finished = true;
   state.selected = null;
   renderBoard();
+  renderMoves();   // shows "Plan: …" for the finished line
   feedback.play('complete');
   progress.recordLineComplete(prog, state.opening.id);
   const entry = progress.scheduleLine(prog, state.opening.id, state.lineObj.id, { perfect: state.lineMistakes === 0 });
@@ -509,6 +523,14 @@ function finishLine() {
   const tierMsg = justEarned ? `  ·  ${tier.tier} unlocked! 🏅` : tier.next ? `  ·  ${tier.next.at - entry.clean} more clean to ${tier.next.name}` : '  ·  mastered';
   setStatus(`${state.lineMistakes === 0 ? 'Clean run! 🎉' : 'Line complete.'}  ·  streak ${streak}  ·  ${when}${tierMsg}`, 'good');
   els.restart.textContent = 'Next line';
+  if (state.lineObj.plan) {
+    els.planDialogTitle.textContent = lineTitle(state.lineObj);
+    const l = state.lineObj;
+    els.planDialogText.textContent = l.plan;
+    els.planDialogCredit.textContent = l.planCredit ? `${l.planBasis === 'quoted' ? 'Source' : 'Based on'}: ${l.planCredit}` : '';
+    if (!els.planDialog.open) els.planDialog.showModal();
+    els.planDialogNext.focus();
+  }
 }
 
 /* =================================================================
@@ -517,12 +539,13 @@ function finishLine() {
 
 function renderLineMode() {
   const { opening } = state;
-  const counts = { main: tree.linesOfKind(opening, 'main').length, side: tree.linesOfKind(opening, 'side').length, mine: tabLines(opening, 'mine').length };
+  const counts = { main: tree.linesOfKind(opening, 'main').length, side: tabLines(opening, 'side').length, surprise: tabLines(opening, 'surprise').length, mine: tabLines(opening, 'mine').length };
   els.lineMode.querySelectorAll('button').forEach((b) => {
     const mode = b.dataset.line;
     b.classList.toggle('active', mode === settings.lineMode);
     b.setAttribute('aria-checked', String(mode === settings.lineMode));
-    const label = { main: 'Main lines', side: 'Side lines', mine: 'My games' }[mode];
+    b.hidden = mode === 'surprise' && counts.surprise === 0;
+    const label = { main: 'Main lines', side: 'Side lines', surprise: 'Surprises', mine: 'My games' }[mode];
     b.textContent = `${label} (${counts[mode]})`;
   });
 }
@@ -551,6 +574,8 @@ function renderLineList() {
     const tier = progress.lineTier(prog, opening.id, l.id);
     const badges = [];
     if (l.kind === 'side') badges.push('<span class="badge side">punish</span>');
+    if (l.kind === 'trap') badges.push(`<span class="badge side" title="${l.club ? `${l.club.share}% of club players fall for it` : ''}">trap${l.club ? ` ${Math.round(l.club.share)}%` : ''}</span>`);
+    if (l.kind === 'surprise') badges.push('<span class="badge side">surprise</span>');
     if (hits[l.id]) badges.push(`<span class="badge">×${hits[l.id]}</span>`);
     if (st.state === 'new') badges.push('<span class="badge new">new</span>');
     else if (st.state === 'due') badges.push('<span class="badge due">due</span>');
@@ -617,7 +642,9 @@ function populateLineSelect() {
     const ls = tree.linesOfKind(opening, kind);
     return ls.length ? `<optgroup label="${label}">${ls.map((l) => `<option value="${l.id}">${lineTitle(l)}</option>`).join('')}</optgroup>` : '';
   };
-  els.lineSelect.innerHTML = group('main', 'Main lines') + group('side', 'Side lines');
+  const sur = tree.surpriseLines(opening);
+  els.lineSelect.innerHTML = group('main', 'Main lines') + group('side', 'Side lines') + group('trap', 'Traps')
+    + (sur.length ? `<optgroup label="Surprises (your alternatives)">${sur.map((l) => `<option value="${l.id}">${lineTitle(l)}</option>`).join('')}</optgroup>` : '');
 }
 
 function reviewLine(lineObj) {
@@ -1143,6 +1170,12 @@ renderSoundToggle();
 els.restart.addEventListener('click', () => {
   if (state.mode === 'weak') { state.weak.index += 1; loadWeakPosition(); }
   else resetLine();
+});
+els.planDialogClose.addEventListener('click', () => els.planDialog.close());
+els.planDialogReview.addEventListener('click', () => els.planDialog.close());
+els.planDialogNext.addEventListener('click', () => resetLine());
+els.planDialog.addEventListener('click', (e) => {
+  if (e.target === els.planDialog) els.planDialog.close();
 });
 els.back.addEventListener('click', () => {
   state.session += 1;
