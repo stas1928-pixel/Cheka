@@ -420,7 +420,10 @@ Rules for every job:
 ### Revisit list (owner, 2026-09-24: "keep flagging items worth revisiting")
 Content
 - Elephant, no drillable line yet: 4.Nd4 Qxd5 **5.c3** (62% of club players
-  at that node), 5.Bc4 Bxe5 6.Qh5 Qe7 **7.dxe5** (52%), and the rare 3.d3,
+  at that node; **met in the owner's own game 2026-09-24**, he played
+  5...Bc5 — club 27%, strong 17%; strong players' top is 5...Nf6 39%, then
+  5...c5 18%. Build this line first, choosing Black's 5th from the strong
+  data + engine veto), 5.Bc4 Bxe5 6.Qh5 Qe7 **7.dxe5** (52%), and the rare 3.d3,
   3.Nc3, 4.Ng1, 4.Ne5. The app only says "opponent left the book" there.
 - Scotch, thin spots: London 7...Bb6 (9%); 5...Ne4 6.Qe2 **d5** (33% of club
   players; strong 7.exd6 Bf5 8.Nbd2 is only three of our moves); 5...Ng4
@@ -483,10 +486,61 @@ with the real components; tokens live in one CSS file; references arrive as
 the owner's phone screenshots; optional screenshot script at the four
 AGENTS.md viewports for golden comparison.
 
+Checkpoint results (2026-09-24, `design.html`, commit 65bcc0e):
+- Round 1: Graphite & Amber preferred; the chess.com green board rejected
+  ("doesn't fit").
+- Round 2: **layouts 1 (stack) and 3 (rail) both clean, "kinda the same",
+  better than 2 (board-first + sheet)**; **Onyx palette preferred** — colder
+  colour wanted, "not the best" yet → tune within the frozen layout (cooler
+  teal/ice accent candidates, steel board kept, possibly less saturation).
+- Owner: "don't be afraid to add things I didn't say or completely change
+  the script if it fits better." Go-ahead for the implementation plan, but
+  **wait for the explicit "start"**.
+
+### Design implementation plan (agreed structure; start on owner's word)
+Frozen: stack/rail hybrid — compact header (back, opening, Train/Review
+segment, today ring or bar), board as hero, one status line, current-line
+card with progress ring, family strip, icon actions + one primary button;
+home = two opening cards; families grouped; completion dialog; Duolingo
+loop (goal, streak, XP/levels, celebrations, due queue); haptics on events;
+no sound; no hearts.
+Jobs (one commit each, review after each):
+1. **Tokens + palette tune**: `css/tokens.css` becomes the app's single
+   palette (Onyx family, 2–3 cooler accent candidates shown in the gallery
+   for a one-tap pick), remove dead directions.
+2. **Trainer screen** rebuilt on the frozen layout (header, board, status,
+   line card, family strip, actions); motion: square wash, shake on error,
+   pulse, button press; haptics via `navigator.vibrate` on events.
+3. **Line browser + search** (owner request 2026-09-24): a search box that
+   matches line names, family names and move sequences ("Nd4 c3", "5.c3",
+   "Bxf7"), plus "find my game": paste or play the moves and the app shows
+   the deepest drilled line that matches and where your game left the
+   book. Then families (Modern Attack, Greco Gambit, London,
+   Hungarian, Paris, 3rd-move; Paulsen 5.Nc3/5.d3, 4.Nd4, 3.Nxe5, 3.d4)
+   with tier dots, due badges, frequency tags; categories Main / Side+Trap /
+   Surprises / My games; tap = drill; checkbox = rotation.
+4. **Progress loop**: daily goal (3/5/10/20, default 5) + streak calendar,
+   XP per clean line + levels tied to tiers, due queue on home and header;
+   `progress.js` extended with tests; localStorage migration kept.
+5. **Completion + celebrations**: dialog polish (plan, credit, Next line /
+   Review), tier-unlock and goal-met moments with animation + haptic; remove
+   the duplicate inline plan.
+6. **Home**: two opening cards (due, tier summary, streak), weaknesses/
+   games below, settings quiet; SW bump; phone QA at 360×800 and 390×844.
+Each job ends with the AGENTS.md QA list for the screens it touched.
+
+Design job 1 done (2026-09-24): `css/tokens.css` is now the app's single
+palette (Onyx, cooled: bg #0a0e12, steel board #d6dde3/#56707f), loaded
+before `css/style.css`, which no longer defines colours; key hard-coded
+colours (primary button, last move, selection, legal dots) route through
+tokens; SW v6. Three accent candidates: **ice** (default #7cc8ff),
+**glacier** (#5ee0e6), **frost** (#a9b8ff) — pick in `design.html` with
+the pills. The live app already runs in Onyx + ice. Graphite/Ember/layout 2
+removed from the gallery.
+
 ### Next candidates (owner picks, one per session)
-- **Design job 1**: tokens file + `design.html` gallery with three palette
-  directions on the trainer screen and the free piece-set comparison; one
-  owner checkpoint. Then golden screens, then implementation.
+- Owner picks the accent (ice / glacier / frost); then design job 2
+  (trainer screen on the frozen layout).
 - Use the app for a few weeks; then the data-driven content pass above.
 - Rotate the Lichess token (owner); re-run `explorer-check` monthly.
 - Analyse more than 60 games on the phone in the background, or run
