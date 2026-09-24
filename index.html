@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a0e12">
 <title>Cheka — Opening Trainer</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -14,100 +14,105 @@
 </head>
 <body>
 
-<!-- ============ HOME SCREEN ============
-     The two openings pinned at the top (training is one tap away),
-     progress and settings below on scroll. -->
+<!-- ============ HOME — header, today's goal, then four tabs you swipe between (Instagram-style) ============ -->
 <main data-screen="home">
-  <header class="home-header">
-    <h1>Cheka</h1>
-    <div class="home-stats">
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"><img src="vendor/pieces/wN.svg" alt=""></span>
+      <div>
+        <h1>Cheka</h1>
+        <span id="greeting" class="greet"></span>
+      </div>
+    </div>
+    <div class="top-stats">
       <span id="home-streak" class="chip streak" title="Day streak">🔥 0</span>
-      <span id="home-level" class="chip xp" title="Level">Lv 1</span>
-      <button id="open-tools" class="icon-btn" aria-label="Your games and settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+      <span id="home-level" class="chip level" title="Level">Lv 1</span>
     </div>
   </header>
-  <div class="goal home-goal" aria-label="Today's goal">
-    <span>Today</span>
-    <div class="bar gloss"><i id="home-goal-fill"></i></div>
-    <b id="home-goal-text">0 / 5</b>
+
+  <section class="today-card" aria-label="Today's goal">
+    <div class="today-row">
+      <span class="today-label">Today</span>
+      <span id="today-hint" class="today-hint"></span>
+      <b id="home-goal-text">0 / 5</b>
+    </div>
+    <div class="bar"><i id="home-goal-fill"></i></div>
+  </section>
+
+  <nav id="tabs" class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" data-page="0" class="on">Openings</button>
+    <button role="tab" data-page="1">Progress</button>
+    <button role="tab" data-page="2">Games</button>
+    <button role="tab" data-page="3">Settings</button>
+    <i class="tab-ink" aria-hidden="true"></i>
+  </nav>
+
+  <div id="pager" class="pager">
+    <!-- 1. Openings -->
+    <section class="page" aria-label="Openings">
+      <div id="opening-cards" class="openings"></div>
+    </section>
+
+    <!-- 2. Progress -->
+    <section class="page" aria-label="Progress">
+      <div id="progress-cards" class="progress-cards"></div>
+    </section>
+
+    <!-- 3. Your games: Chess.com gaps + weakness analysis -->
+    <section class="page" aria-label="Your games">
+      <div class="panel-card">
+        <h3>Chess.com scan</h3>
+        <p class="lead">Finds opponent moves you have no line for.</p>
+        <div class="row-inline">
+          <input id="chesscom-user" type="text" autocomplete="off" spellcheck="false" placeholder="Chess.com username">
+          <button id="scan-games" class="primary">Scan</button>
+        </div>
+        <p id="scan-msg" class="hint" role="status"></p>
+        <div id="gap-report"></div>
+      </div>
+      <div class="panel-card">
+        <h3>Weak spots</h3>
+        <p class="lead">Stockfish checks your recent games and turns your costliest opening mistakes into drills.</p>
+        <div class="row-buttons">
+          <button id="analyse-games" class="secondary">Analyse my games</button>
+          <button id="analyse-stop" class="secondary" hidden>Stop</button>
+          <button id="train-weak" class="primary" hidden>Train weak spots</button>
+        </div>
+        <p id="weak-msg" class="hint" role="status"></p>
+        <div id="weak-report"></div>
+      </div>
+    </section>
+
+    <!-- 4. Settings -->
+    <section class="page" aria-label="Settings">
+      <div class="panel-card">
+        <h3>Training</h3>
+        <label class="row" for="daily-goal"><span>Daily goal</span>
+          <select id="daily-goal"><option value="3">3 perfect lines</option><option value="5">5 perfect lines</option><option value="10">10 perfect lines</option><option value="20">20 perfect lines</option></select></label>
+        <label class="row switch" for="haptics-toggle"><span>Vibration</span><input id="haptics-toggle" type="checkbox"><i></i></label>
+      </div>
+      <div class="panel-card">
+        <h3>Lichess</h3>
+        <label class="row" for="lichess-token"><span>API token</span>
+          <a class="link" href="https://lichess.org/account/oauth/token/create?description=Opening%20Trainer" target="_blank" rel="noopener">create one ↗</a></label>
+        <input id="lichess-token" type="password" autocomplete="off" spellcheck="false" placeholder="lip_…">
+        <p class="hint">For master statistics in Review. Stays on this phone.</p>
+      </div>
+      <div class="panel-card">
+        <h3>Backup</h3>
+        <div class="row-buttons">
+          <button id="export-progress" class="secondary">Export</button>
+          <button id="import-progress" class="secondary">Import</button>
+          <button id="reset-progress" class="danger">Reset</button>
+        </div>
+        <input id="import-file" type="file" accept="application/json,.json" hidden>
+        <p id="settings-msg" class="hint" role="status"></p>
+      </div>
+    </section>
   </div>
-
-  <!-- The two openings, swipe sideways between them. -->
-  <section id="opening-cards" class="carousel openings" aria-label="Openings"></section>
-  <div id="opening-dots" class="dots" aria-hidden="true"></div>
-
-  <h2 class="panel-title">Practice</h2>
-  <section id="practice-tiles" class="carousel tiles" aria-label="Practice"></section>
 </main>
 
-<!-- ============ GAMES & SETTINGS SCREEN ============
-     Stats, Chess.com gaps, weakness analysis, tokens, backup. Off the home screen on purpose. -->
-<main data-screen="tools" hidden>
-  <header class="trainer-header tools-header">
-    <button id="back-tools" class="icon-btn" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="trainer-title"><span>Your games &amp; settings</span></div>
-  </header>
-  <section class="panel" aria-label="Progress">
-    <h2 class="panel-title">Progress</h2>
-    <div id="progress-cards" class="cards"></div>
-  </section>
-
-  <!-- Opponent-awareness: what did real opponents play that the tree does not cover? -->
-  <section class="panel" aria-label="Chess.com import">
-    <h2 class="panel-title">Gaps from your Chess.com games</h2>
-    <div class="setting-card">
-      <div class="row-inline">
-        <input id="chesscom-user" type="text" autocomplete="off" spellcheck="false" placeholder="Chess.com username">
-        <button id="scan-games" class="primary">Scan</button>
-      </div>
-      <p id="scan-msg" class="hint" role="status">Reads your last 6 months of public games and lists opponent moves you have no prepared answer for.</p>
-      <div id="gap-report"></div>
-    </div>
-  </section>
-
-  <!-- Where YOU go wrong: engine analysis of your own games, drilled as puzzles. -->
-  <section class="panel" aria-label="Weaknesses">
-    <h2 class="panel-title">Work on weaknesses</h2>
-    <div class="setting-card">
-      <div class="row-buttons">
-        <button id="analyse-games" class="primary">Analyse my games</button>
-        <button id="analyse-stop" hidden>Stop</button>
-        <button id="train-weak" hidden>Train weak spots</button>
-      </div>
-      <p id="weak-msg" class="hint" role="status">Stockfish replays your recent games in these two openings and finds the moves that cost you a pawn or more. Needs your Chess.com username above. Takes a few minutes.</p>
-      <div id="weak-report"></div>
-    </div>
-  </section>
-
-  <section class="panel" aria-label="Settings">
-    <h2 class="panel-title">Settings</h2>
-    <div class="setting-card">
-      <label class="row" for="daily-goal"><span>Daily goal (clean lines)</span>
-        <select id="daily-goal"><option>3</option><option>5</option><option>10</option><option>20</option></select></label>
-      <label class="row" for="haptics-toggle"><span>Vibration</span><input id="haptics-toggle" type="checkbox"></label>
-    </div>
-    <div class="setting-card">
-      <label class="row" for="lichess-token">
-        <span>Lichess API token</span>
-        <a class="link" href="https://lichess.org/account/oauth/token/create?description=Opening%20Trainer" target="_blank" rel="noopener">create one ↗</a>
-      </label>
-      <input id="lichess-token" type="password" autocomplete="off" spellcheck="false" placeholder="lip_…">
-      <p class="hint">Needed for master-game statistics in Review mode. No scopes required. Stored only on this device.</p>
-    </div>
-    <div class="setting-card">
-      <div class="row-buttons">
-        <button id="export-progress">Export progress</button>
-        <button id="import-progress">Import…</button>
-        <button id="reset-progress" class="subtle">Reset</button>
-      </div>
-      <input id="import-file" type="file" accept="application/json,.json" hidden>
-      <p id="settings-msg" class="hint" role="status"></p>
-    </div>
-  </section>
-</main>
-
-<!-- ============ TRAINER SCREEN ============
-     Board is the hero; everything else stays minimal. -->
+<!-- ============ TRAINER — focus mode: board first, everything else one tap away ============ -->
 <main data-screen="trainer" hidden>
   <header class="trainer-header">
     <button id="back" class="icon-btn" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -116,18 +121,15 @@
       <span id="trainer-side" class="sub"></span>
     </div>
     <span id="streak-top" class="chip streak" title="Day streak">🔥 0</span>
-    <span id="xp-top" class="chip xp" title="Level and XP">Lv 1</span>
+    <span id="xp-top" class="chip level" title="Level">Lv 1</span>
   </header>
-
-  <div class="goal" aria-label="Today's goal">
-    <span>Today</span>
-    <div class="bar gloss"><i id="goal-fill"></i></div>
+  <div class="goal slim" aria-label="Today's goal">
+    <div class="bar"><i id="goal-fill"></i></div>
     <b id="goal-text">0 / 5</b>
   </div>
 
   <div class="board-wrap">
     <div id="board" class="board" role="grid" aria-label="Chess board"></div>
-    <!-- Arrow overlay (hint after repeated misses). 8x8 units = one per square. -->
     <svg id="arrows" class="arrows" viewBox="0 0 8 8" aria-hidden="true">
       <defs>
         <marker id="arrowhead" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto">
@@ -135,92 +137,82 @@
         </marker>
       </defs>
     </svg>
-    
   </div>
   <div id="status" class="status neutral" role="status">Loading…</div>
-  <div id="moves" class="moves"></div>
-  <div id="branch-note" class="note" hidden></div>
 
+  <!-- Toolbar: restart · hint · lines · Train/Review. Next line appears only when a line is done. -->
   <div class="controls">
-    <button id="restart" class="ghost" aria-label="Restart line">↻</button>
-    <button id="next-line" class="primary">Next line</button>
+    <button id="restart" class="tool" aria-label="Restart line"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Restart</span></button>
+    <button id="hint-btn" class="tool" aria-label="Hint"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></svg><span>Hint</span></button>
+    <button id="open-lines" class="tool" aria-label="Choose a line"><svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg><span>Lines</span></button>
+    <div id="mode-toggle" class="mode" role="tablist">
+      <button data-mode="train" role="tab">Train</button>
+      <button data-mode="review" role="tab">Review</button>
+    </div>
   </div>
+  <button id="next-line" class="primary next" hidden>Next line</button>
 
-  <!-- Train = quiz with right/wrong feedback. Review = just step through a line. -->
-  <div id="mode-toggle" class="segmented" role="tablist">
-    <button data-mode="train" role="tab">Train</button>
-    <button data-mode="review" role="tab">Review</button>
-  </div>
-
-  <!-- What the opponent does while you train. -->
-  <div id="line-mode" class="segmented small" role="radiogroup" aria-label="Which lines to train">
-    <button data-line="main" role="radio">Main lines</button>
-    <button data-line="side" role="radio">Side lines</button>
-    <button data-line="surprise" role="radio">Surprises</button>
-    <button data-line="mine" role="radio">My games</button>
-  </div>
-
-  <!-- The lines behind the chosen tab: tick what you want in the rotation. -->
-  <details id="line-list" class="line-list" open>
-    <summary><span id="line-list-title">Lines</span><span id="line-list-meta" class="dim"></span></summary>
-    <input id="line-search" type="search" placeholder="Search lines or moves — e.g. London, Nd4 c3, Bxf7+" autocomplete="off" spellcheck="false">
-    <div id="line-rows"></div>
-  </details>
-
-
+  <div id="moves" class="moves" hidden></div>
+  <div id="branch-note" class="note" hidden></div>
 
   <div id="review-controls" class="review" hidden>
     <select id="line-select" aria-label="Line to review"></select>
     <div class="stepper">
-      <button id="step-first" aria-label="Start position">⏮</button>
-      <button id="step-prev" aria-label="Previous move">◀</button>
-      <button id="step-next" aria-label="Next move">▶</button>
-      <button id="step-last" aria-label="End of line">⏭</button>
+      <button id="step-first" class="tool" aria-label="Start position">⏮</button>
+      <button id="step-prev" class="tool" aria-label="Previous move">◀</button>
+      <button id="step-next" class="tool" aria-label="Next move">▶</button>
+      <button id="step-last" class="tool" aria-label="End of line">⏭</button>
     </div>
-
-    <!-- Master-game statistics for the position on the board (Lichess explorer). -->
     <div class="explorer" aria-label="Masters database">
-      <div class="explorer-head">
-        <span>Masters database</span>
-        <span id="explorer-meta" class="dim"></span>
-      </div>
+      <div class="explorer-head"><span>Masters</span><span id="explorer-meta" class="dim"></span></div>
       <div id="explorer-body" class="explorer-body"></div>
     </div>
-
-    <!-- Stockfish: verify or extend the selected branch with the brief's eval-cutoff rule. -->
     <div class="explorer" aria-label="Engine check">
-      <div class="explorer-head">
-        <span>Engine check</span>
-        <span id="engine-meta" class="dim"></span>
-      </div>
-      <div id="engine-body" class="explorer-body">Pick a branch above, then run the check. Stockfish looks at each of your moves and says where the line should stop.</div>
+      <div class="explorer-head"><span>Engine</span><span id="engine-meta" class="dim"></span></div>
+      <div id="engine-body" class="explorer-body"></div>
       <div class="row-buttons">
-        <button id="engine-check">Check with Stockfish</button>
-        <button id="engine-copy" hidden>Copy branch JSON</button>
+        <button id="engine-check" class="secondary">Check with Stockfish</button>
+        <button id="engine-copy" class="secondary" hidden>Copy JSON</button>
       </div>
       <pre id="engine-json" class="json" hidden></pre>
     </div>
   </div>
 </main>
 
-<dialog id="plan-dialog" class="plan-dialog" aria-labelledby="plan-dialog-title">
-  <div class="plan-dialog-head">
-    <span>Line complete</span>
-    <button id="plan-dialog-close" class="icon-btn" aria-label="Review completed position">×</button>
+<!-- ============ LINES SHEET — slides up over the board ============ -->
+<dialog id="lines-sheet" class="sheet" aria-label="Lines">
+  <div class="sheet-grab" aria-hidden="true"></div>
+  <div class="sheet-head">
+    <div><h2 id="line-list-title">Lines</h2><span id="line-list-meta" class="dim"></span></div>
+    <button id="edit-lines" class="text-btn">Edit</button>
+    <button id="close-lines" class="icon-btn" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
+  <div id="line-mode" class="cats" role="radiogroup" aria-label="Which lines to train">
+    <button data-line="main" role="radio" class="cat-main">Main</button>
+    <button data-line="side" role="radio" class="cat-side">Traps</button>
+    <button data-line="surprise" role="radio" class="cat-sur">Surprises</button>
+    <button data-line="mine" role="radio" class="cat-mine">My games</button>
+  </div>
+  <input id="line-search" type="search" placeholder="Search a name or a move" autocomplete="off" spellcheck="false">
+  <div id="line-list" class="line-list"><div id="line-rows"></div></div>
+</dialog>
+
+<!-- ============ LINE COMPLETE ============ -->
+<dialog id="plan-dialog" class="plan-dialog" aria-labelledby="plan-dialog-title">
   <div class="plan-dialog-body">
     <div id="plan-dialog-reward" class="reward" hidden></div>
     <h2 id="plan-dialog-title"></h2>
+    <p class="plan-label">The plan from here</p>
     <p id="plan-dialog-text"></p>
     <p id="plan-dialog-credit" class="plan-credit"></p>
   </div>
   <div class="plan-dialog-actions">
-    <button id="plan-dialog-review">Review board</button>
+    <button id="plan-dialog-close" class="icon-btn" aria-label="Close">×</button>
+    <button id="plan-dialog-review" class="secondary">Review</button>
     <button id="plan-dialog-next" class="primary">Next line</button>
   </div>
 </dialog>
 
-<!-- type="module" lets app.js import the other files and the vendored chess.js -->
 <script type="module" src="js/app.js"></script>
 </body>
 </html>

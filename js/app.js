@@ -41,11 +41,15 @@ function saveProg() { progress.saveProgress(prog); }
 const $ = (sel) => document.querySelector(sel);
 const els = {
   cards: $('#opening-cards'),
-  openingDots: $('#opening-dots'),
-  practiceTiles: $('#practice-tiles'),
-  openTools: $('#open-tools'),
-  backTools: $('#back-tools'),
-  famStrip: null,
+  pager: $('#pager'),
+  tabs: $('#tabs'),
+  greeting: $('#greeting'),
+  todayHint: $('#today-hint'),
+  linesSheet: $('#lines-sheet'),
+  openLines: $('#open-lines'),
+  closeLines: $('#close-lines'),
+  editLines: $('#edit-lines'),
+  hintBtn: $('#hint-btn'),
   progressCards: $('#progress-cards'),
   lineMode: $('#line-mode'),
   lineList: $('#line-list'),
@@ -139,73 +143,95 @@ function showScreen(name) {
 
 /* ---------- home: opening cards ---------- */
 
+/** A small static board after `sans` (from the player's side), last move highlighted. */
+function miniBoard(sans, side, cls = '') {
+  const g = new Chess();
+  for (const m of sans) g.move(m);
+  const last = g.history({ verbose: true }).at(-1);
+  let cells = g.board().flatMap((row, r) => row.map((p, f) => ({ p, r, f })));
+  if (side === 'b') cells = cells.reverse();
+  return `<div class="mini ${cls}" aria-hidden="true">${cells.map(({ p, r, f }) => {
+    const name = 'abcdefgh'[f] + (8 - r);
+    const hl = last && (name === last.from || name === last.to);
+    return `<i class="${(r + f) % 2 ? 'd' : ''}${hl ? ' hl' : ''}">${p ? `<img src="${pieceSrc(p)}" alt="">` : ''}</i>`;
+  }).join('')}</div>`;
+}
+
+/** Medal ring: fills toward the next tier in that tier's colour; the earned medal sits inside. */
+function medalRing(t, big = false) {
+  const R = 16, C = 2 * Math.PI * R;
+  const target = (t.next?.name ?? 'Master').toLowerCase();
+  const earned = (t.tier ?? '').toLowerCase();
+  return `<span class="ring ${big ? 'big' : ''} to-${target}" title="${t.tier ?? 'No medal yet'}">
+    <svg viewBox="0 0 40 40"><circle class="track" cx="20" cy="20" r="${R}"/><circle class="fill" cx="20" cy="20" r="${R}" style="stroke-dasharray:${C};--off:${C * (1 - t.progress)}"/></svg>
+    <b class="medal-core ${earned || 'none'}">${earned ? t.tier[0] : ''}</b></span>`;
+}
+
+/** Pips for the runs still needed to the next medal. */
+function pips(t) {
+  if (!t.next) return '<span class="pips done">★</span>';
+  const prevAt = [...progress.TIERS].reverse().find((x) => x.at <= t.clean)?.at ?? 0;
+  const n = t.next.at - prevAt, got = t.clean - prevAt;
+  return `<span class="pips to-${t.next.name.toLowerCase()}">${Array.from({ length: n }, (_, i) => `<i class="${i < got ? 'on' : ''}"></i>`).join('')}</span>`;
+}
+
+/** Count a number up for a little life (respects reduced motion). */
+function countUp(root = document) {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  root.querySelectorAll('[data-count]').forEach((el) => {
+    const to = Number(el.dataset.count); if (still || !to) { el.textContent = el.dataset.count; return; }
+    const t0 = performance.now(), dur = 700;
+    const tick = (now) => { const k = Math.min(1, (now - t0) / dur); el.textContent = Math.round(to * (1 - (1 - k) ** 3)); if (k < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  });
+}
+
 function renderHome() {
-  const tierCount = (o) => {
-    const c = { Master: 0, Gold: 0, Silver: 0, Bronze: 0 };
-    for (const l of o.lines) { const t = progress.lineTier(prog, o.id, l.id).tier; if (t) c[t]++; }
-    return c;
-  };
-  els.cards.innerHTML = OPENINGS.map((o) => {
+  const h = new Date().getHours();
+  els.greeting.textContent = h < 5 ? 'Late-night prep' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  els.cards.innerHTML = OPENINGS.map((o, i) => {
     const ids = visibleLines(o, o.lines).map((l) => l.id);
     const due = progress.dueCount(prog, o.id, ids);
     const fresh = ids.filter((id) => progress.lineStatus(prog, o.id, id).state === 'new').length;
-    const c = tierCount(o);
-    const mastered = o.lines.filter((l) => progress.lineTier(prog, o.id, l.id).tier).length;
+    const medals = o.lines.filter((l) => progress.lineTier(prog, o.id, l.id).tier).length;
+    const pct = Math.round((medals / o.lines.length) * 100);
     return `
-      <article class="opening ${o.side}">
-        <div class="op-top">
-          <span class="op-side">${o.side === 'w' ? 'White' : 'Black'}</span>
-          <h2>${o.name}</h2>
+      <article class="opening ${o.side}" style="--i:${i}">
+        <div class="op-head">
+          <div><span class="op-side">You play ${o.side === 'w' ? 'White' : 'Black'}</span><h2>${o.name}</h2></div>
+          ${due ? `<span class="due-pill"><i class="dot"></i>${due} due</span>` : '<span class="due-pill calm">All caught up</span>'}
         </div>
-        <div class="op-stats">
-          <div><b class="due">${due}</b><span>due</span></div>
-          <div><b>${fresh}</b><span>new</span></div>
-          <div><b>${o.lines.length}</b><span>lines</span></div>
+        ${miniBoard(tree.mainLine(o).slice(0, o.signaturePlies), o.side, 'op-board')}
+        <div class="op-meta">
+          <span><b data-count="${o.lines.length}">0</b> lines</span>
+          <span><b data-count="${fresh}">0</b> new</span>
+          <span><b data-count="${medals}">0</b> medals</span>
         </div>
-        <div class="op-tiers" title="Lines with a medal">
-          ${['Master', 'Gold', 'Silver', 'Bronze'].map((t) => `<span class="medal ${t.toLowerCase()}">${c[t]}</span>`).join('')}
-          <div class="bar thin gloss"><i style="width:${Math.round((mastered / o.lines.length) * 100)}%"></i></div>
-        </div>
+        <div class="bar thin"><i style="width:${pct}%"></i></div>
         <div class="op-actions">
-          <button class="btn-review" data-review="${o.id}">Review</button>
+          <button class="secondary" data-review="${o.id}">Review</button>
           <button class="primary" data-train="${o.id}">Train</button>
         </div>
       </article>`;
   }).join('');
-  els.openingDots.innerHTML = OPENINGS.map((o, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('');
-
-  const due = OPENINGS.map((o) => ({ o, n: progress.dueCount(prog, o.id, visibleLines(o, o.lines).map((l) => l.id)) })).sort((a, b) => b.n - a.n)[0];
-  const weakN = (loadWeakReport()?.weaknesses ?? []).length;
-  const surprises = OPENINGS.reduce((n, o) => n + tree.surpriseLines(o).length, 0);
-  const traps = OPENINGS.reduce((n, o) => n + o.lines.filter((l) => l.kind !== 'main').length, 0);
-  els.practiceTiles.innerHTML = [
-    { act: 'due', cls: 't-due', icon: '⏰', title: 'Due now', sub: due.n ? `${due.n} in ${due.o.name.split(' ')[0]}` : 'All caught up', dot: due.n > 0 },
-    { act: 'traps', cls: 't-trap', icon: '🪤', title: 'Traps & punishments', sub: `${traps} lines` },
-    { act: 'surprise', cls: 't-sur', icon: '⚡', title: 'Surprise weapons', sub: `${surprises} lines` },
-    { act: 'weak', cls: 't-weak', icon: '🎯', title: 'Your weak spots', sub: weakN ? `${weakN} positions` : 'Analyse your games', dot: weakN > 0 },
-    { act: 'games', cls: 't-games', icon: '♟', title: 'Your games', sub: 'Gaps & scan' },
-  ].map((t) => `<button class="tile ${t.cls}" data-act="${t.act}"${t.act === 'due' ? ` data-opening="${due.o.id}"` : ''}>${t.dot ? '<i class="dot"></i>' : ''}<span class="tile-icon">${t.icon}</span><b>${t.title}</b><small>${t.sub}</small></button>`).join('');
-  renderStreakChip();
+  countUp(els.cards);
 }
 
-// Opening carousel: dots follow the swipe.
-els.cards.addEventListener('scroll', () => {
-  const i = Math.round(els.cards.scrollLeft / Math.max(1, els.cards.clientWidth * 0.86));
-  [...els.openingDots.children].forEach((d, k) => d.classList.toggle('on', k === i));
-}, { passive: true });
-
-els.practiceTiles.addEventListener('click', (e) => {
-  const t = e.target.closest('.tile');
-  if (!t) return;
-  const act = t.dataset.act;
-  if (act === 'due') { settings = updateSetting('lineMode', 'main'); openTrainer(t.dataset.opening, 'train'); }
-  else if (act === 'traps') { settings = updateSetting('lineMode', 'side'); openTrainer('scotch', 'train'); }
-  else if (act === 'surprise') { settings = updateSetting('lineMode', 'surprise'); openTrainer('scotch', 'train'); }
-  else if (act === 'weak') { if (!els.trainWeak.hidden) els.trainWeak.click(); else showScreen('tools'); }
-  else showScreen('tools');
+/* ---------- home tabs: swipe between pages (Instagram-style), or tap a tab ---------- */
+function setTab(i, smooth = true) {
+  els.pager.scrollTo({ left: i * els.pager.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
+}
+els.tabs.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-page]');
+  if (b) { setTab(Number(b.dataset.page)); feedback.haptic('good'); }
 });
-els.openTools.addEventListener('click', () => { renderProgress(); showScreen('tools'); });
-els.backTools.addEventListener('click', () => { renderHome(); showScreen('home'); });
+els.pager.addEventListener('scroll', () => {
+  const x = els.pager.scrollLeft / Math.max(1, els.pager.clientWidth);
+  els.tabs.style.setProperty('--x', x);
+  const i = Math.round(x);
+  els.tabs.querySelectorAll('[data-page]').forEach((b) => b.classList.toggle('on', Number(b.dataset.page) === i));
+  if (i === 1 && !els.progressCards.dataset.done) { renderProgress(); els.progressCards.dataset.done = '1'; }
+}, { passive: true });
 
 els.cards.addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-train], button[data-review]');
@@ -233,13 +259,13 @@ function setMode(mode) {
   els.modeToggle.querySelectorAll('button').forEach((b) => {
     b.classList.toggle('active', b.dataset.mode === mode);
   });
-  els.controls.hidden = mode !== 'train';
-  els.lineMode.hidden = mode !== 'train';
-  els.lineList.hidden = mode !== 'train';
   els.review.hidden = mode !== 'review';
+  els.moves.hidden = mode !== 'review';
+  els.hintBtn.hidden = mode !== 'train';
+  els.restart.hidden = mode !== 'train';
+  els.openLines.hidden = mode !== 'train';
 
   if (mode === 'train') {
-    els.lineList.open = true;   // choosing a line should be one tap away
     resetLine();
   } else {
     populateLineSelect();
@@ -353,6 +379,8 @@ function showHint() {
 
 /** Daily loop: streak, level/XP and today's goal bar, in the trainer header and on home. */
 function renderStreakChip() {
+  const g0 = Number(settings.dailyGoal ?? 5), t0 = progress.todayCount(prog);
+  if (els.todayHint) els.todayHint.textContent = t0 >= g0 ? 'Goal met — streak safe' : `${g0 - t0} perfect line${g0 - t0 === 1 ? '' : 's'} to go`;
   const goal = Number(settings.dailyGoal ?? 5);
   const today = progress.todayCount(prog);
   const streak = progress.streakDays(prog, goal);
@@ -364,7 +392,8 @@ function renderStreakChip() {
     fill.style.width = pct;
     fill.parentElement.classList.toggle('done', today >= goal);
     text.textContent = `${Math.min(today, goal)} / ${goal}`;
-    lv.textContent = `Lv ${lvl.level} · ${lvl.into}/${lvl.need}`;
+    lv.textContent = `Lv ${lvl.level}`;
+    lv.style.setProperty('--p', lvl.progress);
   }
 }
 
@@ -395,8 +424,7 @@ function renderMoves() {
   // At the end of a trained line the sourced PLAN takes over the note area;
   // resetLine() clears state.finished, so the next line starts clean.
   const showPlan = false;   // the plan lives in the completion dialog only
-  const showNote = l && (review || l.draft);   // training stays chess-talk free
-  els.moves.hidden = !review;
+  const showNote = l && (review || l.draft);   // training stays notation-free
   els.note.classList.toggle('plan', Boolean(showPlan));
   els.note.hidden = !(showPlan || showNote);
   els.note.textContent = showPlan ? `Plan: ${l.plan}` : showNote ? `${lineTitle(l)} — ${l.note ?? ''}` : '';
@@ -464,6 +492,8 @@ function resetLine(lineObj = null) {
   state.lineMistakes = 0;
   state.finished = false;
   els.nextLine.textContent = 'Next line';
+  els.nextLine.hidden = true;
+  if (els.planDialog.open) els.planDialog.close();
 
   renderBoard();
   renderMoves();
@@ -590,18 +620,20 @@ function finishLine() {
   const when = entry.interval >= 1 ? `again in ${Math.round(entry.interval)} day${Math.round(entry.interval) === 1 ? '' : 's'}` : 'again tomorrow';
   const tier = progress.tierFor(entry.clean);
   const justEarned = state.lineMistakes === 0 && progress.TIERS.some((t) => t.at === entry.clean);
-  const tierMsg = justEarned ? `${tier.tier} unlocked` : tier.next ? `${tier.next.at - entry.clean} more clean to ${tier.next.name}` : 'mastered';
+  const tierMsg = justEarned ? `${tier.tier} unlocked` : tier.next ? `${tier.next.at - entry.clean} more perfect to ${tier.next.name}` : 'mastered';
   const daily = progress.recordDaily(prog, { perfect: state.lineMistakes === 0 }, Number(settings.dailyGoal ?? 5));
   saveProg();
   renderStreakChip();
-  setStatus(`${state.lineMistakes === 0 ? 'Clean run' : 'Line complete'} · +${daily.gained} XP · ${tierMsg}`, 'good');
+  setStatus(`${state.lineMistakes === 0 ? 'Perfect!' : 'Line complete'} · +${daily.gained} XP`, 'good');
   const rewards = [];
   if (justEarned) rewards.push(`<span class="medal ${tier.tier.toLowerCase()}">${tier.tier}</span> ${tier.tier} unlocked`);
   if (daily.goalMet) rewards.push('<span class="medal goal">🔥</span> Daily goal met');
   if (daily.levelUp) rewards.push(`<span class="medal lvl">↑</span> Level ${progress.levelFor(progress.totalXp(prog)).level}`);
   els.planDialogReward.hidden = false;
   els.planDialogReward.className = `reward${rewards.length ? ' big' : ''}`;
-  els.planDialogReward.innerHTML = `<b>${state.lineMistakes === 0 ? 'Clean run' : 'Line complete'}</b> <span class="xp-gain">+${daily.gained} XP</span>${rewards.map((r) => `<div class="reward-row">${r}</div>`).join('')}<div class="reward-sub">${when} · ${tierMsg}</div>`;
+  els.planDialogReward.innerHTML = `<b>${state.lineMistakes === 0 ? 'Perfect line' : 'Line complete'}</b> <span class="xp-gain">+${daily.gained} XP</span>${rewards.map((r) => `<div class="reward-row">${r}</div>`).join('')}<div class="reward-sub">${when} · ${tierMsg}</div>`;
+  els.planDialogReward.insertAdjacentHTML('beforeend', `<div class="reward-ring">${medalRing(progress.tierFor(entry.clean), true)}${pips(progress.tierFor(entry.clean))}</div>`);
+  els.nextLine.hidden = false;
   feedback.haptic(rewards.length ? 'milestone' : 'complete');
   if (state.lineObj.plan) {
     els.planDialogTitle.textContent = lineTitle(state.lineObj);
@@ -625,8 +657,8 @@ function renderLineMode() {
     b.classList.toggle('active', mode === settings.lineMode);
     b.setAttribute('aria-checked', String(mode === settings.lineMode));
     b.hidden = mode === 'surprise' && counts.surprise === 0;
-    const label = { main: 'Main lines', side: 'Side lines', surprise: 'Surprises', mine: 'My games' }[mode];
-    b.textContent = `${label} (${counts[mode]})`;
+    const label = { main: 'Main', side: 'Traps', surprise: 'Surprises', mine: 'My games' }[mode];
+    b.innerHTML = `${label}<small>${counts[mode]}</small>`;
   });
 }
 
@@ -637,66 +669,59 @@ function renderLineList() {
   const hits = loadGapReport()?.report?.[opening.id]?.lineHits ?? {};
   const ticked = lines.filter((l) => !hidden[l.id]);
   const due = progress.dueCount(prog, opening.id, ticked.map((l) => l.id));
-
-  els.lineListTitle.textContent = `${ticked.length} of ${lines.length} lines in rotation`;
-  els.lineListMeta.textContent = due ? `${due} due` : 'all fresh';
-  if (settings.lineMode === 'mine' && Object.keys(hits).length === 0) {
-    els.lineRows.innerHTML = '<p class="hint" style="padding:6px">No scan yet — run the Chess.com scan on the home screen and this tab will hold exactly the lines your opponents play, most frequent first. Showing every line meanwhile.</p>';
-  } else {
-    els.lineRows.innerHTML = '';
-  }
-
+  els.lineListTitle.textContent = opening.name;
+  els.lineListMeta.textContent = `${ticked.length} lines in rotation${due ? ` · ${due} due` : ''}`;
   const q = els.lineSearch?.value ?? '';
-  const allFams = [...new Set(lines.map((l) => tree.lineFamily(opening, l)))];
-  if (state.famFilter && !allFams.includes(state.famFilter)) state.famFilter = null;
-  els.famStrip ??= (() => { const d = document.createElement('div'); d.className = 'carousel chips-row'; d.id = 'fam-strip'; els.lineSearch.after(d);
-    d.addEventListener('click', (e) => { const c = e.target.closest('[data-fam]'); if (!c) return; state.famFilter = c.dataset.fam || null; renderLineList(); });
-    return d; })();
-  els.famStrip.innerHTML = [`<button class="fchip${state.famFilter ? '' : ' on'}" data-fam="">All</button>`, ...allFams.map((f) => {
-    const n = lines.filter((l) => tree.lineFamily(opening, l) === f && progress.lineStatus(prog, opening.id, l.id).state === 'due').length;
-    return `<button class="fchip${state.famFilter === f ? ' on' : ''}" data-fam="${f}">${f.replace(/ \(.*\)$/, '')}${n ? '<i class="dot"></i>' : ''}</button>`;
-  })].join('');
-  const shown = lines.filter((l) => tree.matchesQuery(opening, l, q) && (!state.famFilter || tree.lineFamily(opening, l) === state.famFilter));
-  if (q && !shown.length) els.lineRows.innerHTML = `<p class="hint" style="padding:6px">No line matches “${q.replace(/[<>&]/g, '')}”. Try a move (Nd4, Bxf7+) or a family (London, Paulsen).</p>`;
+  const shown = lines.filter((l) => tree.matchesQuery(opening, l, q));
+  const note = settings.lineMode === 'mine' && Object.keys(hits).length === 0
+    ? '<p class="empty">Scan your Chess.com games (Games tab) and this list shows exactly what your opponents play.</p>' : '';
+  if (!shown.length) { els.lineRows.innerHTML = note + `<p class="empty">Nothing matches “${q.replace(/[<>&]/g, '')}”.</p>`; return; }
   const fams = [];
   for (const l of shown) { const f = tree.lineFamily(opening, l); let g = fams.find((x) => x.name === f); if (!g) fams.push(g = { name: f, lines: [] }); g.lines.push(l); }
-  els.lineRows.insertAdjacentHTML('beforeend', fams.map((g) => {
+  let k = 0;
+  els.lineRows.innerHTML = note + fams.map((g) => {
     const dueN = g.lines.filter((l) => progress.lineStatus(prog, opening.id, l.id).state === 'due').length;
-    const dots = g.lines.map((l) => `<i class="${(progress.lineTier(prog, opening.id, l.id).tier ?? '').toLowerCase()}"></i>`).join('');
-    return `<div class="fam-head"><span>${g.name}</span><span class="fam-meta">${dueN ? `<b class="due-dot"></b>${dueN} due · ` : ''}${g.lines.length}</span><span class="fam-dots">${dots}</span></div>` + g.lines.map((l) => {
-    const dev = tree.deviation(opening, l);
-    const from = dev ? dev.ply : opening.signaturePlies;
-    const tail = tree.formatMoves(l.moves).slice(from).map((m) => m.text).join(' ');
-    const st = progress.lineStatus(prog, opening.id, l.id);
-    const tier = progress.lineTier(prog, opening.id, l.id);
-    const badges = [];
-    if (l.kind === 'side') badges.push(`<span class="badge side" title="${l.club ? `${l.club.share}% of club players play the mistake` : ''}">punish${l.club ? ` ${Math.round(l.club.share)}%` : ''}</span>`);
-    if (l.kind === 'trap') badges.push(`<span class="badge side" title="${l.club ? `${l.club.share}% of club players fall for it` : ''}">trap${l.club ? ` ${Math.round(l.club.share)}%` : ''}</span>`);
-    if (l.kind === 'surprise') badges.push('<span class="badge side">surprise</span>');
-    if (hits[l.id]) badges.push(`<span class="badge">×${hits[l.id]}</span>`);
-    if (l.kind === 'main' && l.club) badges.push(`<span class="badge">${Math.round(l.club.share)}%</span>`);
-    if (st.state === 'new') badges.push('<span class="badge new">new</span>');
-    else if (st.state === 'due') badges.push('<span class="badge due">due</span>');
-    else badges.push(`<span class="badge ok">${-st.overdueDays}d</span>`);
-    const playing = state.lineObj?.id === l.id;
-    const tierCls = (tier.tier ?? '').toLowerCase();
-    const toNext = tier.next ? `${tier.clean} / ${tier.next.at} clean runs to ${tier.next.name}` : `${tier.clean} clean runs · mastered`;
-    return `
-      <div class="line-row${hidden[l.id] ? ' hidden-line' : ''}${playing ? ' playing' : ''}" data-play="${l.id}" role="button">
-        <div>
-          <div class="lr-name">${lineTitle(l)}${tier.tier ? `<span class="tier ${tierCls}">${tier.tier}</span>` : ''}</div>
-          ${q ? `<div class="lr-moves">${tail}</div>` : ''}
-          <div class="lr-bar ${tierCls}"><i style="width:${Math.round(tier.progress * 100)}%"></i></div>
-          <div class="lr-clean">${toNext}</div>
-        </div>
-        <div class="lr-badges">${badges.join('')}</div>
-        <input type="checkbox" ${hidden[l.id] ? '' : 'checked'} data-toggle="${l.id}" title="In rotation">
-      </div>`;
+    const medals = g.lines.map((l) => { const t = progress.lineTier(prog, opening.id, l.id).tier; return `<i class="${(t ?? '').toLowerCase()}"></i>`; }).join('');
+    return `<section class="fam">
+      <header class="fam-head"><h3>${g.name.replace(/ \((.*)\)$/, '')}</h3>${g.name.match(/\((.*)\)$/) ? `<small>${g.name.match(/\((.*)\)$/)[1]}</small>` : ''}<span class="fam-medals">${medals}</span>${dueN ? `<span class="fam-due">${dueN}</span>` : ''}</header>
+      ${g.lines.map((l) => {
+        const st = progress.lineStatus(prog, opening.id, l.id);
+        const t = progress.lineTier(prog, opening.id, l.id);
+        const kind = l.kind === 'trap' ? '<span class="kind trap">trap</span>' : l.kind === 'side' ? '<span class="kind side">punish</span>' : l.kind === 'surprise' ? '<span class="kind sur">surprise</span>' : '';
+        const freq = l.club ? `<span class="freq">${Math.round(l.club.share)}% of club players</span>` : hits[l.id] ? `<span class="freq">×${hits[l.id]} in your games</span>` : '';
+        const name = l.name.replace(/^[\d.]+\S*\s·\s/, '');
+        const playing = state.lineObj?.id === l.id;
+        return `
+        <div class="line-row${hidden[l.id] ? ' off' : ''}${playing ? ' playing' : ''}" data-play="${l.id}" role="button" style="--k:${k++}">
+          ${miniBoard(l.moves.slice(0, tree.definingPly(opening, l) + 1), opening.side, 'thumb')}
+          <div class="lr-body">
+            <div class="lr-name">${st.state === 'due' ? '<i class="dot"></i>' : ''}${name}</div>
+            <div class="lr-sub">${kind}${freq}${q ? `<span class="lr-moves">${tree.formatMoves(l.moves).slice(tree.definingPly(opening, l)).map((m) => m.text).join(' ')}</span>` : ''}</div>
+            ${pips(t)}
+          </div>
+          ${medalRing(t)}
+          <label class="keep"><input type="checkbox" ${hidden[l.id] ? '' : 'checked'} data-toggle="${l.id}"><i></i></label>
+        </div>`;
+      }).join('')}
+    </section>`;
   }).join('');
-  }).join(''));
 }
 
-els.lineSearch?.addEventListener('input', () => renderLineList());
+els.lineSearch.addEventListener('input', () => renderLineList());
+els.openLines.addEventListener('click', () => { renderLineList(); els.linesSheet.showModal(); });
+els.closeLines.addEventListener('click', () => els.linesSheet.close());
+els.linesSheet.addEventListener('click', (e) => { if (e.target === els.linesSheet) els.linesSheet.close(); });
+els.editLines.addEventListener('click', () => {
+  const on = els.linesSheet.classList.toggle('editing');
+  els.editLines.textContent = on ? 'Done' : 'Edit';
+});
+els.hintBtn.addEventListener('click', () => {
+  if (state.finished || !tree.isUserPly(state.opening, state.ply)) return;
+  state.lineMistakes += 1;           // a hint means this run is not perfect
+  showHint();
+  setStatus(`Hint: ${state.line[state.ply]}`, 'warn');
+  feedback.haptic('deviation');
+});
 
 // Tap a row to drill that line now; the checkbox on the right keeps or drops it from the rotation.
 els.lineRows.addEventListener('click', (e) => {
@@ -713,8 +738,9 @@ els.lineRows.addEventListener('click', (e) => {
   }
   const row = e.target.closest('.line-row[data-play]');
   if (row) {
+    if (els.linesSheet.classList.contains('editing')) { row.querySelector('input[data-toggle]')?.click(); return; }
+    els.linesSheet.close();
     resetLine(tree.lineById(state.opening, row.dataset.play));
-    els.board.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 });
 
@@ -722,8 +748,8 @@ els.lineMode.addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-line]');
   if (!btn || btn.dataset.line === settings.lineMode) return;
   settings = updateSetting('lineMode', btn.dataset.line);
-  els.lineList.open = true;
-  resetLine();
+  renderLineMode();
+  renderLineList();
 });
 
 /* =================================================================
@@ -954,31 +980,38 @@ els.engineCopy.addEventListener('click', async () => {
    ================================================================= */
 
 function renderProgress() {
-  els.progressCards.innerHTML = OPENINGS.map((o) => {
-    const s = prog.openings[o.id];
-    const acc = progress.accuracy(s);
-    const spots = progress.weakSpots(prog, o.id, 3);
-    let weak;
-    if (!s || s.attempts === 0) weak = 'Not trained yet.';
-    else if (spots.length === 0) weak = 'No mistakes so far. 👌';
-    else {
-      weak = 'Most missed: ' + spots.map((w) => {
-        const l = tree.lineById(o, w.lineKey);
-        return `<span class="pill">${l ? tree.lineFamily(o, l) : 'a line'} · ${w.count}×</span>`;
-      }).join(' ');
-    }
-    return `
-      <div class="stat-card">
-        <h3>${o.name}</h3>
-        <div class="stat-row">
-          <div class="stat"><b>${acc === null ? '–' : acc + '%'}</b><span>accuracy</span></div>
-          <div class="stat"><b>${s?.streak ?? 0}</b><span>streak</span></div>
-          <div class="stat"><b>${s?.bestStreak ?? 0}</b><span>best</span></div>
-          <div class="stat"><b>${s?.linesCompleted ?? 0}</b><span>lines</span></div>
-        </div>
-        <p class="weak">${weak}</p>
-      </div>`;
-  }).join('');
+  const lvl = progress.levelFor(progress.totalXp(prog));
+  const goal = Number(settings.dailyGoal ?? 5);
+  const streak = progress.streakDays(prog, goal);
+  const days = Array.from({ length: 14 }, (_, k) => { const d = new Date(); d.setDate(d.getDate() - (13 - k)); return progress.todayCount(prog, d); });
+  const R = 34, C = 2 * Math.PI * R;
+  els.progressCards.innerHTML = `
+    <div class="panel-card hero-stats">
+      <span class="ring xl"><svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="${R}"/><circle class="fill lvl" cx="40" cy="40" r="${R}" style="stroke-dasharray:${C};--off:${C * (1 - lvl.progress)}"/></svg><b>${lvl.level}</b><small>level</small></span>
+      <div class="hero-nums">
+        <div><b data-count="${progress.totalXp(prog)}">0</b><span>XP</span></div>
+        <div><b data-count="${streak}">0</b><span>day streak</span></div>
+        <div><b>${lvl.into}<small>/${lvl.need}</small></b><span>to level ${lvl.level + 1}</span></div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <h3>Last 14 days</h3>
+      <div class="heat">${days.map((n) => `<i class="h${Math.min(4, Math.ceil((n / goal) * 4))}" title="${n}"></i>`).join('')}</div>
+    </div>
+    ${OPENINGS.map((o) => {
+      const s = prog.openings[o.id];
+      const acc = progress.accuracy(s);
+      const counts = { Master: 0, Gold: 0, Silver: 0, Bronze: 0 };
+      for (const l of o.lines) { const t = progress.lineTier(prog, o.id, l.id).tier; if (t) counts[t]++; }
+      const spots = progress.weakSpots(prog, o.id, 3);
+      return `
+        <div class="panel-card op-progress ${o.side}">
+          <div class="opp-head"><h3>${o.name}</h3><span class="acc">${acc === null ? '—' : `${acc}%`}<small>accuracy</small></span></div>
+          <div class="medal-row">${Object.entries(counts).map(([t, n]) => `<span class="medal-stat ${t.toLowerCase()}"><b class="medal-core ${t.toLowerCase()}">${t[0]}</b><em data-count="${n}">0</em></span>`).join('')}</div>
+          <p class="weak">${!s || s.attempts === 0 ? 'Not trained yet.' : spots.length === 0 ? 'No repeated mistakes. 👌' : `Trips you up: ${spots.map((w) => { const l = tree.lineById(o, w.lineKey); return `<span class="tag">${l ? tree.lineFamily(o, l).replace(/ \(.*\)$/, '') : 'a line'}</span>`; }).join(' ')}`}</p>
+        </div>`;
+    }).join('')}`;
+  countUp(els.progressCards);
 }
 
 /* ---------- Chess.com gap report ---------- */
@@ -1147,6 +1180,7 @@ function openWeakDrill() {
   els.review.hidden = true;
   els.controls.hidden = false;
   els.nextLine.textContent = 'Skip';
+  els.nextLine.hidden = false;
   showScreen('trainer');
   loadWeakPosition();
 }

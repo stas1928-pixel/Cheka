@@ -12,8 +12,8 @@ button { border-radius: var(--r-3); border: 0; font-weight: 700; box-shadow: 0 3
 button:active { transform: translateY(3px); box-shadow: 0 0 0 rgba(0, 0, 0, 0.45); }
 button.primary { text-transform: uppercase; letter-spacing: 0.04em; font-weight: 900; position: relative; overflow: hidden; }
 button.primary:active { box-shadow: 0 0 0 var(--accent-deep); transform: translateY(4px); }
-button.primary::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.35) 50%, transparent 65%); transform: translateX(-120%); animation: shine 5.5s ease-in-out 1.2s infinite; pointer-events: none; }
-@keyframes shine { 0%, 78% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+button.primary::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.35) 50%, transparent 65%); transform: translateX(-120%); animation: shine 3.2s var(--ease-out) 1s infinite; pointer-events: none; }
+@keyframes shine { 0%, 70% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
 .icon-btn { box-shadow: none; background: transparent; color: var(--text); }
 .icon-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -30,9 +30,9 @@ button.primary::after { content: ""; position: absolute; inset: 0; background: l
 .bar { flex: 1; height: 14px; border-radius: 999px; background: var(--surface-2); overflow: hidden; position: relative; }
 .bar > i { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 999px; background: var(--accent); transition: width var(--t-slow) var(--ease-pop); overflow: hidden; }
 .bar > i::after { content: ""; position: absolute; inset: 3px 6px auto 6px; height: 3px; border-radius: 999px; background: rgba(255, 255, 255, 0.4); }
-.bar > i::before { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%); transform: translateX(-100%); animation: shimmer 5.5s ease-in-out 1.6s infinite; }
+.bar > i::before { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%); transform: translateX(-100%); animation: shimmer 2.4s var(--ease-out) 0.8s infinite; }
 .bar.done > i { background: var(--good); }
-@keyframes shimmer { 0%, 78% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes shimmer { 0%, 40% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
 /* home */
 .home-header { display: flex; align-items: center; justify-content: space-between; }
@@ -104,7 +104,7 @@ button.primary::after { content: ""; position: absolute; inset: 0; background: l
 .reward.big { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, var(--surface-2)), var(--surface-2)); }
 .medal { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 900; color: #1a1400; background: var(--gold); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4); position: relative; overflow: hidden; flex: none; }
 .medal.bronze { background: var(--bronze); color: #fff; } .medal.silver { background: var(--silver); } .medal.master { background: var(--master); } .medal.goal { background: var(--warn); } .medal.lvl { background: var(--accent); color: var(--accent-ink); }
-.medal::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.7) 50%, transparent 70%); transform: translateX(-100%); animation: shine 5.5s ease-in-out 0.8s infinite; }
+.medal::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.7) 50%, transparent 70%); transform: translateX(-100%); animation: shine 2.4s var(--ease-out) 0.8s infinite; }
 .plan-dialog-actions button.primary { flex: 1; }
 
 @media (prefers-reduced-motion: reduce) {

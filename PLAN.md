@@ -573,7 +573,98 @@ Revisit (UI): Review-mode panels and the tools screen are still prototype
 styling; the tile targets (traps/surprises) always open the Scotch —
 make them ask or remember the opening; Weak-spot drill screen unstyled.
 
+### Owner review notes on 15c84c7 (2026-09-24) — collect first, build later
+Owner rejected pass 3 (079b685): wrong reading of "left/right scroll"
+(he means Instagram-style swiping between tabs/screens, not carousels
+inside a screen), forced new colours, redesigned opening cards. Rule:
+talk here before big changes. Baseline for the next pass is 15c84c7.
+Notes, in the order he marks them:
+1. **Home header** (Cheka title, streak + level chips, "Today" goal bar):
+   "here I think you can do more." Keep the elements; the area needs more
+   design craft (currently a plain title, two flat chips and a bare bar).
+2. **Opening card**: replace the move text ("1. e4 e5 2. Nf3 Nc6 3. d4
+   exd4 …") with a **small board showing the opening position** (pieces
+   after the opening's signature moves, from the side you play). The
+   header + the opening card(s) together **fill the whole first screen**
+   (one viewport, no scrolling needed for the main part).
+   Clarified: cards stay **stacked vertically**; scrolling down to see the
+   second card fully is fine as long as proportions make sense (e.g. the
+   first card fully visible, the second starting below it). **No sideways
+   carousel for the cards** ("no awkward slides").
+3. **Progress section** (per-opening stat cards: accuracy, streak, best,
+   lines + "Not trained yet"): redesign. Currently four identical grey
+   boxes with the same blue number per opening — flat and repetitive.
+4. **Colour, global**: use **more colours, but ones that match** — expand
+   the ice accent into a tasteful palette (a family of related cold hues
+   plus complementary tones), not the unrelated role colours of pass 3.
+   To be shown to the owner as a swatch before it is used everywhere.
+5. **Off the home screen, into other tab(s)** (Instagram-style swipe
+   between tabs): the Progress section AND everything marked below it —
+   "Gaps from your Chess.com games" (username + Scan), "Work on
+   weaknesses" (Analyse my games), and Settings (daily goal, vibration,
+   Lichess token, export/import/reset). All of it also gets redesigned
+   (item 7); long explanatory hint texts should be shortened.
+6. **Wording**: drop the phrase **"clean line / clean run"** everywhere
+   (goal text, settings "Daily goal (clean lines)", status, dialog, tier
+   progress "N clean runs to Bronze"); replace with a better-fitting word,
+   to be agreed.
+8. **Trainer control bar** (↻ + NEXT LINE, Train/Review toggle, Main /
+   Side / Surprises / My games tabs, and the line list under it):
+   - **Hide it while a line is being trained** — only the board and a
+     minimal status; this is what "bigger board, fewer distractions" means.
+   - The buttons all look the same (same ice fill); give them a
+     **universal button system** (distinct but related styles) that then
+     applies across the whole app.
+   - Owner invites a **different structure** for it, using tools already
+     discussed. Proposal to discuss (see chat 2026-09-24): focus mode +
+     a slim icon toolbar + a Chess Reps-style "mode" bottom sheet.
+9. **Line rows in the browser** are "too much, hard to read at a glance":
+   the move strings ("Bc5 8. Be3 Bd7 9. Bxc6 …"), the "7...Bc5 ·" prefix
+   repeated in every name, a NEW badge + checkbox on every row, and the
+   "0 / 3 clean runs to Bronze" line. Keep chess notation to a minimum and
+   find a better way. (Also a bug: the trunk row's badge and checkbox
+   overflow outside the card.) Proposal to discuss in chat 2026-09-24.
+10. **Per-line mastery progress** (the thin grey bar + "0 / 3 clean runs
+    to Bronze" text): "can be done better, more striking". Proposal in
+    chat 2026-09-24: a glossy medal ring / segmented pips per tier,
+    animated fill, tier colour; no sentence.
+11. **A one-line idea per move** in the trainer: "a crisp, easy-to-read
+    one-liner stating the idea behind the move", placed somewhere good
+    (proposal: in the status line under the board, right after you play
+    the move — "Bc4 · aims at f7" — and reused as the hint text).
+    Content job: one idea per unique OUR-move position (~200 across both
+    openings, since lines share moves), stored in the library keyed by
+    position, sourced where a source explains it, otherwise marked
+    interpreted — same provenance rules as the plans.
+7. **Global rule from the owner**: everything in the app gets redesigned
+   for consistency — big change or a light touch — no screen or element
+   left in prototype style.
+
+Design pass 4 (2026-09-24, built from 15c84c7; pass 3 dropped): items
+1-10 applied app-wide. Home = header (logo, greeting, streak, level) +
+"Today" goal card with hint + **Instagram-style swipe tabs** (Openings ·
+Progress · Games · Settings, sliding underline). Opening cards stacked
+with a **mini board of the opening position**, due pill, counts, Review
+(secondary) + Train (primary). Progress tab: level ring, XP, streak, 14-day
+heat strip, medal counts per opening, "trips you up" families. Games and
+Settings tabs hold scan / weak spots / goal / vibration switch / token /
+backup with short texts. **Trainer focus mode**: board + status + icon
+toolbar (restart, hint, lines, Train/Review); Next line appears only when
+a line is done; notation only in Review. **Lines sheet** slides up: four
+category cards (colour-coded top edge), search, families with medal dots
+and due counts, rows = thumbnail board + name + kind/frequency + pips +
+**medal ring**; checkboxes behind Edit. **Universal buttons**: primary
+(ice, gloss, sheen), secondary (ice-800, outline, gloss, offset sheen),
+danger, tertiary icons. **Ice palette family** + mint/lilac/coral/amber
+complements in tokens.css. Wording "perfect" replaces "clean". Motion:
+staggered rise-in, count-up numbers, ring fill, pip pop, medal pop,
+sheet slide, pinging due dots, flame flicker, 6 s sheen cycle. SW v9.
+Still open: human line names (item 9 names still carry notation — content
+job), item 11 per-move ideas (content job), Review panels restyle depth.
+
 ### Next candidates (owner picks, one per session)
+- Owner reviews pass 4 on the phone.
+- Content: human line names (~60) and per-move one-liners (item 11).
 - Owner reviews design pass 3 on the phone; next: home progress cards →
   tier summary, Review mode restyle, content gap 4.Nd4 Qxd5 5.c3.
 - Use the app for a few weeks; then the data-driven content pass above.

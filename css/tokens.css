@@ -31,11 +31,11 @@
   --accent-ink: #04121e;
 
   /* semantic */
-  --good: #3fd7b0;
-  --good-wash: rgba(63, 215, 176, 0.45);
+  --good: #4fe0bf;
+  --good-wash: rgba(79, 224, 191, 0.45);
   --bad: #ff6470;
   --bad-wash: rgba(255, 100, 112, 0.45);
-  --warn: #ffb547;
+  --warn: #ffc26b;
   --info: #7cc8ff;
   --xp: #ffd166;
 
@@ -47,6 +47,16 @@
   --sq-check: #ff4b55;
   --coord: rgba(5, 12, 16, 0.55);
   --hint: #ffd166;
+
+  /* ice family (the accent expanded into a palette) + complements that sit with it */
+  --ice-50: #eef8ff; --ice-100: #d6eeff; --ice-200: #aedcff; --ice-300: #7cc8ff; --ice-400: #5aafee;
+  --ice-500: #3f93d6; --ice-700: #1d5a8c; --ice-800: #16405f; --ice-900: #0f2638;
+  --mint: #4fe0bf;      /* success, "my games" */
+  --lilac: #aab6ff;     /* surprises, secondary accents */
+  --coral: #ff8a93;     /* traps, errors */
+  --amber: #ffc26b;     /* streak, due */
+  --gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.10) 46%, rgba(255, 255, 255, 0) 50%);
+  --glow-ice: 0 0 0 1px rgba(124, 200, 255, 0.25), 0 8px 24px rgba(63, 147, 214, 0.25);
 
   /* tiers */
   --bronze: #cd7f32; --silver: #b9c4d3; --gold: #ffc800; --master: #ff6b9d;
