@@ -134,3 +134,45 @@ export function pickWeighted(items, weights, random = Math.random) {
   }
   return items[items.length - 1];
 }
+
+/**
+ * The named family a line belongs to, for the line browser (Chess Reps-style
+ * grouping). Decided by the opponent's defining moves; stable across data
+ * regeneration because it reads only the moves.
+ */
+export function lineFamily(opening, line) {
+  const m = line.moves;
+  if (opening.id === 'scotch') {
+    if (m[5] !== 'exd4') return '3rd-move sidelines';
+    if (line.kind === 'surprise') return 'Surprise weapons';
+    return ({
+      Nf6: m[9] === 'Ng4' ? '5...Ng4' : m[9] === 'Ne4' ? '5...Ne4' : m[9] === 'Qe7' ? '5...Qe7' : 'Modern Attack (4...Nf6 5.e5 d5)',
+      Bc5: 'Greco Gambit (4...Bc5 5.c3)',
+      'Bb4+': 'London Defence (4...Bb4+)',
+      Be7: 'Hungarian (4...Be7)',
+      d6: 'Paris (4...d6)',
+      h6: '4...h6',
+    })[m[7]] ?? 'Other 4th moves';
+  }
+  if (opening.id === 'elephant') {
+    if (line.kind === 'surprise') return 'Surprise weapons';
+    if (m[4] === 'Nxe5') return '3.Nxe5 Bd6';
+    if (m[4] === 'd4') return '3.d4 (declined)';
+    if (m[4] === 'exd5') {
+      if (m[6] === 'Nd4') return '4.Nd4';
+      if (m[6] === 'Qe2') return m[8] === 'Nc3' ? 'Paulsen 5.Nc3' : m[8] === 'd3' ? (m[10] === 'dxe4' ? 'Paulsen 5.d3 Qxd5 6.dxe4' : 'Paulsen 5.d3 Qxd5 6.Nc3') : 'Paulsen, other';
+      return '3.exd5 e4, other';
+    }
+    return 'Other 3rd moves';
+  }
+  return 'Lines';
+}
+
+/** Case-insensitive search over name, family and move text ("Nd4 c3", "5.c3", "bxf7"). */
+export function matchesQuery(opening, line, query) {
+  const q = query.trim().toLowerCase().replace(/\s+/g, ' ');
+  if (!q) return true;
+  const numbered = formatMoves(line.moves).map((x) => x.text).join(' ');
+  const hay = `${line.name} ${lineFamily(opening, line)} ${numbered} ${line.moves.join(' ')}`.toLowerCase();
+  return q.split(' ').every((t) => hay.includes(t.replace(/^\d+\.+/, '')) || hay.includes(t));
+}

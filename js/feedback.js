@@ -67,3 +67,30 @@ function tone(freq, start, duration, type, peak) {
   osc.start(start);
   osc.stop(start + duration + 0.02);
 }
+
+/* ---------------------------------------------------------------
+   HAPTICS (Android Chrome supports navigator.vibrate; elsewhere a no-op).
+   Events only — piece moves stay silent (owner, 2026-09-24).
+--------------------------------------------------------------- */
+let hapticsOn = true;
+export function setHapticsEnabled(on) { hapticsOn = on; }
+const PATTERNS = {
+  good: 12,                    // a light tick
+  bad: [35, 40, 35],           // two short buzzes — clear but slight
+  deviation: [20, 60, 20],     // "look up"
+  complete: [15, 40, 15, 40, 60],
+  milestone: [30, 50, 30, 50, 120],
+};
+export function haptic(kind) {
+  if (!hapticsOn || typeof navigator === 'undefined' || !navigator.vibrate) return;
+  if (globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches && kind === 'good') return;
+  try { navigator.vibrate(PATTERNS[kind] ?? 10); } catch { /* ignored */ }
+}
+
+/** Slight shake of an element (the board on a wrong move). Restarts on repeat. */
+export function shake(el) {
+  if (!el) return;
+  el.classList.remove('shake');
+  void el.offsetWidth;
+  el.classList.add('shake');
+}

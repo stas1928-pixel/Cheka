@@ -4,9 +4,7 @@
    these variables.
 
    Palette: "Onyx" (owner's pick, 2026-09-24 checkpoint), cooled down:
-   blue-black base, steel board, cold accent. Three accent candidates
-   remain for a one-tap pick (data-accent on <html>); the default is
-   "ice". After the pick the other two blocks are deleted.
+   blue-black base, steel board, cold accent. Accent: "ice" (owner, 2026-09-24).
 
    Scale: spacing 4 8 12 16 24 32; radius 6 8 12; touch target 44.
 --------------------------------------------------------------- */
@@ -52,20 +50,4 @@
 
   /* tiers */
   --bronze: #cd7f32; --silver: #b9c4d3; --gold: #ffc800; --master: #ff6b9d;
-}
-
-/* ---- accent candidates for the owner's pick ---- */
-[data-accent="glacier"] {
-  --accent: #5ee0e6;
-  --accent-deep: #2fa9ae;
-  --accent-ink: #021b1c;
-  --info: #5ee0e6;
-  --sq-last: rgba(94, 224, 230, 0.42);
-}
-[data-accent="frost"] {
-  --accent: #a9b8ff;
-  --accent-deep: #7383d6;
-  --accent-ink: #0b0f26;
-  --info: #a9b8ff;
-  --sq-last: rgba(169, 184, 255, 0.42);
 }

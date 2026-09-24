@@ -81,3 +81,17 @@ test('pickWeighted respects weights, skips zeros, handles nothing pickable', () 
   assert.equal(pickWeighted(items, [0, 0, 0]), null);
   assert.equal(pickWeighted([], []), null);
 });
+
+import { lineFamily, matchesQuery } from '../js/tree.js';
+import { OPENINGS as REAL } from '../js/repertoire.js';
+
+test('every shipped line has a named family; search finds lines by moves and names', () => {
+  for (const o of REAL) for (const l of [...o.lines, ...(o.surprise ?? [])]) assert.ok(lineFamily(o, l), `${o.id}/${l.id}`);
+  const s = REAL.find((o) => o.id === 'scotch');
+  assert.equal(lineFamily(s, s.lines[0]), 'Modern Attack (4...Nf6 5.e5 d5)');
+  assert.ok(s.lines.some((l) => matchesQuery(s, l, 'london')));
+  assert.ok(s.lines.some((l) => matchesQuery(s, l, 'Bxf7+')));
+  assert.ok(!s.lines.some((l) => matchesQuery(s, l, 'zzz')));
+  const e = REAL.find((o) => o.id === 'elephant');
+  assert.ok(e.lines.some((l) => matchesQuery(e, l, 'Nd4 Nb3')));
+});

@@ -223,3 +223,61 @@ function validate(obj) {
   }
   return obj;
 }
+
+/* ---------------------------------------------------------------
+   DAILY LOOP (design phase, 2026-09-24): daily goal, streak, XP, level.
+   Stored under progress.daily = { days: { 'YYYY-MM-DD': cleanLines }, xp }.
+   - A day counts toward the streak when its clean lines ≥ the goal.
+   - XP: 10 per clean line, 3 per line completed with mistakes; +25 bonus
+     the moment the day's goal is met. Level n needs 100·n XP more.
+--------------------------------------------------------------- */
+export const XP = Object.freeze({ clean: 10, done: 3, goalBonus: 25 });
+
+const dayKey = (d) => d.toISOString().slice(0, 10);
+
+function daily(progress) {
+  progress.daily ??= { days: {}, xp: 0 };
+  progress.daily.days ??= {};
+  progress.daily.xp ??= 0;
+  return progress.daily;
+}
+
+/** Record one finished line for the daily loop. Returns what happened, for the UI. */
+export function recordDaily(progress, { perfect }, goal = 5, now = new Date()) {
+  const d = daily(progress);
+  const k = dayKey(now);
+  const before = d.days[k] ?? 0;
+  const levelBefore = levelFor(d.xp).level;
+  let gained = perfect ? XP.clean : XP.done;
+  if (perfect) d.days[k] = before + 1;
+  const goalMet = perfect && before < goal && before + 1 >= goal;
+  if (goalMet) gained += XP.goalBonus;
+  d.xp += gained;
+  return { gained, goalMet, today: d.days[k] ?? 0, levelUp: levelFor(d.xp).level > levelBefore };
+}
+
+/** Clean lines today. */
+export function todayCount(progress, now = new Date()) {
+  return daily(progress).days[dayKey(now)] ?? 0;
+}
+
+/** Consecutive days (ending today, or yesterday if today is not done yet) with the goal met. */
+export function streakDays(progress, goal = 5, now = new Date()) {
+  const days = daily(progress).days;
+  const d = new Date(now);
+  if ((days[dayKey(d)] ?? 0) < goal) d.setUTCDate(d.getUTCDate() - 1);
+  let n = 0;
+  while ((days[dayKey(d)] ?? 0) >= goal) { n++; d.setUTCDate(d.getUTCDate() - 1); }
+  return n;
+}
+
+/** Level from total XP: level 1 at 0, level n+1 after 100·n more. */
+export function levelFor(xp) {
+  let level = 1, need = 100, rest = xp;
+  while (rest >= need) { rest -= need; level++; need = 100 * level; }
+  return { level, into: rest, need, progress: rest / need };
+}
+
+export function totalXp(progress) {
+  return daily(progress).xp;
+}

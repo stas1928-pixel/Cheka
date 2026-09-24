@@ -31,7 +31,8 @@ const pieceSrc = (piece) => `vendor/pieces/${piece.color}${piece.type.toUpperCas
 
 // User preferences (sound, which tab of lines, hidden lines, tokens…).
 let settings = loadSettings();
-feedback.setSoundEnabled(settings.sound);
+feedback.setSoundEnabled(false);          // sound skipped for now (owner)
+feedback.setHapticsEnabled(settings.haptics !== false);
 
 // Accuracy / streaks / weak spots / spaced repetition, saved after every move.
 let prog = progress.loadProgress();
@@ -72,10 +73,21 @@ const els = {
   name: $('#trainer-name'),
   side: $('#trainer-side'),
   modeToggle: $('#mode-toggle'),
-  soundToggle: $('#sound-toggle'),
+  streakTop: $('#streak-top'),
+  xpTop: $('#xp-top'),
+  goalFill: $('#goal-fill'),
+  goalText: $('#goal-text'),
+  homeStreak: $('#home-streak'),
+  homeLevel: $('#home-level'),
+  homeGoalFill: $('#home-goal-fill'),
+  homeGoalText: $('#home-goal-text'),
+  nextLine: $('#next-line'),
+  lineSearch: $('#line-search'),
+  dailyGoal: $('#daily-goal'),
+  hapticsToggle: $('#haptics-toggle'),
+  planDialogReward: $('#plan-dialog-reward'),
   board: $('#board'),
   arrows: $('#arrows'),
-  streakChip: $('#streak-chip'),
   status: $('#status'),
   moves: $('#moves'),
   note: $('#branch-note'),
@@ -291,10 +303,21 @@ function showHint() {
   if (move) drawArrow(move.from, move.to);
 }
 
+/** Daily loop: streak, level/XP and today's goal bar, in the trainer header and on home. */
 function renderStreakChip() {
-  const streak = prog.openings[state.opening?.id]?.streak ?? 0;
-  els.streakChip.hidden = !(state.mode === 'train' && streak >= 3);
-  els.streakChip.textContent = `🔥 ${streak}`;
+  const goal = Number(settings.dailyGoal ?? 5);
+  const today = progress.todayCount(prog);
+  const streak = progress.streakDays(prog, goal);
+  const lvl = progress.levelFor(progress.totalXp(prog));
+  const pct = `${Math.min(100, Math.round((today / goal) * 100))}%`;
+  for (const [chip, fill, text, lv] of [[els.streakTop, els.goalFill, els.goalText, els.xpTop], [els.homeStreak, els.homeGoalFill, els.homeGoalText, els.homeLevel]]) {
+    chip.textContent = `🔥 ${streak}`;
+    chip.classList.toggle('cold', streak === 0);
+    fill.style.width = pct;
+    fill.parentElement.classList.toggle('done', today >= goal);
+    text.textContent = `${Math.min(today, goal)} / ${goal}`;
+    lv.textContent = `Lv ${lvl.level} · ${lvl.into}/${lvl.need}`;
+  }
 }
 
 /**
@@ -323,7 +346,7 @@ function renderMoves() {
   const dev = l ? tree.deviation(state.opening, l) : null;
   // At the end of a trained line the sourced PLAN takes over the note area;
   // resetLine() clears state.finished, so the next line starts clean.
-  const showPlan = l && state.finished && !review && l.plan;
+  const showPlan = false;   // the plan lives in the completion dialog only
   const showNote = l && (review || (dev && state.ply > dev.ply) || l.draft);
   els.note.classList.toggle('plan', Boolean(showPlan));
   els.note.hidden = !(showPlan || showNote);
@@ -391,7 +414,7 @@ function resetLine(lineObj = null) {
   state.misses = 0;
   state.lineMistakes = 0;
   state.finished = false;
-  els.restart.textContent = 'Restart line';
+  els.nextLine.textContent = 'Next line';
 
   renderBoard();
   renderMoves();
@@ -451,8 +474,8 @@ function attemptUserMove(move) {
     state.lineMistakes += 1;
     renderBoard();
     feedback.flash(els.board, [move.from, move.to], 'bad');
-    feedback.play('bad');
-    renderStreakChip();
+    feedback.shake(els.board.parentElement);
+    feedback.haptic('bad');
     if (state.misses >= HINT_AFTER_MISSES) {
       showHint();
       setStatus(`Not the line — follow the arrow: ${expected}`, 'bad');
@@ -468,9 +491,8 @@ function attemptUserMove(move) {
   renderBoard({ animate: true });
   renderMoves();
   feedback.flash(els.board, [move.from, move.to], 'good');
-  feedback.play('good');
-  renderStreakChip();
-  setStatus('Correct ✓', 'good');
+  feedback.haptic('good');
+  setStatus('Correct', 'good');
 
   if (state.ply >= state.line.length) finishLine();
   else scheduleOpponent();
@@ -498,8 +520,9 @@ function playOpponentMove() {
 
   if (state.ply >= state.line.length) { finishLine(); return; }
   if (leftBook) {
-    const kind = state.lineObj.kind === 'side' ? 'punish it!' : state.lineObj.kind === 'trap' ? 'a real variation — this line shows a trap they may fall into.' : 'a real variation — know your reply.';
-    setStatus(`Opponent left the main line with ${san} — ${kind}`, 'warn');
+    const kind = state.lineObj.kind === 'side' ? 'punish it' : state.lineObj.kind === 'trap' ? 'a trap may follow' : 'know your reply';
+    feedback.haptic('deviation');
+    setStatus(`${tree.moveLabel(state.ply - 1, san)} — they left the main line: ${kind}`, 'warn');
   } else {
     setStatus('Your move');
   }
@@ -509,20 +532,28 @@ function finishLine() {
   state.finished = true;
   state.selected = null;
   renderBoard();
-  renderMoves();   // shows "Plan: …" for the finished line
-  feedback.play('complete');
+  renderMoves();
   progress.recordLineComplete(prog, state.opening.id);
   const entry = progress.scheduleLine(prog, state.opening.id, state.lineObj.id, { perfect: state.lineMistakes === 0 });
   saveProg();
-  const streak = prog.openings[state.opening.id].streak;
   renderStreakChip();
   renderLineList();
   const when = entry.interval >= 1 ? `again in ${Math.round(entry.interval)} day${Math.round(entry.interval) === 1 ? '' : 's'}` : 'again tomorrow';
   const tier = progress.tierFor(entry.clean);
   const justEarned = state.lineMistakes === 0 && progress.TIERS.some((t) => t.at === entry.clean);
-  const tierMsg = justEarned ? `  ·  ${tier.tier} unlocked! 🏅` : tier.next ? `  ·  ${tier.next.at - entry.clean} more clean to ${tier.next.name}` : '  ·  mastered';
-  setStatus(`${state.lineMistakes === 0 ? 'Clean run! 🎉' : 'Line complete.'}  ·  streak ${streak}  ·  ${when}${tierMsg}`, 'good');
-  els.restart.textContent = 'Next line';
+  const tierMsg = justEarned ? `${tier.tier} unlocked` : tier.next ? `${tier.next.at - entry.clean} more clean to ${tier.next.name}` : 'mastered';
+  const daily = progress.recordDaily(prog, { perfect: state.lineMistakes === 0 }, Number(settings.dailyGoal ?? 5));
+  saveProg();
+  renderStreakChip();
+  setStatus(`${state.lineMistakes === 0 ? 'Clean run' : 'Line complete'} · +${daily.gained} XP · ${tierMsg}`, 'good');
+  const rewards = [];
+  if (justEarned) rewards.push(`<span class="medal ${tier.tier.toLowerCase()}">${tier.tier}</span> ${tier.tier} unlocked`);
+  if (daily.goalMet) rewards.push('<span class="medal goal">🔥</span> Daily goal met');
+  if (daily.levelUp) rewards.push(`<span class="medal lvl">↑</span> Level ${progress.levelFor(progress.totalXp(prog)).level}`);
+  els.planDialogReward.hidden = false;
+  els.planDialogReward.className = `reward${rewards.length ? ' big' : ''}`;
+  els.planDialogReward.innerHTML = `<b>${state.lineMistakes === 0 ? 'Clean run' : 'Line complete'}</b> <span class="xp-gain">+${daily.gained} XP</span>${rewards.map((r) => `<div class="reward-row">${r}</div>`).join('')}<div class="reward-sub">${when} · ${tierMsg}</div>`;
+  feedback.haptic(rewards.length ? 'milestone' : 'complete');
   if (state.lineObj.plan) {
     els.planDialogTitle.textContent = lineTitle(state.lineObj);
     const l = state.lineObj;
@@ -566,17 +597,26 @@ function renderLineList() {
     els.lineRows.innerHTML = '';
   }
 
-  els.lineRows.insertAdjacentHTML('beforeend', lines.map((l) => {
+  const q = els.lineSearch?.value ?? '';
+  const shown = lines.filter((l) => tree.matchesQuery(opening, l, q));
+  if (q && !shown.length) els.lineRows.innerHTML = `<p class="hint" style="padding:6px">No line matches “${q.replace(/[<>&]/g, '')}”. Try a move (Nd4, Bxf7+) or a family (London, Paulsen).</p>`;
+  const fams = [];
+  for (const l of shown) { const f = tree.lineFamily(opening, l); let g = fams.find((x) => x.name === f); if (!g) fams.push(g = { name: f, lines: [] }); g.lines.push(l); }
+  els.lineRows.insertAdjacentHTML('beforeend', fams.map((g) => {
+    const dueN = g.lines.filter((l) => progress.lineStatus(prog, opening.id, l.id).state === 'due').length;
+    const dots = g.lines.map((l) => `<i class="${(progress.lineTier(prog, opening.id, l.id).tier ?? '').toLowerCase()}"></i>`).join('');
+    return `<div class="fam-head"><span>${g.name}</span><span class="fam-meta">${dueN ? `<b class="due-dot"></b>${dueN} due · ` : ''}${g.lines.length}</span><span class="fam-dots">${dots}</span></div>` + g.lines.map((l) => {
     const dev = tree.deviation(opening, l);
     const from = dev ? dev.ply : opening.signaturePlies;
     const tail = tree.formatMoves(l.moves).slice(from).map((m) => m.text).join(' ');
     const st = progress.lineStatus(prog, opening.id, l.id);
     const tier = progress.lineTier(prog, opening.id, l.id);
     const badges = [];
-    if (l.kind === 'side') badges.push('<span class="badge side">punish</span>');
+    if (l.kind === 'side') badges.push(`<span class="badge side" title="${l.club ? `${l.club.share}% of club players play the mistake` : ''}">punish${l.club ? ` ${Math.round(l.club.share)}%` : ''}</span>`);
     if (l.kind === 'trap') badges.push(`<span class="badge side" title="${l.club ? `${l.club.share}% of club players fall for it` : ''}">trap${l.club ? ` ${Math.round(l.club.share)}%` : ''}</span>`);
     if (l.kind === 'surprise') badges.push('<span class="badge side">surprise</span>');
     if (hits[l.id]) badges.push(`<span class="badge">×${hits[l.id]}</span>`);
+    if (l.kind === 'main' && l.club) badges.push(`<span class="badge">${Math.round(l.club.share)}%</span>`);
     if (st.state === 'new') badges.push('<span class="badge new">new</span>');
     else if (st.state === 'due') badges.push('<span class="badge due">due</span>');
     else badges.push(`<span class="badge ok">${-st.overdueDays}d</span>`);
@@ -594,8 +634,11 @@ function renderLineList() {
         <div class="lr-badges">${badges.join('')}</div>
         <input type="checkbox" ${hidden[l.id] ? '' : 'checked'} data-toggle="${l.id}" title="In rotation">
       </div>`;
+  }).join('');
   }).join(''));
 }
+
+els.lineSearch?.addEventListener('input', () => renderLineList());
 
 // Tap a row to drill that line now; the checkbox on the right keeps or drops it from the rotation.
 els.lineRows.addEventListener('click', (e) => {
@@ -1045,7 +1088,7 @@ function openWeakDrill() {
   els.lineList.hidden = true;
   els.review.hidden = true;
   els.controls.hidden = false;
-  els.restart.textContent = 'Skip';
+  els.nextLine.textContent = 'Skip';
   showScreen('trainer');
   loadWeakPosition();
 }
@@ -1155,21 +1198,22 @@ els.resetBtn.addEventListener('click', () => {
 
 /* ---------- wiring ---------- */
 
-function renderSoundToggle() {
-  els.soundToggle.textContent = settings.sound ? '🔊' : '🔇';
-  els.soundToggle.classList.toggle('off', !settings.sound);
-}
-els.soundToggle.addEventListener('click', () => {
-  settings = updateSetting('sound', !settings.sound);
-  feedback.setSoundEnabled(settings.sound);
-  renderSoundToggle();
-  if (settings.sound) feedback.play('good');
-});
-renderSoundToggle();
-
+// ↻ restarts the same line; Next line picks the next one from the rotation.
 els.restart.addEventListener('click', () => {
   if (state.mode === 'weak') { state.weak.index += 1; loadWeakPosition(); }
+  else resetLine(state.finished ? null : state.lineObj);
+});
+els.nextLine.addEventListener('click', () => {
+  if (state.mode === 'weak') { state.weak.index += 1; loadWeakPosition(); }
   else resetLine();
+});
+els.dailyGoal.value = String(settings.dailyGoal ?? 5);
+els.dailyGoal.addEventListener('change', () => { settings = updateSetting('dailyGoal', Number(els.dailyGoal.value)); renderStreakChip(); });
+els.hapticsToggle.checked = settings.haptics !== false;
+els.hapticsToggle.addEventListener('change', () => {
+  settings = updateSetting('haptics', els.hapticsToggle.checked);
+  feedback.setHapticsEnabled(settings.haptics);
+  feedback.haptic('good');
 });
 els.planDialogClose.addEventListener('click', () => els.planDialog.close());
 els.planDialogReview.addEventListener('click', () => els.planDialog.close());
@@ -1181,12 +1225,14 @@ els.back.addEventListener('click', () => {
   state.session += 1;
   renderProgress();
   renderHome();
+  renderStreakChip();
   showScreen('home');
 });
 
 renderHome();
 renderProgress();
 renderSettingsPanel();
+renderStreakChip();
 renderGapReport(loadGapReport());
 renderWeakReport(loadWeakReport());
 showScreen('home');

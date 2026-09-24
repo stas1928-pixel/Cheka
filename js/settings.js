@@ -8,10 +8,13 @@
 export const SETTINGS_KEY = 'openingTrainer.settings.v1';
 
 export const DEFAULT_SETTINGS = Object.freeze({
-  sound: true,            // chime / buzz on correct / incorrect
+  sound: false,           // owner: sound skipped for now (haptics instead)
+  haptics: true,          // vibration on events (Android)
+  dailyGoal: 5,           // clean lines per day for the streak (3 / 5 / 10 / 20)
   lineMode: 'main',       // which tab of lines to train:
                           //   'main' – the main variations
                           //   'side' – opponent mistakes and their punishments
+                          //   'surprise' – our own offbeat weapons
                           //   'mine' – whatever showed up in YOUR games, weighted by frequency
   hiddenLines: {},        // { [openingId]: { [lineId]: true } } — lines unticked in the list
   deviationChance: 0.35,  // kept for old saved settings; no longer used

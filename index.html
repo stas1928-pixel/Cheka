@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0a0e12">
-<title>Opening Trainer</title>
+<title>Cheka — Opening Trainer</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app-v2.css">
 </head>
 <body>
 
@@ -17,8 +18,17 @@
      progress and settings below on scroll. -->
 <main data-screen="home">
   <header class="home-header">
-    <h1>Opening Trainer</h1>
+    <h1>Cheka</h1>
+    <div class="home-stats">
+      <span id="home-streak" class="chip streak" title="Day streak">🔥 0</span>
+      <span id="home-level" class="chip xp" title="Level">Lv 1</span>
+    </div>
   </header>
+  <div class="goal home-goal" aria-label="Today's goal">
+    <span>Today</span>
+    <div class="bar"><i id="home-goal-fill"></i></div>
+    <b id="home-goal-text">0 / 5</b>
+  </div>
 
   <section id="opening-cards" class="cards" aria-label="Openings"></section>
 
@@ -57,6 +67,11 @@
   <section class="panel" aria-label="Settings">
     <h2 class="panel-title">Settings</h2>
     <div class="setting-card">
+      <label class="row" for="daily-goal"><span>Daily goal (clean lines)</span>
+        <select id="daily-goal"><option>3</option><option>5</option><option>10</option><option>20</option></select></label>
+      <label class="row" for="haptics-toggle"><span>Vibration</span><input id="haptics-toggle" type="checkbox"></label>
+    </div>
+    <div class="setting-card">
       <label class="row" for="lichess-token">
         <span>Lichess API token</span>
         <a class="link" href="https://lichess.org/account/oauth/token/create?description=Opening%20Trainer" target="_blank" rel="noopener">create one ↗</a>
@@ -80,13 +95,41 @@
      Board is the hero; everything else stays minimal. -->
 <main data-screen="trainer" hidden>
   <header class="trainer-header">
-    <button id="back" class="icon-btn" aria-label="Back to home">‹</button>
+    <button id="back" class="icon-btn" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="trainer-title">
       <span id="trainer-name"></span>
-      <span id="trainer-side" class="pill"></span>
+      <span id="trainer-side" class="sub"></span>
     </div>
-    <button id="sound-toggle" class="icon-btn" aria-label="Toggle sound">🔊</button>
+    <span id="streak-top" class="chip streak" title="Day streak">🔥 0</span>
+    <span id="xp-top" class="chip xp" title="Level and XP">Lv 1</span>
   </header>
+
+  <div class="goal" aria-label="Today's goal">
+    <span>Today</span>
+    <div class="bar"><i id="goal-fill"></i></div>
+    <b id="goal-text">0 / 5</b>
+  </div>
+
+  <div class="board-wrap">
+    <div id="board" class="board" role="grid" aria-label="Chess board"></div>
+    <!-- Arrow overlay (hint after repeated misses). 8x8 units = one per square. -->
+    <svg id="arrows" class="arrows" viewBox="0 0 8 8" aria-hidden="true">
+      <defs>
+        <marker id="arrowhead" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--hint)"/>
+        </marker>
+      </defs>
+    </svg>
+    
+  </div>
+  <div id="status" class="status neutral" role="status">Loading…</div>
+  <div id="moves" class="moves"></div>
+  <div id="branch-note" class="note" hidden></div>
+
+  <div class="controls">
+    <button id="restart" class="ghost" aria-label="Restart line">↻</button>
+    <button id="next-line" class="primary">Next line</button>
+  </div>
 
   <!-- Train = quiz with right/wrong feedback. Review = just step through a line. -->
   <div id="mode-toggle" class="segmented" role="tablist">
@@ -103,30 +146,13 @@
   </div>
 
   <!-- The lines behind the chosen tab: tick what you want in the rotation. -->
-  <details id="line-list" class="line-list">
+  <details id="line-list" class="line-list" open>
     <summary><span id="line-list-title">Lines</span><span id="line-list-meta" class="dim"></span></summary>
+    <input id="line-search" type="search" placeholder="Search lines or moves — e.g. London, Nd4 c3, Bxf7+" autocomplete="off" spellcheck="false">
     <div id="line-rows"></div>
   </details>
 
-  <div class="board-wrap">
-    <div id="board" class="board" role="grid" aria-label="Chess board"></div>
-    <!-- Arrow overlay (hint after repeated misses). 8x8 units = one per square. -->
-    <svg id="arrows" class="arrows" viewBox="0 0 8 8" aria-hidden="true">
-      <defs>
-        <marker id="arrowhead" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="var(--hint)"/>
-        </marker>
-      </defs>
-    </svg>
-    <div id="streak-chip" class="streak-chip" hidden></div>
-  </div>
-  <div id="status" class="status neutral" role="status">Loading…</div>
-  <div id="moves" class="moves"></div>
-  <div id="branch-note" class="note" hidden></div>
 
-  <div class="controls">
-    <button id="restart">Restart line</button>
-  </div>
 
   <div id="review-controls" class="review" hidden>
     <select id="line-select" aria-label="Line to review"></select>
@@ -168,6 +194,7 @@
     <button id="plan-dialog-close" class="icon-btn" aria-label="Review completed position">×</button>
   </div>
   <div class="plan-dialog-body">
+    <div id="plan-dialog-reward" class="reward" hidden></div>
     <h2 id="plan-dialog-title"></h2>
     <p id="plan-dialog-text"></p>
     <p id="plan-dialog-credit" class="plan-credit"></p>

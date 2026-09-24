@@ -538,9 +538,28 @@ tokens; SW v6. Three accent candidates: **ice** (default #7cc8ff),
 the pills. The live app already runs in Onyx + ice. Graphite/Ember/layout 2
 removed from the gallery.
 
+Design job 2 (owner: "free rein", 2026-09-24): accent **ice** and layout 1
+frozen. Shipped in one pass: new `css/app-v2.css` layer on the tokens;
+trainer = header (back, name, streak chip, level chip) → today's goal bar
+with shimmer → board → status → ↻ + NEXT LINE → Train/Review → categories
+→ line browser (open by default) with **search** (names, families, moves)
+and **family groups** (`tree.lineFamily`) showing due dots and tier bars.
+**Daily loop** in `progress.js` (`recordDaily`, `streakDays`, `levelFor`;
+XP 10 clean / 3 with mistakes / +25 goal; goal 3/5/10/20 in Settings,
+default 5), shown on home and trainer. **Haptics** (`feedback.haptic`,
+events only, toggle in Settings), **slight board shake** on a wrong move,
+green/red square wash, pop-in completion dialog with a reward block (XP,
+tier unlocked, goal met, level up) and shining medals; the duplicate inline
+plan is gone. Sound removed from the UI. Home header "Cheka" with streak,
+level and goal. SW v7. 91 tests.
+Revisit (UI): home still shows the old "Progress" stat cards (replace with
+per-opening tier summary); Review mode panels (masters/engine) not yet
+restyled; the trainer's line note below the moves is long — shorten or
+collapse; weakness drill and gap report untouched visually.
+
 ### Next candidates (owner picks, one per session)
-- Owner picks the accent (ice / glacier / frost); then design job 2
-  (trainer screen on the frozen layout).
+- Owner reviews design job 2 on the phone; next: home progress cards →
+  tier summary, Review mode restyle, content gap 4.Nd4 Qxd5 5.c3.
 - Use the app for a few weeks; then the data-driven content pass above.
 - Rotate the Lichess token (owner); re-run `explorer-check` monthly.
 - Analyse more than 60 games on the phone in the background, or run
