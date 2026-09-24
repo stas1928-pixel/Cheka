@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/app-v2.css">
+<link rel="stylesheet" href="css/app-v3.css">
 </head>
 <body>
 
@@ -22,16 +23,30 @@
     <div class="home-stats">
       <span id="home-streak" class="chip streak" title="Day streak">🔥 0</span>
       <span id="home-level" class="chip xp" title="Level">Lv 1</span>
+      <button id="open-tools" class="icon-btn" aria-label="Your games and settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
     </div>
   </header>
   <div class="goal home-goal" aria-label="Today's goal">
     <span>Today</span>
-    <div class="bar"><i id="home-goal-fill"></i></div>
+    <div class="bar gloss"><i id="home-goal-fill"></i></div>
     <b id="home-goal-text">0 / 5</b>
   </div>
 
-  <section id="opening-cards" class="cards" aria-label="Openings"></section>
+  <!-- The two openings, swipe sideways between them. -->
+  <section id="opening-cards" class="carousel openings" aria-label="Openings"></section>
+  <div id="opening-dots" class="dots" aria-hidden="true"></div>
 
+  <h2 class="panel-title">Practice</h2>
+  <section id="practice-tiles" class="carousel tiles" aria-label="Practice"></section>
+</main>
+
+<!-- ============ GAMES & SETTINGS SCREEN ============
+     Stats, Chess.com gaps, weakness analysis, tokens, backup. Off the home screen on purpose. -->
+<main data-screen="tools" hidden>
+  <header class="trainer-header tools-header">
+    <button id="back-tools" class="icon-btn" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="trainer-title"><span>Your games &amp; settings</span></div>
+  </header>
   <section class="panel" aria-label="Progress">
     <h2 class="panel-title">Progress</h2>
     <div id="progress-cards" class="cards"></div>
@@ -106,7 +121,7 @@
 
   <div class="goal" aria-label="Today's goal">
     <span>Today</span>
-    <div class="bar"><i id="goal-fill"></i></div>
+    <div class="bar gloss"><i id="goal-fill"></i></div>
     <b id="goal-text">0 / 5</b>
   </div>
 

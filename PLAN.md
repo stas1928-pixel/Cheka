@@ -557,8 +557,24 @@ per-opening tier summary); Review mode panels (masters/engine) not yet
 restyled; the trainer's line note below the moves is long — shorten or
 collapse; weakness drill and gap report untouched visually.
 
+Design pass 3 (owner feedback 2026-09-24): home = header (streak, level,
+gear) + goal bar + **swipeable opening cards** (due / new / lines, medal
+counts, Review in violet + Train in ice) + **swipeable practice tiles**
+(Due now, Traps & punishments, Surprise weapons, Your weak spots, Your
+games — each its own colour with a red attention dot). Stats, weak spots,
+Chess.com gaps, weakness analysis, tokens and backup moved to a separate
+**"Your games & settings"** screen (gear). Weak spots show families, not
+move strings. Trainer: board near edge-to-edge (--board-max 640px), move
+list and notes only in Review, categories and **families as sideways chip
+rows** (filter), line rows without move strings unless searching.
+**Gloss at all times** on buttons, tiles, medals and bars; sheen sweeps
+once every ~5.5 s, slower. `css/app-v3.css`, SW v8.
+Revisit (UI): Review-mode panels and the tools screen are still prototype
+styling; the tile targets (traps/surprises) always open the Scotch —
+make them ask or remember the opening; Weak-spot drill screen unstyled.
+
 ### Next candidates (owner picks, one per session)
-- Owner reviews design job 2 on the phone; next: home progress cards →
+- Owner reviews design pass 3 on the phone; next: home progress cards →
   tier summary, Review mode restyle, content gap 4.Nd4 Qxd5 5.c3.
 - Use the app for a few weeks; then the data-driven content pass above.
 - Rotate the Lichess token (owner); re-run `explorer-check` monthly.

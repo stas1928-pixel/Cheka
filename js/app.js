@@ -41,6 +41,11 @@ function saveProg() { progress.saveProgress(prog); }
 const $ = (sel) => document.querySelector(sel);
 const els = {
   cards: $('#opening-cards'),
+  openingDots: $('#opening-dots'),
+  practiceTiles: $('#practice-tiles'),
+  openTools: $('#open-tools'),
+  backTools: $('#back-tools'),
+  famStrip: null,
   progressCards: $('#progress-cards'),
   lineMode: $('#line-mode'),
   lineList: $('#line-list'),
@@ -135,29 +140,72 @@ function showScreen(name) {
 /* ---------- home: opening cards ---------- */
 
 function renderHome() {
+  const tierCount = (o) => {
+    const c = { Master: 0, Gold: 0, Silver: 0, Bronze: 0 };
+    for (const l of o.lines) { const t = progress.lineTier(prog, o.id, l.id).tier; if (t) c[t]++; }
+    return c;
+  };
   els.cards.innerHTML = OPENINGS.map((o) => {
-    const preview = tree.formatMoves(tree.mainLine(o), 6).map((m) => m.text).join(' ');
-    const sideText = o.side === 'w' ? 'You play White' : 'You play Black';
-    const main = tree.linesOfKind(o, 'main').length;
-    const side = o.lines.filter((l) => l.kind === 'side' || l.kind === 'trap').length;
-    const due = progress.dueCount(prog, o.id, visibleLines(o, o.lines).map((l) => l.id));
-    const tiers = o.lines.map((l) => progress.lineTier(prog, o.id, l.id).tier).filter(Boolean);
-    const tierText = tiers.length ? ' · ' + ['Master', 'Gold', 'Silver', 'Bronze'].map((t) => { const n = tiers.filter((x) => x === t).length; return n ? `${n} ${t.toLowerCase()}` : null; }).filter(Boolean).join(', ') : '';
+    const ids = visibleLines(o, o.lines).map((l) => l.id);
+    const due = progress.dueCount(prog, o.id, ids);
+    const fresh = ids.filter((id) => progress.lineStatus(prog, o.id, id).state === 'new').length;
+    const c = tierCount(o);
+    const mastered = o.lines.filter((l) => progress.lineTier(prog, o.id, l.id).tier).length;
     return `
-      <article class="card ${o.side}">
-        <div class="card-top">
+      <article class="opening ${o.side}">
+        <div class="op-top">
+          <span class="op-side">${o.side === 'w' ? 'White' : 'Black'}</span>
           <h2>${o.name}</h2>
-          <span class="pill ${o.side}">${sideText}</span>
         </div>
-        <p class="card-sub">${main} main line${main === 1 ? '' : 's'} · ${side} side/trap line${side === 1 ? '' : 's'} · <b>${due} due</b>${tierText}</p>
-        <p class="card-line">${preview} …</p>
-        <div class="card-actions">
+        <div class="op-stats">
+          <div><b class="due">${due}</b><span>due</span></div>
+          <div><b>${fresh}</b><span>new</span></div>
+          <div><b>${o.lines.length}</b><span>lines</span></div>
+        </div>
+        <div class="op-tiers" title="Lines with a medal">
+          ${['Master', 'Gold', 'Silver', 'Bronze'].map((t) => `<span class="medal ${t.toLowerCase()}">${c[t]}</span>`).join('')}
+          <div class="bar thin gloss"><i style="width:${Math.round((mastered / o.lines.length) * 100)}%"></i></div>
+        </div>
+        <div class="op-actions">
+          <button class="btn-review" data-review="${o.id}">Review</button>
           <button class="primary" data-train="${o.id}">Train</button>
-          <button data-review="${o.id}">Review</button>
         </div>
       </article>`;
   }).join('');
+  els.openingDots.innerHTML = OPENINGS.map((o, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('');
+
+  const due = OPENINGS.map((o) => ({ o, n: progress.dueCount(prog, o.id, visibleLines(o, o.lines).map((l) => l.id)) })).sort((a, b) => b.n - a.n)[0];
+  const weakN = (loadWeakReport()?.weaknesses ?? []).length;
+  const surprises = OPENINGS.reduce((n, o) => n + tree.surpriseLines(o).length, 0);
+  const traps = OPENINGS.reduce((n, o) => n + o.lines.filter((l) => l.kind !== 'main').length, 0);
+  els.practiceTiles.innerHTML = [
+    { act: 'due', cls: 't-due', icon: '⏰', title: 'Due now', sub: due.n ? `${due.n} in ${due.o.name.split(' ')[0]}` : 'All caught up', dot: due.n > 0 },
+    { act: 'traps', cls: 't-trap', icon: '🪤', title: 'Traps & punishments', sub: `${traps} lines` },
+    { act: 'surprise', cls: 't-sur', icon: '⚡', title: 'Surprise weapons', sub: `${surprises} lines` },
+    { act: 'weak', cls: 't-weak', icon: '🎯', title: 'Your weak spots', sub: weakN ? `${weakN} positions` : 'Analyse your games', dot: weakN > 0 },
+    { act: 'games', cls: 't-games', icon: '♟', title: 'Your games', sub: 'Gaps & scan' },
+  ].map((t) => `<button class="tile ${t.cls}" data-act="${t.act}"${t.act === 'due' ? ` data-opening="${due.o.id}"` : ''}>${t.dot ? '<i class="dot"></i>' : ''}<span class="tile-icon">${t.icon}</span><b>${t.title}</b><small>${t.sub}</small></button>`).join('');
+  renderStreakChip();
 }
+
+// Opening carousel: dots follow the swipe.
+els.cards.addEventListener('scroll', () => {
+  const i = Math.round(els.cards.scrollLeft / Math.max(1, els.cards.clientWidth * 0.86));
+  [...els.openingDots.children].forEach((d, k) => d.classList.toggle('on', k === i));
+}, { passive: true });
+
+els.practiceTiles.addEventListener('click', (e) => {
+  const t = e.target.closest('.tile');
+  if (!t) return;
+  const act = t.dataset.act;
+  if (act === 'due') { settings = updateSetting('lineMode', 'main'); openTrainer(t.dataset.opening, 'train'); }
+  else if (act === 'traps') { settings = updateSetting('lineMode', 'side'); openTrainer('scotch', 'train'); }
+  else if (act === 'surprise') { settings = updateSetting('lineMode', 'surprise'); openTrainer('scotch', 'train'); }
+  else if (act === 'weak') { if (!els.trainWeak.hidden) els.trainWeak.click(); else showScreen('tools'); }
+  else showScreen('tools');
+});
+els.openTools.addEventListener('click', () => { renderProgress(); showScreen('tools'); });
+els.backTools.addEventListener('click', () => { renderHome(); showScreen('home'); });
 
 els.cards.addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-train], button[data-review]');
@@ -347,7 +395,8 @@ function renderMoves() {
   // At the end of a trained line the sourced PLAN takes over the note area;
   // resetLine() clears state.finished, so the next line starts clean.
   const showPlan = false;   // the plan lives in the completion dialog only
-  const showNote = l && (review || (dev && state.ply > dev.ply) || l.draft);
+  const showNote = l && (review || l.draft);   // training stays chess-talk free
+  els.moves.hidden = !review;
   els.note.classList.toggle('plan', Boolean(showPlan));
   els.note.hidden = !(showPlan || showNote);
   els.note.textContent = showPlan ? `Plan: ${l.plan}` : showNote ? `${lineTitle(l)} — ${l.note ?? ''}` : '';
@@ -598,7 +647,16 @@ function renderLineList() {
   }
 
   const q = els.lineSearch?.value ?? '';
-  const shown = lines.filter((l) => tree.matchesQuery(opening, l, q));
+  const allFams = [...new Set(lines.map((l) => tree.lineFamily(opening, l)))];
+  if (state.famFilter && !allFams.includes(state.famFilter)) state.famFilter = null;
+  els.famStrip ??= (() => { const d = document.createElement('div'); d.className = 'carousel chips-row'; d.id = 'fam-strip'; els.lineSearch.after(d);
+    d.addEventListener('click', (e) => { const c = e.target.closest('[data-fam]'); if (!c) return; state.famFilter = c.dataset.fam || null; renderLineList(); });
+    return d; })();
+  els.famStrip.innerHTML = [`<button class="fchip${state.famFilter ? '' : ' on'}" data-fam="">All</button>`, ...allFams.map((f) => {
+    const n = lines.filter((l) => tree.lineFamily(opening, l) === f && progress.lineStatus(prog, opening.id, l.id).state === 'due').length;
+    return `<button class="fchip${state.famFilter === f ? ' on' : ''}" data-fam="${f}">${f.replace(/ \(.*\)$/, '')}${n ? '<i class="dot"></i>' : ''}</button>`;
+  })].join('');
+  const shown = lines.filter((l) => tree.matchesQuery(opening, l, q) && (!state.famFilter || tree.lineFamily(opening, l) === state.famFilter));
   if (q && !shown.length) els.lineRows.innerHTML = `<p class="hint" style="padding:6px">No line matches “${q.replace(/[<>&]/g, '')}”. Try a move (Nd4, Bxf7+) or a family (London, Paulsen).</p>`;
   const fams = [];
   for (const l of shown) { const f = tree.lineFamily(opening, l); let g = fams.find((x) => x.name === f); if (!g) fams.push(g = { name: f, lines: [] }); g.lines.push(l); }
@@ -627,7 +685,7 @@ function renderLineList() {
       <div class="line-row${hidden[l.id] ? ' hidden-line' : ''}${playing ? ' playing' : ''}" data-play="${l.id}" role="button">
         <div>
           <div class="lr-name">${lineTitle(l)}${tier.tier ? `<span class="tier ${tierCls}">${tier.tier}</span>` : ''}</div>
-          <div class="lr-moves">${tail}</div>
+          ${q ? `<div class="lr-moves">${tail}</div>` : ''}
           <div class="lr-bar ${tierCls}"><i style="width:${Math.round(tier.progress * 100)}%"></i></div>
           <div class="lr-clean">${toNext}</div>
         </div>
@@ -904,10 +962,10 @@ function renderProgress() {
     if (!s || s.attempts === 0) weak = 'Not trained yet.';
     else if (spots.length === 0) weak = 'No mistakes so far. 👌';
     else {
-      weak = '<b>Weak spots:</b> ' + spots.map((w) => {
+      weak = 'Most missed: ' + spots.map((w) => {
         const l = tree.lineById(o, w.lineKey);
-        return `${tree.moveLabel(w.ply, w.expected)} <span class="dim">(${l ? lineTitle(l) : w.lineKey}, missed ${w.count}×)</span>`;
-      }).join(' · ');
+        return `<span class="pill">${l ? tree.lineFamily(o, l) : 'a line'} · ${w.count}×</span>`;
+      }).join(' ');
     }
     return `
       <div class="stat-card">

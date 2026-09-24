@@ -1,0 +1,105 @@
+/* =================================================================
+   DESIGN PASS 3 (2026-09-24, owner feedback): permanent gloss + slow
+   sheen, coloured button roles, sideways swipe rows, a near edge-to-edge
+   board, a calm home and a separate "Your games & settings" screen.
+   Loaded last; tokens in css/tokens.css.
+   ================================================================= */
+:root {
+  --board-max: 640px;
+  /* button / tile roles — each with its own colour and darker edge */
+  --role-train: var(--accent);        --role-train-deep: var(--accent-deep);   --role-train-ink: var(--accent-ink);
+  --role-review: #9d8cff;             --role-review-deep: #6d5bd6;             --role-review-ink: #0e0a26;
+  --role-trap: #ff7a85;               --role-trap-deep: #c9485a;
+  --role-sur: #c08cff;                --role-sur-deep: #8c55d6;
+  --role-weak: #ffb547;               --role-weak-deep: #c98314;
+  --role-games: #3fd7b0;              --role-games-deep: #1e9e7f;
+  --gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.08) 48%, rgba(255, 255, 255, 0) 52%);
+}
+
+/* ---------- gloss finish at all times, sheen every few seconds ---------- */
+button.primary, .btn-review, .tile, .medal, .bar > i {
+  background-image: var(--gloss);
+}
+button.primary { background-color: var(--role-train); }
+.btn-review {
+  background-color: var(--role-review); color: var(--role-review-ink); font-weight: 900;
+  text-transform: uppercase; letter-spacing: 0.04em; position: relative; overflow: hidden;
+  box-shadow: 0 4px 0 var(--role-review-deep);
+}
+.btn-review:active { transform: translateY(4px); box-shadow: 0 0 0 var(--role-review-deep); }
+.btn-review::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.35) 50%, transparent 65%); transform: translateX(-120%); animation: shine 5.5s ease-in-out 3.9s infinite; pointer-events: none; }
+button:not(.primary):not(.btn-review):not(.tile):not(.icon-btn):not(.fchip) {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0));
+}
+
+/* ---------- sideways swipe rows ---------- */
+.carousel { width: 100%; display: flex; gap: var(--sp-3); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding: 4px 2px 10px; }
+.carousel::-webkit-scrollbar { display: none; }
+.carousel > * { scroll-snap-align: start; flex: none; }
+.dots { display: flex; justify-content: center; gap: 6px; margin-top: -4px; }
+.dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--surface-2); transition: width var(--t-base) var(--ease-out), background var(--t-base); }
+.dots i.on { width: 18px; background: var(--accent); }
+
+/* ---------- home ---------- */
+[data-screen="home"] { gap: var(--sp-4); }
+.panel-title { align-self: flex-start; margin: var(--sp-2) 0 0; }
+.home-stats .icon-btn { width: var(--tap); height: var(--tap); color: var(--text-dim); }
+.openings > .opening { width: 86%; }
+.opening {
+  position: relative; overflow: hidden; border-radius: 16px; padding: var(--sp-4);
+  background: linear-gradient(160deg, var(--surface-2), var(--surface) 60%);
+  border: 1px solid var(--line); display: flex; flex-direction: column; gap: var(--sp-4);
+}
+.opening::before { content: ""; position: absolute; right: -30px; top: -30px; width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 24%, transparent), transparent 70%); pointer-events: none; }
+.opening.b::before { background: radial-gradient(circle, color-mix(in srgb, var(--role-review) 26%, transparent), transparent 70%); }
+.op-top h2 { margin: 2px 0 0; font-size: 22px; font-weight: 900; }
+.op-side { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); }
+.op-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-2); }
+.op-stats div { background: color-mix(in srgb, var(--bg) 55%, transparent); border-radius: var(--r-2); padding: var(--sp-2); text-align: center; }
+.op-stats b { display: block; font-size: 24px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.op-stats b.due { color: var(--warn); }
+.op-stats span { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+.op-tiers { display: flex; align-items: center; gap: 6px; }
+.op-tiers .medal { width: 26px; height: 26px; font-size: 11px; }
+.op-tiers .bar { margin-left: var(--sp-2); }
+.bar.thin { height: 8px; }
+.op-actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--sp-2); }
+.op-actions button { height: 50px; }
+
+.tiles > .tile { width: 40%; min-width: 140px; }
+.tile {
+  position: relative; text-align: left; display: flex; flex-direction: column; gap: 2px;
+  padding: var(--sp-3); min-height: 112px; border-radius: 14px; color: #0b0f14;
+  background-color: var(--role-train); box-shadow: 0 4px 0 var(--role-train-deep);
+}
+.tile:active { transform: translateY(4px); box-shadow: none; }
+.tile b { font-size: 14px; font-weight: 900; line-height: 1.15; margin-top: auto; }
+.tile small { font-size: 12px; font-weight: 700; opacity: 0.75; }
+.tile-icon { font-size: 26px; }
+.tile .dot { position: absolute; top: 8px; right: 8px; width: 10px; height: 10px; border-radius: 50%; background: var(--bad); border: 2px solid #fff; }
+.t-trap { background-color: var(--role-trap); box-shadow: 0 4px 0 var(--role-trap-deep); }
+.t-sur { background-color: var(--role-sur); box-shadow: 0 4px 0 var(--role-sur-deep); }
+.t-weak { background-color: var(--role-weak); box-shadow: 0 4px 0 var(--role-weak-deep); }
+.t-games { background-color: var(--role-games); box-shadow: 0 4px 0 var(--role-games-deep); }
+.weak .pill { margin: 2px 2px 0 0; }
+
+/* ---------- trainer: board as big as the screen allows ---------- */
+main[data-screen="trainer"] { padding-left: 4px; padding-right: 4px; }
+.board-wrap { width: min(calc(100vw - 8px), var(--board-max)); padding: 2px; border-radius: var(--r-2); }
+.trainer-header, .goal:not(.home-goal), .status, .controls, .segmented, .line-list, .review { width: min(calc(100vw - 16px), var(--board-max)); }
+.trainer-header .chip { height: 30px; padding: 0 10px; font-size: 12px; }
+#trainer-side { font-size: 11px; }
+
+/* categories + families: horizontal chips */
+#line-mode { display: flex; overflow-x: auto; scrollbar-width: none; gap: 6px; background: transparent; padding: 0; }
+#line-mode::-webkit-scrollbar { display: none; }
+#line-mode button { flex: none; border-radius: 999px; padding: 8px 14px; background: var(--surface-2); color: var(--text-dim); font-weight: 800; font-size: 13px; }
+#line-mode button.active { background-color: var(--accent); background-image: var(--gloss); color: var(--accent-ink); }
+.chips-row { gap: 6px; padding: 2px 0 6px; }
+.fchip { position: relative; border-radius: 999px; padding: 7px 12px; background: var(--surface); border: 1px solid var(--line); color: var(--text); font-size: 12px; font-weight: 800; box-shadow: none; white-space: nowrap; }
+.fchip.on { background: var(--role-review); color: var(--role-review-ink); border-color: transparent; }
+.fchip .dot { position: absolute; top: -2px; right: -2px; width: 9px; height: 9px; border-radius: 50%; background: var(--bad); border: 2px solid var(--bg); }
+.lr-name { font-weight: 800; }
+
+/* games & settings screen */
+.tools-header { grid-template-columns: var(--tap) 1fr; }
