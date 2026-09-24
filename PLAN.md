@@ -417,9 +417,77 @@ Rules for every job:
   Qe7 7.dxe5 (52%), 3.d3 / 3.Nc3 / 4.Ng1 / 4.Ne5 (each < 15% of club
   games); Scotch London 7...Bb6 (9%).
 
+### Revisit list (owner, 2026-09-24: "keep flagging items worth revisiting")
+Content
+- Elephant, no drillable line yet: 4.Nd4 Qxd5 **5.c3** (62% of club players
+  at that node), 5.Bc4 Bxe5 6.Qh5 Qe7 **7.dxe5** (52%), and the rare 3.d3,
+  3.Nc3, 4.Ng1, 4.Ne5. The app only says "opponent left the book" there.
+- Scotch, thin spots: London 7...Bb6 (9%); 5...Ne4 6.Qe2 **d5** (33% of club
+  players; strong 7.exd6 Bf5 8.Nbd2 is only three of our moves); 5...Ng4
+  6.O-O Bc5 7.Bf4 **d6** (16%).
+- The Elephant trunk ends about −1.0 by engine (the gambit's price). If
+  that proves costly in practice, the book's 3...Bd6 system (now a
+  surprise) is the alternative.
+- 40 of 63 plans are `interpreted` (my reading of the sources' moves), not
+  quoted. Owner to read them over time and flag any that sound made up.
+- After a few weeks of play: re-run `tools/fetch-club.mjs` and
+  `tools/explorer-check.mjs` and the Chess.com scan to see which drilled
+  lines occur and which never do; prune or add from data, not research.
+- `docs/LIBRARY.md` shows "?" in the masters column for the 2026-09-23
+  lines (regenerated offline); run `build-library` online once to fill.
+- Progress ids changed for several lines in the rebuild (e.g. `haxo`, `ng4`,
+  `ne4`), so their mastery tiers restarted from zero.
+UI (for the design phase)
+- 30 main Scotch lines in one flat list: group by family (Modern Attack,
+  Greco Gambit, London, Hungarian, Paris, 3rd-move sidelines).
+- The plan shows twice on completion: inline green note AND the dialog.
+- Main lines show no frequency badge; trap/side rows do. The data exists.
+- Nothing shows WHY a line stops (theory ends / material won / mistake
+  punished). A one-word end marker would make the depth rule visible.
+- Surprise lines in Review mode: the note area logic assumes the
+  deviation is the opponent's; check wording.
+Process / hygiene
+- Lichess token: owner still to rotate the partially exposed one.
+- Test coverage ≥ 90 % on core logic is a stated target, not yet measured.
+- Service-worker VERSION must be bumped whenever app-shell files change
+  (done for v5; keep doing it).
+
+### Design phase — decisions (owner, 2026-09-24; brief in `AGENTS.md`)
+Owner's answers, locked unless changed:
+- **References**: Chess Reps for repertoire structure, Duolingo for the
+  feedback/addiction loop. Phone only (Android). Name/wordmark later.
+- **Duolingo mechanics wanted, all four**: daily goal + streak (goal
+  adjustable 3/5/10/20, default 5 clean lines; streak = days the goal was
+  met); XP and levels tied to the Bronze 3 / Silver 6 / Gold 10 / Master 15
+  tiers; big celebrations only for line completion and tier unlocks
+  (routine moves quiet); the spaced-repetition due queue front and centre.
+- **Mistakes**: no hearts or health. Red error, slight screen shake, short
+  vibration, then play continues; the run just isn't clean. Keep it slight.
+- **Haptics**: events only (correct, wrong, opponent deviation, line
+  complete, tier unlock). **Sound: skipped for now.** Animations required.
+- **Board**: owner likes the chess.com look. Use its green/cream board
+  colours; the chess.com "Neo" pieces are proprietary, so the gallery shows
+  the closest freely licensed set beside our current cburnett set.
+- **Line browser**: group by named family (Modern Attack, Greco Gambit,
+  London, Hungarian, Paris, 3rd-move sidelines; Paulsen 5.Nc3 / 5.d3, 4.Nd4,
+  3.Nxe5 …), expandable, Chess Reps style; categories Main / Side+Trap /
+  Surprises / My games stay.
+- **Home**: the two opening cards first (mastery, due, streak state), scroll
+  down for weaknesses/games, sideways where it helps; settings close at
+  hand but quiet. Not a bottom tab bar.
+- **Style**: "almost all of it" changes — style, feel, structure, colours,
+  naming. Palette is the first checkpoint (three swatches on the same real
+  trainer screenshot), then the golden screens.
+Tools: Claude Code only. A `design.html` gallery renders every golden state
+with the real components; tokens live in one CSS file; references arrive as
+the owner's phone screenshots; optional screenshot script at the four
+AGENTS.md viewports for golden comparison.
+
 ### Next candidates (owner picks, one per session)
-- Use the app for a few weeks; then re-run `tools/fetch-club.mjs` and
-  `tools/explorer-check.mjs` to see which drilled lines actually occur.
+- **Design job 1**: tokens file + `design.html` gallery with three palette
+  directions on the trainer screen and the free piece-set comparison; one
+  owner checkpoint. Then golden screens, then implementation.
+- Use the app for a few weeks; then the data-driven content pass above.
 - Rotate the Lichess token (owner); re-run `explorer-check` monthly.
 - Analyse more than 60 games on the phone in the background, or run
   `tools/analyse-games.mjs` on the PC and import the JSON.
