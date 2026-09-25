@@ -147,3 +147,19 @@ button.nudge { animation: nudge 1.8s ease-in-out 1.2s infinite; }
 .cats button { font-size: 12px; white-space: nowrap; }
 .thumb { width: 60px; }
 .line-row { grid-template-columns: 60px 1fr auto; }
+
+/* ---------- critic round 2 fixes ---------- */
+.seg-bar i.done.learned { background-color: var(--ice-300); box-shadow: 0 0 10px rgba(124, 200, 255, 0.45); }
+.seg-bar i.done.perfect { background-color: var(--mint); box-shadow: 0 0 10px rgba(79, 224, 191, 0.55); }
+.due-pill.fresh { color: var(--ice-200); background: rgba(124, 200, 255, 0.12); }
+.plan-text { max-height: 7.6em; overflow-y: auto; overscroll-behavior: contain; mask-image: linear-gradient(180deg, #000 80%, transparent); padding-bottom: 0.6em; }
+.after-actions { position: sticky; bottom: calc(8px + env(safe-area-inset-bottom)); }
+.after { margin-bottom: var(--sp-2); }
+.line-info { width: min(calc(100vw - 16px), var(--board-max)); display: grid; grid-template-columns: 1fr auto; gap: 2px var(--sp-2); padding: var(--sp-3); border-radius: var(--r-3); background: rgba(15, 38, 56, 0.55); box-shadow: inset 0 0 0 1px rgba(124, 200, 255, 0.1); animation: rise 360ms var(--ease-out) both; }
+.line-info .li-fam { grid-column: 1 / -1; font-size: 11px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+.line-info b { font-size: 15px; font-weight: 900; }
+.line-info .li-medal { font-size: 12px; color: var(--ice-200); font-weight: 800; align-self: center; }
+.line-info .li-steps { grid-column: 1 / -1; display: flex; gap: 4px; margin-top: 6px; }
+.line-info .li-steps i { flex: 1; height: 4px; border-radius: 2px; background: var(--ice-900); transition: background 300ms; }
+.line-info .li-steps i.on { background: var(--ice-300); }
+main[data-screen="trainer"] .controls[hidden] ~ .line-info { display: none; }

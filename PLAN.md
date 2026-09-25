@@ -727,6 +727,27 @@ job), item 11 per-move ideas (content job), Review panels restyle depth.
   insightful; nobody should feel stuck or alone. Needs a designed loop,
   not decoration. Proposal in chat 2026-09-25.
 
+### Pass 5 + Critic loop (2026-09-25)
+Built (2d1b259): sessions of 5 lines (segment bar, combo ×N with +5 XP bonus
+from ×3, session-end summary with insight + tomorrow's due), XP that flies
+from the board into the level chip, milestone celebration sliding up (medal,
+goal met, level up), plan panel **under** the board (no modal), hints glow
+the piece (2nd level marks the target, never arrows), square Train/Watch
+switch, **right-edge lines drawer that pushes the board aside** (edge swipe
+to open, swipe to change category, tap the dimmed board to close), **Watch
+mode = tutorial** (play/pause autoplay with arrows before each move,
+plain-language status, progress track) with **what-if** (play any move:
+our line → "That's a line you have!", otherwise Stockfish verdict in words),
+**human line names** for all 63 lines (`js/names.js`, test enforces no
+notation), plain-language move descriptions (`js/describe.js`).
+Critic agent (owner request): 3 rounds, ≥ 8.5 = PASS.
+- Round 1: **7/10**. Fixed (eb95253): My games empty until a scan, no page
+  jump (sticky header, plan replaces toolbar), LEARN mode on a line's first
+  run, known moves auto-played, one progress bar in the trainer, 8 px corners
+  / 44 px targets, plain family names, distinct hint ring, flame SVG, wording.
+Content jobs still open: plan texts contain notation; per-move sourced ideas
+(item 11) — the app shows factual plain-language descriptions meanwhile.
+
 ### Next candidates (owner picks, one per session)
 - Owner reviews pass 4 on the phone.
 - Content: human line names (~60) and per-move one-liners (item 11).

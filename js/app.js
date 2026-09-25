@@ -215,7 +215,7 @@ function renderHome() {
       <article class="opening ${o.side}" style="--i:${i}">
         <div class="op-head">
           <div><span class="op-side">You play ${o.side === 'w' ? 'White' : 'Black'}</span><h2>${o.name}</h2></div>
-          ${due ? `<span class="due-pill"><i class="dot"></i>${due} due</span>` : '<span class="due-pill calm">All caught up</span>'}
+          ${due ? `<span class="due-pill"><i class="dot"></i>${due} to review</span>` : fresh ? `<span class="due-pill fresh">${fresh} new to learn</span>` : '<span class="due-pill calm">All caught up</span>'}
         </div>
         ${miniBoard(tree.mainLine(o).slice(0, o.signaturePlies), o.side, 'op-board')}
         <div class="op-meta">
@@ -225,7 +225,7 @@ function renderHome() {
         </div>
         <div class="bar thin"><i style="width:${pct}%"></i></div>
         <div class="op-actions">
-          <button class="secondary" data-review="${o.id}">Review</button>
+          <button class="secondary" data-review="${o.id}">Watch</button>
           <button class="primary" data-train="${o.id}">Train</button>
         </div>
       </article>`;
@@ -520,17 +520,25 @@ function planLine() {
   const hits = loadGapReport()?.report?.[opening.id]?.lineHits ?? {};
   const mistakes = prog.openings[opening.id]?.mistakes ?? {};
   const missCount = (id) => Object.keys(mistakes).filter((k) => k.startsWith(id + '#')).reduce((n, k) => n + mistakes[k].count, 0);
-  const weights = candidates.map((l) => {
+  const st = (l) => progress.lineStatus(prog, opening.id, l.id).state;
+  const due = candidates.filter((l) => st(l) === 'due');
+  if (!due.length) {
+    const fresh = candidates.find((l) => st(l) === 'new');   // teach in order: main line first, then branches
+    if (fresh) return fresh;
+  }
+  const pool = due.length ? due : candidates;
+  const weights = pool.map((l) => {
     let w = progress.lineWeight(prog, opening.id, l.id);
     if (settings.lineMode === 'mine') w *= 1 + Math.log2(1 + (hits[l.id] ?? 0));
     return w * (1 + missCount(l.id));
   });
-  return tree.pickWeighted(candidates, weights) ?? candidates[0];
+  return tree.pickWeighted(pool, weights) ?? pool[0];
 }
 
-function resetLine(lineObj = null) {
+function resetLine(lineObj = null, { test = false } = {}) {
   hideAfter();
   state.hint = null;
+  state.forceTest = test;
   state.session += 1;
   state.lineObj = lineObj ?? planLine();
   state.line = state.lineObj.moves;
@@ -544,14 +552,15 @@ function resetLine(lineObj = null) {
   els.nextLine.hidden = true;
 
   const o = state.opening;
-  state.learning = progress.lineStatus(prog, o.id, state.lineObj.id).state === 'new';
+  state.learning = !test && progress.lineStatus(prog, o.id, state.lineObj.id).state === 'new';
   // Moves you already know are played for you, fast: everything before this line leaves the trunk,
   // once the trunk itself has been played (and at least the opening's signature moves).
   const trunk = o.lines[0];
   const dev = tree.deviation(o, state.lineObj);
   const trunkKnown = progress.lineStatus(prog, o.id, trunk.id).state !== 'new';
-  let auto = o.signaturePlies;
-  if (dev && trunkKnown) auto = Math.max(auto, dev.ply);
+  let auto = 0;
+  if (trunkKnown) auto = dev ? dev.ply : o.signaturePlies;
+  if (state.forceTest) auto = Math.min(auto, o.signaturePlies);
   if (state.lineObj.kind === 'surprise') auto = Math.min(auto, (state.lineObj.deviatesAt ?? auto));
   while (auto > 0 && !tree.isUserPly(o, auto)) auto--;   // stop so that it is the user's move
   state.autoTo = Math.min(auto, state.line.length - 1);
@@ -561,7 +570,7 @@ function resetLine(lineObj = null) {
   renderLineMode();
   renderLineList();
   renderStreakChip();
-  setStatus(`${state.learning ? 'New line' : 'Next'}: ${humanName(o.id, state.lineObj)}`, 'intro');
+  setStatus(test ? `From memory: ${humanName(o.id, state.lineObj)}` : `${state.learning ? 'New line' : 'Next'}: ${humanName(o.id, state.lineObj)}`, 'intro');
   const session = state.session;
   const step = () => {
     if (session !== state.session) return;
@@ -579,11 +588,21 @@ function resetLine(lineObj = null) {
 }
 
 /** Your turn: on a new line the move is shown first (learn), otherwise just asked. */
+function renderLineInfo() {
+  const info = document.getElementById('line-info');
+  if (!info || !state.lineObj) return;
+  const mine = state.line.filter((_, i) => tree.isUserPly(state.opening, i)).length;
+  const done = state.line.slice(0, state.ply).filter((_, i) => tree.isUserPly(state.opening, i)).length;
+  const t = progress.lineTier(prog, state.opening.id, state.lineObj.id);
+  info.innerHTML = `<span class="li-fam">${familyName(state.opening.id, tree.lineFamily(state.opening, state.lineObj))}</span><b>${humanName(state.opening.id, state.lineObj)}</b><span class="li-steps">${Array.from({ length: mine }, (_, i) => `<i class="${i < done ? 'on' : ''}"></i>`).join('')}</span><span class="li-medal">${t.tier ? `${t.tier} medal` : t.next ? `${t.clean}/${t.next.at} to ${t.next.name}` : ''}</span>`;
+}
 function promptUser() {
   if (state.learning) {
     showHint(2);
     const g = new Chess(); state.line.slice(0, state.ply).forEach((m) => g.move(m));
-    setStatus(`Learn: ${describeMove(g.move(state.line[state.ply])).toLowerCase()}`, 'intro');
+    const prev = state.ply > 0 && !tree.isUserPly(state.opening, state.ply - 1) ? g.history({ verbose: true }).at(-1) : null;
+    const them = state.opening.side === 'w' ? 'Black' : 'White';
+    setStatus(`${prev ? `${them}: ${describeMove(prev).toLowerCase()} · ` : ''}Learn: ${describeMove(g.move(state.line[state.ply])).toLowerCase()}`, 'intro');
   } else {
     setStatus(`${state.opening.side === 'w' ? 'White' : 'Black'} to play — your move`);
   }
@@ -641,6 +660,11 @@ function attemptUserMove(move) {
     feedback.flash(els.board, [move.from, move.to], 'bad');
     feedback.shake(els.board.parentElement);
     feedback.haptic('bad');
+    if (state.learning) {
+      const g = new Chess(); state.line.slice(0, state.ply).forEach((m) => g.move(m));
+      setStatus(`Not that one — ${describeMove(g.move(expected)).toLowerCase()}`, 'bad');
+      return;
+    }
     if (state.misses >= HINT_AFTER_MISSES) {
       showHint(state.misses > HINT_AFTER_MISSES ? 2 : 1);
       setStatus(state.misses > HINT_AFTER_MISSES ? 'Move the glowing piece to the marked square' : 'Not quite — the glowing piece moves', 'bad');
@@ -690,7 +714,7 @@ function playOpponentMove() {
     feedback.haptic('deviation');
     feedback.shake(els.status);
     setStatus(`New: ${humanName(opening.id, state.lineObj)}. ${kind[0].toUpperCase() + kind.slice(1)}.`, 'warn');
-    if (state.learning) showHint(2);
+    if (state.learning) { showHint(2); setStatus(`New: ${humanName(opening.id, state.lineObj)} — watch the glow`, 'warn'); }
   } else {
     const them = opening.side === 'w' ? 'Black' : 'White';
     if (state.learning) promptUser();
@@ -720,7 +744,7 @@ function finishLine() {
   if (bonus) prog.daily.xp += bonus;
   const gained = daily.gained + bonus;
   run.xp += gained;
-  run.results.push({ perfect, id: state.lineObj.id });
+  run.results.push({ perfect, learned: state.learning, id: state.lineObj.id });
   saveProg();
 
   flyXp(gained);
@@ -735,7 +759,8 @@ function finishLine() {
   if (daily.levelUp) milestones.push({ kind: 'level' });
   if (milestones.length) setTimeout(() => celebrate(gained, milestones), 700);
   feedback.haptic(milestones.length ? 'milestone' : 'complete');
-  els.nextLine.textContent = run.results.length >= SESSION_LEN ? 'Finish session' : 'Next line';
+  els.nextLine.textContent = state.learning ? 'Now from memory' : run.results.length >= SESSION_LEN ? 'Finish session' : 'Next line';
+  state.justLearned = state.learning ? state.lineObj : null;
 }
 
 /* ---------- after a line: the plan under the board ---------- */
@@ -775,7 +800,8 @@ function flyXp(n) {
     { transform: 'translate(-50%, -50%) scale(0.4)', opacity: 0 },
     { transform: 'translate(-50%, -80%) scale(1.25)', opacity: 1, offset: 0.25 },
     { transform: 'translate(-50%, -80%) scale(1)', opacity: 1, offset: 0.55 },
-    { transform: `translate(calc(-50% + ${x1 - x0}px), calc(-50% + ${y1 - y0}px)) scale(0.4)`, opacity: 0.2 },
+    { transform: `translate(calc(-50% + ${(x1 - x0) * 0.85}px), calc(-50% + ${(y1 - y0) * 0.85}px)) scale(0.5)`, opacity: 0.6, offset: 0.85 },
+    { transform: `translate(calc(-50% + ${x1 - x0}px), calc(-50% + ${y1 - y0}px)) scale(0.3)`, opacity: 0 },
   ], { duration: 1300, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' });
   anim.onfinish = () => {
     el.remove();
@@ -811,7 +837,7 @@ function renderSession() {
   const run = state.run ?? { results: [], combo: 0 };
   els.sessionBar.innerHTML = Array.from({ length: SESSION_LEN }, (_, i) => {
     const r = run.results[i];
-    const cls = r ? (r.perfect ? 'done perfect' : 'done') : i === run.results.length ? 'current' : '';
+    const cls = r ? (r.learned ? 'done learned' : r.perfect ? 'done perfect' : 'done') : i === run.results.length ? 'current' : '';
     return `<i class="${cls}"></i>`;
   }).join('');
   els.combo.hidden = run.combo < 2;
@@ -824,21 +850,22 @@ function showSessionEnd() {
   const goal = Number(settings.dailyGoal ?? 5);
   const today = progress.todayCount(prog);
   const o = state.opening;
-  const dueTomorrow = progress.dueCount(prog, o.id, o.lines.map((l) => l.id), new Date(Date.now() + 86400000));
-  const missed = run.results.filter((r) => !r.perfect).map((r) => humanName(o.id, tree.lineById(o, r.id)));
+  const dueTomorrow = o.lines.filter((l) => progress.lineStatus(prog, o.id, l.id, new Date(Date.now() + 86400000)).state === 'due').length;
+  const learned = run.results.filter((r) => r.learned).length;
+  const missed = run.results.filter((r) => !r.perfect && !r.learned).map((r) => humanName(o.id, tree.lineById(o, r.id)));
   els.controls.hidden = true;
   els.after.hidden = true;
   els.sessionEnd.hidden = false;
   els.sessionEnd.innerHTML = `
-    <div class="se-top"><span class="after-kind">Session complete</span><h2>${perfect === SESSION_LEN ? 'Flawless run!' : perfect >= 3 ? 'Strong session' : 'Good work — keep at it'}</h2></div>
+    <div class="se-top"><span class="after-kind">Session complete</span><h2>${perfect === SESSION_LEN ? 'Flawless run!' : learned && !perfect ? `${learned} new line${learned === 1 ? '' : 's'} learned` : perfect >= 3 ? 'Strong session' : 'Good work — keep at it'}</h2></div>
     <div class="se-stats">
-      <div><b data-count="${perfect}">0</b><small>/ ${SESSION_LEN} perfect</small></div>
+      ${learned ? `<div><b data-count="${learned}">0</b><small>learned</small></div>` : ''}<div><b data-count="${perfect}">0</b><small>perfect</small></div>
       <div><b data-count="${run.xp}">0</b><small>XP</small></div>
-      <div><b data-count="${run.bestCombo}">0</b><small>best combo</small></div>
+      ${run.bestCombo >= 2 ? `<div><b data-count="${run.bestCombo}">0</b><small>best combo</small></div>` : ''}
     </div>
     <div class="se-goal"><span>Today</span><div class="bar${today >= goal ? ' done' : ''}"><i style="width:${Math.min(100, Math.round((today / goal) * 100))}%"></i></div><b>${Math.min(today, goal)} / ${goal}</b></div>
     <p class="se-insight">${missed.length ? `Worth another look: <b>${[...new Set(missed)].slice(0, 2).join('</b>, <b>')}</b>. They'll come back first next time.` : 'Every line clean. Your medals are growing.'}</p>
-    <p class="se-next">Tomorrow: ${dueTomorrow} line${dueTomorrow === 1 ? '' : 's'} due in ${o.name}.</p>
+    <p class="se-next">${dueTomorrow ? `Tomorrow: ${dueTomorrow} line${dueTomorrow === 1 ? '' : 's'} to review.` : 'Next time: new lines to learn.'}</p>
     <div class="after-actions"><button id="se-home" class="secondary">Home</button><button id="se-again" class="primary">Keep going</button></div>`;
   countUp(els.sessionEnd);
   els.sessionEnd.querySelector('#se-again').onclick = () => { startSession(); resetLine(); };
@@ -872,7 +899,9 @@ function renderLineList() {
   const ticked = lines.filter((l) => !hidden[l.id]);
   const due = progress.dueCount(prog, opening.id, ticked.map((l) => l.id));
   els.lineListTitle.textContent = { main: 'Main lines', side: 'Traps & punishments', surprise: 'Surprise weapons', mine: 'From your games' }[settings.lineMode] ?? opening.name;
-  els.lineListMeta.textContent = `${ticked.length} lines in rotation${due ? ` · ${due} due` : ''}`;
+  const dueN = ticked.filter((l) => progress.lineStatus(prog, opening.id, l.id).state === 'due').length;
+  const newN = ticked.filter((l) => progress.lineStatus(prog, opening.id, l.id).state === 'new').length;
+  els.lineListMeta.textContent = `${ticked.length} lines${dueN ? ` · ${dueN} to review` : ''}${newN ? ` · ${newN} new` : ''}`;
   const q = els.lineSearch?.value ?? '';
   const shown = lines.filter((l) => tree.matchesQuery(opening, l, q));
   const note = settings.lineMode === 'mine' && Object.keys(hits).length === 0
@@ -1041,7 +1070,8 @@ function renderReviewStatus() {
     const g = new Chess(); line.slice(0, ply - 1).forEach((m) => g.move(m));
     const mv = g.move(line[ply - 1]);
     const mine = tree.isUserPly(opening, ply - 1);
-    setStatus(`${mine ? 'You' : 'They'}: ${describeMove(mv).toLowerCase()}`, mine ? 'good' : 'neutral');
+    const col = (ply - 1) % 2 === 0 ? 'White' : 'Black';
+    setStatus(`${col} plays ${describeMove(mv).toLowerCase()}`, mine ? 'good' : 'neutral');
   }
   els.tutFill.style.width = `${Math.round((ply / Math.max(1, line.length)) * 100)}%`;
   els.stepFirst.disabled = els.stepPrev.disabled = ply === 0;
@@ -1601,6 +1631,7 @@ els.restart.addEventListener('click', () => {
 els.nextLine.addEventListener('click', () => {
   if (state.mode === 'weak') { state.weak.index += 1; loadWeakPosition(); return; }
   if (state.mode === 'review') { setMode('train'); return; }
+  if (state.justLearned) { const l = state.justLearned; state.justLearned = null; resetLine(l, { test: true }); return; }
   if ((state.run?.results.length ?? 0) >= SESSION_LEN) { showSessionEnd(); return; }
   resetLine();
 });
@@ -1624,7 +1655,7 @@ els.back.addEventListener('click', () => {
   showScreen('home');
 });
 
-{ const base = renderBoard; renderBoard = (...a) => { base(...a); paintHint(); }; }
+{ const base = renderBoard; renderBoard = (...a) => { base(...a); paintHint(); if (state.mode === 'train') renderLineInfo(); }; }
 
 renderHome();
 renderProgress();
