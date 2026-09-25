@@ -67,6 +67,9 @@ const els = {
   whatif: $('#whatif'),
   celebrate: $('#celebrate'),
   planLabel: $('#plan-label'),
+  coachMeta: $('#coach-meta'),
+  barActions: $('#bar-actions'),
+  seActions: $('#se-actions'),
   closeLines: $('#close-lines'),
   editLines: $('#edit-lines'),
   hintBtn: $('#hint-btn'),
@@ -213,12 +216,17 @@ function renderHome() {
     const fresh = ids.filter((id) => progress.lineStatus(prog, o.id, id).state === 'new').length;
     const medals = o.lines.filter((l) => progress.lineTier(prog, o.id, l.id).tier).length;
     const pct = Math.round((medals / o.lines.length) * 100);
+    const r = prog.resume?.[o.id];
+    const rl = r ? tree.lineById(o, r.lineId) : null;
+    const firstNew = visibleLines(o, o.lines).find((l) => progress.lineStatus(prog, o.id, l.id).state === 'new');
+    const next = rl && progress.lineStatus(prog, o.id, rl.id).state === 'new' ? { resume: true, name: humanName(o.id, rl) } : !due && firstNew ? { name: humanName(o.id, firstNew) } : null;
     return `
       <article class="opening ${o.side}" style="--i:${i}">
         <div class="op-head">
           <div><span class="op-side">You play ${o.side === 'w' ? 'White' : 'Black'}</span><h2>${o.name}</h2></div>
-          ${due ? `<span class="due-pill"><i class="dot"></i>${due} to review</span>` : fresh ? `<span class="due-pill fresh">${fresh} new to learn</span>` : '<span class="due-pill calm">All caught up</span>'}
+          ${due ? `<span class="due-pill"><i class="dot"></i>${due} to review</span>` : !fresh ? '<span class="due-pill calm">All caught up</span>' : ''}
         </div>
+        ${next ? `<p class="op-next"><span>${next.resume ? 'Continue' : due ? 'Review' : 'Next'}</span>${next.name}</p>` : ''}
         ${miniBoard(tree.mainLine(o).slice(0, o.signaturePlies), o.side, 'op-board')}
         <div class="op-meta">
           <span><b data-count="${o.lines.length}">0</b> lines</span>
@@ -228,7 +236,7 @@ function renderHome() {
         <div class="bar thin"><i style="width:${pct}%"></i></div>
         <div class="op-actions">
           <button class="secondary" data-review="${o.id}">Watch</button>
-          <button class="primary" data-train="${o.id}">Train</button>
+          <button class="primary" data-train="${o.id}">${next?.resume ? 'Continue' : 'Train'}</button>
         </div>
       </article>`;
   }).join('');
@@ -298,16 +306,16 @@ function setMode(mode) {
     b.classList.toggle('active', b.dataset.mode === mode);
   });
   els.review.hidden = mode !== 'review';
+  els.controls.hidden = mode !== 'train';
   els.moves.hidden = true;   // minimal notation: the coach talks instead
-  els.hintBtn.hidden = mode !== 'train';
-  els.restart.hidden = mode !== 'train';
-  els.drawerEdge.hidden = mode !== 'train';
+  els.drawerEdge.hidden = false;
   document.getElementById('line-info').hidden = mode !== 'train';
   els.stage.classList.remove('plan-view');
 
   stopPlay();
   hideAfter();
   els.whatif.hidden = true;
+  closeDrawer();
   if (mode === 'train') {
     if (!state.run || state.run.results.length >= SESSION_LEN) startSession();
     renderSession();
@@ -434,6 +442,12 @@ function clearArrows() {
 function coachAt(plies, line = state.line) {
   return plies > 0 ? IDEAS[line.slice(0, plies).join(' ')] ?? null : null;
 }
+/** One word in colour per coach line (owner: "ok to add a highlighted word with color"). */
+const HL = /\b(pu+sh|push|pins?|pin it|castle|take back|recapture|grab|snap|takes?|check|checkmate|mate|hit|kick|attack|trap|develop|out comes|strike|claim|surprise|careful|watch out|sneaky|only move|stuck)\b/i;
+function coachHTML(text) {
+  const t = esc(text);
+  return t.replace(HL, '<em class="hl">$&</em>');
+}
 const esc = (t) => String(t).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 
 /** Hint: level 1 lights up the piece that has to move; level 2 also marks its target. Never an arrow. */
@@ -457,16 +471,19 @@ function renderStreakChip() {
   const goal = Number(settings.dailyGoal ?? 5);
   const today = progress.todayCount(prog);
   const streak = progress.streakDays(prog, goal);
-  const lvl = progress.levelFor(progress.totalXp(prog));
+  if (!xpInFlight || xpShown === null) xpShown = progress.totalXp(prog);
+  const lvl = progress.levelFor(xpShown);
   const pct = `${Math.min(100, Math.round((today / goal) * 100))}%`;
   for (const [chip, fill, text, lv] of [[els.streakTop, els.goalFill, els.goalText, els.xpTop], [els.homeStreak, els.homeGoalFill, els.homeGoalText, els.homeLevel]]) {
     chip.innerHTML = `${FLAME}<b>${streak}</b>`;
+    chip.setAttribute('aria-label', `${streak} day streak`);
     chip.classList.toggle('cold', streak === 0);
     fill.style.width = pct;
     fill.parentElement.classList.toggle('done', today >= goal);
     text.textContent = `${Math.min(today, goal)} / ${goal}`;
-    lv.textContent = `Lv ${lvl.level}`;
-    lv.style.setProperty('--p', lvl.progress);
+    lv.querySelector('b').textContent = `Lv ${lvl.level}`;
+    lv.querySelector('.lv-bar > i').style.width = `${Math.round(lvl.progress * 100)}%`;
+    lv.title = `Level ${lvl.level} — ${lvl.into} / ${lvl.need} XP`;
   }
 }
 
@@ -572,6 +589,10 @@ function resetLine(lineObj = null, { test = false, chunkFrom = 0 } = {}) {
   state.hint = null;
   state.forceTest = test;
   state.session += 1;
+  prog.resume ??= {};
+  const resume = !lineObj && !test && !chunkFrom ? prog.resume[state.opening.id] : null;
+  const resumeLine = resume ? tree.lineById(state.opening, resume.lineId) : null;
+  if (resumeLine && progress.lineStatus(prog, state.opening.id, resumeLine.id).state === 'new') { lineObj = resumeLine; chunkFrom = resume.from; }
   state.lineObj = lineObj ?? planLine();
   state.line = state.lineObj.moves;
   state.ply = 0;
@@ -607,12 +628,15 @@ function resetLine(lineObj = null, { test = false, chunkFrom = 0 } = {}) {
     for (let p = state.autoTo; p < state.line.length; p++) if (tree.isUserPly(o, p) && ++mine === CHUNK) { end = p + 1; break; }
     if (end < state.line.length - 1) { state.chunk = { from: state.autoTo, to: end }; state.line = state.lineObj.moves.slice(0, end); }
   }
+  if (state.chunk && state.mode === 'train') { prog.resume[o.id] = { lineId: state.lineObj.id, from: state.chunk.from }; saveProg(); }
 
   renderBoard();
   renderMoves();
   renderLineMode();
   renderLineList();
   renderStreakChip();
+  renderCoachMeta();
+  els.hintBtn.hidden = els.restart.hidden = state.learning;
   setStatus(test ? `From memory: ${humanName(o.id, state.lineObj)}` : `${state.learning ? 'New line' : 'Next'}: ${humanName(o.id, state.lineObj)}`, 'intro');
   const session = state.session;
   const step = () => {
@@ -639,14 +663,30 @@ function renderLineInfo() {
   const t = progress.lineTier(prog, state.opening.id, state.lineObj.id);
   info.innerHTML = `<span class="li-fam">${familyName(state.opening.id, tree.lineFamily(state.opening, state.lineObj))}</span><b>${humanName(state.opening.id, state.lineObj)}</b><span class="li-steps">${Array.from({ length: mine }, (_, i) => `<i class="${i < done ? 'on' : ''}"></i>`).join('')}</span><span class="li-medal">${t.tier ? `${t.tier} medal` : t.next ? `${t.clean}/${t.next.at} to ${t.next.name}` : ''}</span>`;
 }
+function renderCoachMeta() {
+  if (!state.lineObj) { els.coachMeta.textContent = ''; return; }
+  const o = state.opening, l = state.lineObj;
+  let where = '';
+  if (state.mode === 'review') where = 'Watch';
+  else if (state.chunk || state.keepChunk) {
+    const c = state.chunk ?? state.keepChunk;
+    const total = l.moves.filter((_, i) => tree.isUserPly(o, i)).length;
+    const upTo = l.moves.slice(0, c.to).filter((_, i) => tree.isUserPly(o, i)).length;
+    where = `Part ${Math.ceil(upTo / CHUNK)} of ${Math.ceil(total / CHUNK)}`;
+  } else if (state.run) where = `Line ${Math.min(SESSION_LEN, state.run.results.length + 1)} of ${SESSION_LEN}`;
+  els.coachMeta.innerHTML = `<b>${esc(humanName(o.id, l))}</b>${where ? `<span>${where}</span>` : ''}`;
+}
 function promptUser() {
+  els.hintBtn.hidden = els.restart.hidden = state.learning;
   if (state.learning) {
     showHint(2);
     const g = new Chess(); state.line.slice(0, state.ply).forEach((m) => g.move(m));
     const prev = state.ply > 0 && !tree.isUserPly(state.opening, state.ply - 1) ? g.history({ verbose: true }).at(-1) : null;
     const them = state.opening.side === 'w' ? 'Black' : 'White';
     const said = prev ? coachAt(state.ply)?.say : null;
-    setStatusHTML(`${prev ? `<small>${esc(said ?? `${them} ${playsPhrase(prev)}`)}</small>` : ''}<span>Learn: ${describeMove(g.move(state.line[state.ply])).toLowerCase()}</span>`, 'intro');
+    const learnWhat = describeMove(g.move(state.line[state.ply])).toLowerCase();
+    const first = !settings.introSeen && state.ply === 0;
+    setStatusHTML(`<span>${first ? 'Hi — I’m your coach. Follow the <em class="hl">glow</em>.' : prev ? coachHTML(said ?? `${them} ${playsPhrase(prev)}`) : 'Your move — follow the <em class="hl">glow</em>.'}</span><small>${first ? 'New lines come in short parts: learn one, then play it from memory. ' : ''}Learn: ${learnWhat}</small>`, 'intro');
   } else {
     setStatus(`${state.opening.side === 'w' ? 'White' : 'Black'} to play — your move`);
   }
@@ -692,21 +732,22 @@ function attemptUserMove(move) {
   const expected = state.line[state.ply];
   const correct = move.san === expected;
 
-  progress.recordAttempt(prog, state.opening.id, {
-    correct, lineKey: state.lineObj.id, ply: state.ply, expected, played: move.san,
-  });
-  saveProg();
+  if (!state.learning) {
+    progress.recordAttempt(prog, state.opening.id, {
+      correct, lineKey: state.lineObj.id, ply: state.ply, expected, played: move.san,
+    });
+    saveProg();
+  }
 
   if (!correct) {
     state.misses += 1;
     if (!state.learning) state.lineMistakes += 1;
     renderBoard();
-    feedback.flash(els.board, [move.from, move.to], 'bad');
-    feedback.shake(els.board.parentElement);
-    feedback.haptic('bad');
+    feedback.flash(els.board, [move.from, move.to], state.learning ? 'hint' : 'bad');
+    if (!state.learning) { feedback.shake(els.board.parentElement); feedback.haptic('bad'); }
     if (state.learning) {
       const g = new Chess(); state.line.slice(0, state.ply).forEach((m) => g.move(m));
-      setStatus(`Not that one — ${describeMove(g.move(expected)).toLowerCase()}`, 'bad');
+      setStatusHTML(`<span>Close! Follow the <em class="hl">glow</em>.</span><small>Learn: ${describeMove(g.move(expected)).toLowerCase()}</small>`, 'intro');
       return;
     }
     if (state.misses >= HINT_AFTER_MISSES) {
@@ -719,6 +760,7 @@ function attemptUserMove(move) {
   }
 
   const played = state.game.move(move.san);
+  if (!settings.introSeen) settings = updateSetting('introSeen', true);
   state.ply += 1;
   state.misses = 0;
   state.hint = null;
@@ -727,7 +769,7 @@ function attemptUserMove(move) {
   feedback.flash(els.board, [move.from, move.to], 'good');
   feedback.haptic('good');
   const c = coachAt(state.ply);
-  if (c) setStatusHTML(`<span>✓ ${esc(c.say)}</span><small>${esc(c.why)}</small>`, 'good');
+  if (c) setStatusHTML(`<span>${coachHTML(c.say)}</span><small>${esc(c.why)}</small>`, 'good');
   else setStatus(`✓ ${describeMove(played)}`, 'good');
 
   if (state.ply >= state.line.length) finishLine();
@@ -764,7 +806,7 @@ function playOpponentMove() {
   } else {
     const them = opening.side === 'w' ? 'Black' : 'White';
     if (state.learning) promptUser();
-    else { const c = coachAt(state.ply); setStatusHTML(`<small>${esc(c?.say ?? `${them} ${playsPhrase(theirs)}`)}</small><span>Your move</span>`); }
+    else { const c = coachAt(state.ply); setStatusHTML(`<span>${coachHTML(c?.say ?? `${them} ${playsPhrase(theirs)}`)}</span><small>Your move</small>`); }
   }
 }
 
@@ -776,6 +818,7 @@ function finishLine() {
   renderMoves();
   const perfect = state.lineMistakes === 0 && !state.learning;
   if (state.chunk) { finishChunk(perfect); return; }
+  if (prog.resume?.[state.opening.id]?.lineId === state.lineObj.id) delete prog.resume[state.opening.id];
   progress.recordLineComplete(prog, state.opening.id);
   const entry = progress.scheduleLine(prog, state.opening.id, state.lineObj.id, { perfect });
   const tier = progress.tierFor(entry.clean);
@@ -813,12 +856,18 @@ function finishLine() {
 }
 
 /** End of a learning chunk: learn → from memory → continue with the next chunk. No progress is recorded until the whole line is done. */
+function showActions() {
+  els.status.hidden = true;
+  els.after.hidden = false;
+  els.controls.hidden = els.review.hidden = true;
+  els.modeToggle.hidden = true;
+  els.barActions.hidden = false;
+}
 function finishChunk(perfect) {
   const l = state.lineObj, c = state.chunk;
   const total = l.moves.filter((_, i) => tree.isUserPly(state.opening, i)).length;
   const done = l.moves.slice(0, c.to).filter((_, i) => tree.isUserPly(state.opening, i)).length;
-  els.controls.hidden = true;
-  els.after.hidden = false;
+  showActions();
   els.after.classList.toggle('perfect', perfect);
   const parts = Math.ceil(total / CHUNK), part = Math.ceil(done / CHUNK);
   els.after.classList.add('part');
@@ -831,7 +880,7 @@ function finishChunk(perfect) {
   els.nextLine.hidden = false;
   if (state.learning) { els.nextLine.textContent = 'Now from memory'; state.after = () => resetLine(l, { test: true }); }
   else if (!perfect) { els.nextLine.textContent = 'Try again from memory'; state.after = () => resetLine(l, { test: true }); }
-  else { els.nextLine.textContent = 'Continue the line'; state.after = () => resetLine(l, { chunkFrom: c.to }); }
+  else { els.nextLine.textContent = 'Continue the line'; state.after = () => resetLine(l, { chunkFrom: c.to }); prog.resume ??= {}; prog.resume[state.opening.id] = { lineId: l.id, from: c.to }; saveProg(); }
   // keep the chunk while testing it
   state.keepChunk = c;
   setStatus(state.learning ? 'Nice — part learned!' : perfect ? 'Perfect part!' : 'Nearly there', perfect || state.learning ? 'good' : 'neutral');
@@ -842,19 +891,24 @@ function finishChunk(perfect) {
 /* ---------- after a line: the plan under the board ---------- */
 function showAfter(kind, perfect) {
   const l = state.lineObj;
-  els.controls.hidden = true;
-  els.after.hidden = false;
+  showActions();
   els.after.classList.toggle('perfect', Boolean(perfect));
   els.after.classList.remove('part');
   els.afterKind.textContent = kind;
   els.planTitle.textContent = humanName(state.opening.id, l);
-  els.planText.textContent = l.plan ? plainNotation(l.plan) : 'You reached the end of the line — play it again to lock it in.';
+  // Short plan first (owner: one screen, no scroll box); "More" shows the full sourced quote.
+  const full = l.plan ? plainNotation(l.plan) : 'You reached the end of the line — play it again to lock it in.';
+  const cut = full.length > 170 ? Math.max(full.lastIndexOf('. ', 170), full.lastIndexOf('; ', 170)) : -1;
+  const short = cut > 60 ? full.slice(0, cut + 1) : full.length > 170 ? full.slice(0, 165).replace(/\s+\S*$/, '') + '…' : full;
+  els.planText.innerHTML = short === full ? esc(full) : `${esc(short)} <button class="more">More</button>`;
+  els.planText.querySelector('.more')?.addEventListener('click', () => { els.planText.textContent = full; els.after.classList.add('expanded'); });
+  els.after.classList.remove('expanded');
   els.planCredit.textContent = l.planCredit ? `${l.planBasis === 'quoted' ? 'Source' : 'Based on'}: ${l.planCredit.split(';').map((x) => x.replace(/\s*\(.*?\)/g, '').trim()).slice(0, 2).join(', ')}` : '';
   // the plan drawn on the board; the board shrinks for a moment so plan and board fit together
   clearArrows();
   drawMarks(planMarks(l.moves, l.plan, state.opening.side), 'plan');
   els.stage.classList.add('plan-view');
-  els.planReview.hidden = state.mode === 'review';
+  els.planReview.hidden = false;
   els.nextLine.hidden = false;
   els.nextLine.classList.remove('nudge'); void els.nextLine.offsetWidth; els.nextLine.classList.add('nudge');
 }
@@ -862,11 +916,43 @@ function hideAfter() {
   els.stage.classList.remove('plan-view');
   els.after.hidden = true;
   els.sessionEnd.hidden = true;
-  els.controls.hidden = false;
+  els.status.hidden = false;
+  els.barActions.hidden = els.seActions.hidden = true;
+  els.modeToggle.hidden = false;
+  els.controls.hidden = state.mode !== 'train';
+  els.review.hidden = state.mode !== 'review';
 }
 
 /* ---------- XP: "+10 XP" rises off the board and lands in the level chip ---------- */
+let xpInFlight = 0;
+let xpShown = null;
 function flyXp(n) {
+  if (!n) return;
+  xpInFlight += 1;
+  const bar = (els.xpTop.offsetParent ? els.xpTop : els.homeLevel);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const el = document.createElement('div');
+  el.className = 'xp-pop';
+  el.innerHTML = `<b>+${n}</b><span>XP</span>`;
+  document.body.appendChild(el);
+  const to = bar.getBoundingClientRect();
+  const dx = to.left + to.width / 2 - innerWidth / 2, dy = to.top + to.height / 2 - innerHeight * 0.42;
+  const anim = el.animate(still ? [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }] : [
+    { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0 },
+    { transform: 'translate(-50%, -50%) scale(1.15)', opacity: 1, offset: 0.12 },
+    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.2 },
+    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.72 },
+    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.25)`, opacity: 0.2 },
+  ], { duration: 2400, easing: 'cubic-bezier(0.3, 0.7, 0.2, 1)' });
+  anim.onfinish = () => {
+    el.remove();
+    xpInFlight = Math.max(0, xpInFlight - 1);
+    renderStreakChip();
+    for (const c of [els.xpTop, els.homeLevel]) { c.classList.remove('fill'); void c.offsetWidth; c.classList.add('fill'); }
+  };
+  return;
+}
+function flyXpOld(n) {
   if (!n) return;
   const from = els.board.getBoundingClientRect();
   const to = els.xpTop.getBoundingClientRect();
@@ -935,9 +1021,11 @@ function showSessionEnd() {
   const dueTomorrow = o.lines.filter((l) => progress.lineStatus(prog, o.id, l.id, new Date(Date.now() + 86400000)).state === 'due').length;
   const learned = run.results.filter((r) => r.learned).length;
   const missed = run.results.filter((r) => !r.perfect && !r.learned).map((r) => humanName(o.id, tree.lineById(o, r.id)));
-  els.controls.hidden = true;
+  showActions();
   els.after.hidden = true;
+  els.barActions.hidden = true;
   els.sessionEnd.hidden = false;
+  els.stage.classList.add('plan-view');
   els.sessionEnd.innerHTML = `
     <div class="se-top"><span class="after-kind">Session complete</span><h2>${perfect === SESSION_LEN ? 'Flawless — 5 perfect lines' : [learned ? `${learned} learned` : '', perfect ? `${perfect} perfect` : '', run.results.length - learned - perfect > 0 ? `${run.results.length - learned - perfect} to polish` : ''].filter(Boolean).join(' · ')}</h2></div>
     <div class="se-stats">
@@ -945,15 +1033,14 @@ function showSessionEnd() {
       <div><b data-count="${run.xp}">0</b><small>XP</small></div>
       ${run.bestCombo >= 2 ? `<div><b data-count="${run.bestCombo}">0</b><small>best combo</small></div>` : ''}
     </div>
-    <div class="se-goal"><span>Today</span><div class="bar${today >= goal ? ' done' : ''}"><i style="width:${Math.min(100, Math.round((today / goal) * 100))}%"></i></div><b>${Math.min(today, goal)} / ${goal}</b></div>
     <p class="se-insight">${missed.length ? `Worth another look: <b>${[...new Set(missed)].slice(0, 2).join('</b>, <b>')}</b>. They'll come back first next time.` : 'Every line clean. Your medals are growing.'}</p>
-    <p class="se-next">${dueTomorrow ? `Tomorrow: ${dueTomorrow} line${dueTomorrow === 1 ? '' : 's'} to review.` : 'Next time: new lines to learn.'}</p>
-    <div class="after-actions"><button id="se-home" class="secondary">Home</button><button id="se-again" class="primary">Keep going</button></div>`;
+    <p class="se-next">${dueTomorrow ? `Tomorrow: ${dueTomorrow} line${dueTomorrow === 1 ? '' : 's'} to review.` : 'Next time: new lines to learn.'}</p>`;
+  els.seActions.innerHTML = '<button id="se-home" class="secondary">Home</button><button id="se-again" class="primary">Keep going</button>';
+  els.seActions.hidden = false;
   countUp(els.sessionEnd);
-  els.sessionEnd.querySelector('#se-again').onclick = () => { startSession(); resetLine(); };
-  els.sessionEnd.querySelector('#se-home').onclick = () => els.back.click();
+  els.seActions.querySelector('#se-again').onclick = () => { startSession(); resetLine(); };
+  els.seActions.querySelector('#se-home').onclick = () => els.back.click();
   feedback.haptic('milestone');
-  requestAnimationFrame(() => els.sessionEnd.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
 }
 
 /* =================================================================
@@ -1022,13 +1109,20 @@ function renderLineList() {
 
 els.lineSearch.addEventListener('input', () => renderLineList());
 function openDrawer() {
-  if (state.mode !== 'train') return;
   renderLineMode(); renderLineList();
+  // Board slides to the bottom; the drawer takes the top across the full width (owner, 2026-09-25).
+  const b = document.querySelector('.board-wrap').getBoundingClientRect();
+  const top = innerHeight * 0.56;
+  const room = innerHeight - top - 10;
+  const k = Math.min(1, room / b.height);
+  els.stage.style.transformOrigin = `${b.left + b.width / 2}px ${b.top}px`;
+  els.stage.style.setProperty('--drawer-t', `translateY(${top - b.top}px) scale(${k})`);
   els.trainerMain.classList.add('drawer-open');
   els.linesSheet.setAttribute('aria-hidden', 'false');
   feedback.haptic('good');
 }
 function closeDrawer() {
+  if (!els.trainerMain.classList.contains('drawer-open')) return;
   els.trainerMain.classList.remove('drawer-open');
   els.linesSheet.setAttribute('aria-hidden', 'true');
 }
@@ -1039,7 +1133,7 @@ els.stage.addEventListener('click', (e) => { if (els.trainerMain.classList.conta
 let edge = null;
 els.trainerMain.addEventListener('touchstart', (e) => {
   const t = e.touches[0];
-  edge = { x: t.clientX, y: t.clientY, fromEdge: t.clientX > innerWidth - 32, inDrawer: els.linesSheet.contains(e.target) };
+  edge = { x: t.clientX, y: t.clientY, fromEdge: t.clientX > innerWidth - 32, inDrawer: els.linesSheet.contains(e.target), onCats: els.lineMode.contains(e.target) };
 }, { passive: true });
 els.trainerMain.addEventListener('touchend', (e) => {
   if (!edge) return;
@@ -1047,12 +1141,12 @@ els.trainerMain.addEventListener('touchend', (e) => {
   const dx = t.clientX - edge.x, dy = t.clientY - edge.y;
   const horiz = Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5;
   if (horiz && edge.fromEdge && dx < 0 && !els.trainerMain.classList.contains('drawer-open')) openDrawer();
-  else if (horiz && edge.inDrawer) {
+  else if (horiz && edge.onCats) {
+    // swipe along the category row changes category
     const order = ['main', 'side', 'surprise', 'mine'];
     const i = order.indexOf(settings.lineMode);
-    if (dx > 0 && i === 0) closeDrawer();
-    else { settings = updateSetting('lineMode', order[Math.max(0, Math.min(3, i + (dx < 0 ? 1 : -1)))]); renderLineMode(); renderLineList(); feedback.haptic('good'); }
-  }
+    settings = updateSetting('lineMode', order[Math.max(0, Math.min(3, i + (dx < 0 ? 1 : -1)))]); renderLineMode(); renderLineList(); feedback.haptic('good');
+  } else if (horiz && edge.inDrawer) closeDrawer();   // swipe either way on the list closes it
   edge = null;
 }, { passive: true });
 els.editLines.addEventListener('click', () => {
@@ -1085,7 +1179,8 @@ els.lineRows.addEventListener('click', (e) => {
   if (row) {
     if (els.linesSheet.classList.contains('editing')) { row.querySelector('input[data-toggle]')?.click(); return; }
     closeDrawer();
-    setTimeout(() => resetLine(tree.lineById(state.opening, row.dataset.play)), 180);
+    const picked = tree.lineById(state.opening, row.dataset.play);
+    setTimeout(() => (state.mode === 'review' ? reviewLine(picked) : resetLine(picked)), 180);
   }
 });
 
@@ -1132,6 +1227,7 @@ function reviewLine(lineObj) {
 function stepTo(ply) {
   state.whatif = false;
   if (els.whatif) els.whatif.hidden = true;
+  els.status.hidden = false;
   const target = Math.max(0, Math.min(ply, state.line.length));
   state.game.reset();
   for (let i = 0; i < target; i++) state.game.move(state.line[i]);
@@ -1141,6 +1237,7 @@ function stepTo(ply) {
   renderMoves();
   renderReviewStatus();
   renderStreakChip();
+  renderCoachMeta();
   scheduleExplorer();
 }
 
@@ -1148,12 +1245,12 @@ function renderReviewStatus() {
   const { ply, line, opening } = state;
   clearArrows();
   if (ply === 0) {
-    setStatus(`${humanName(opening.id, state.lineObj)} — tap → to start`, 'intro');
+    setStatusHTML(`<span>Let’s <em class="hl">watch</em> this line.</span><small>Tap → for each move. Try your own move any time — what if?</small>`, 'intro');
   } else {
     const mine = tree.isUserPly(opening, ply - 1);
     const c = coachAt(ply);
     if (c) {
-      setStatusHTML(`<span>${esc(c.say)}</span><small>${esc(c.why)}</small>`, mine ? 'good' : 'neutral');
+      setStatusHTML(`<span>${coachHTML(c.say)}</span><small>${esc(c.why)}</small>`, mine ? 'good' : 'neutral');
       drawMarks(c.marks, mine ? '' : 'them');
     } else {
       const g = new Chess(); line.slice(0, ply - 1).forEach((m) => g.move(m));
@@ -1166,6 +1263,7 @@ function renderReviewStatus() {
   els.playBtn.disabled = ply >= line.length;
   if (ply >= line.length && state.mode === 'review') {
     showAfter('Watched', false);
+    els.planReview.textContent = 'Watch again';
     els.nextLine.textContent = 'Train this line';
     const r = progress.recordWatch(prog, `${opening.id}/${state.lineObj.id}`);
     if (r.gained) { saveProg(); flyXp(r.gained); }
@@ -1191,12 +1289,11 @@ async function whatIf(move) {
   state.game.move(move.san);
   state.whatif = true;
   renderBoard({ animate: true });
-  setStatus(`What if: ${describeMove(move).toLowerCase()}?`, 'warn');
+  els.status.hidden = true;
   els.whatif.hidden = false;
-  requestAnimationFrame(() => els.whatif.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
   if (known) {
     els.whatif.innerHTML = `<b>That's a line you have!</b><span>${humanName(state.opening.id, known)}</span><div class="wi-actions"><button class="secondary" id="wi-back">Back</button><button class="primary" id="wi-go">Watch it</button></div>`;
-    els.whatif.querySelector('#wi-go').onclick = () => { els.whatif.hidden = true; state.whatif = false; reviewLine(known); stepTo(tried.length); };
+    els.whatif.querySelector('#wi-go').onclick = () => { els.whatif.hidden = true; els.status.hidden = false; state.whatif = false; reviewLine(known); stepTo(tried.length); };
   } else {
     const mineMove = tree.isUserPly(state.opening, prefix.length);
     els.whatif.innerHTML = `<b>What if ${describeMove(move).toLowerCase()}?</b><span class="wi-verdict">Asking Stockfish…</span><div class="wi-actions"><button class="secondary" id="wi-back">Back to the line</button></div>`;
@@ -1215,7 +1312,7 @@ async function whatIf(move) {
       else v.innerHTML = Math.abs(diff) < 0.3 ? 'A sound try — not in your lines yet. Stockfish: about equal.' : diff > 0 ? `A mistake by them — you'd be about <b>+${diff.toFixed(1)}</b> better than in the book line.` : `A strong try — about ${(-diff).toFixed(1)} better for them than the book move.`;
     } catch { const v = els.whatif.querySelector('.wi-verdict'); if (v) v.textContent = 'Stockfish is not available offline yet.'; }
   }
-  els.whatif.querySelector('#wi-back').onclick = () => { els.whatif.hidden = true; state.whatif = false; stepTo(state.ply); };
+  els.whatif.querySelector('#wi-back').onclick = () => { els.whatif.hidden = true; els.status.hidden = false; state.whatif = false; stepTo(state.ply); };
 }
 
 els.lineSelect.addEventListener('change', () => {
@@ -1421,11 +1518,16 @@ function renderProgress() {
       const spots = progress.weakSpots(prog, o.id, 3);
       return `
         <div class="panel-card op-progress ${o.side}">
-          <div class="opp-head"><h3>${o.name}</h3><span class="acc">${acc === null ? '—' : `${acc}%`}<small>accuracy</small></span></div>
-          <div class="ladder" aria-label="Mastery of ${o.lines.length} lines">${segs.map((x, k) => `<i class="${(x.t.tier ?? (x.st !== 'new' ? 'learned' : '')).toLowerCase()}" style="--k:${k}"></i>`).join('')}</div>
-          <div class="ladder-legend"><span><b data-count="${learnedN}">0</b> of ${o.lines.length} learned</span>${counts.map(([t, n]) => `<span class="lg ${t.toLowerCase()}"><i></i>${n} ${t}</span>`).join('')}</div>
-          <p class="next-medal">${started ? `Next medal: <b>${humanName(o.id, started.l)}</b> — ${started.t.next.at - started.t.clean} perfect run${started.t.next.at - started.t.clean === 1 ? '' : 's'} to ${started.t.next.name}` : learnedN ? 'Every learned line is at its top medal.' : 'Learn a line to start the ladder.'}</p>
-          <p class="weak">${!s || s.attempts === 0 ? 'Not trained yet.' : spots.length === 0 ? 'No repeated mistakes. 👌' : `Trips you up: ${spots.map((w) => { const l = tree.lineById(o, w.lineKey); return `<span class="tag">${l ? tree.lineFamily(o, l).replace(/ \(.*\)$/, '') : 'a line'}</span>`; }).join(' ')}`}</p>
+          <div class="opp-head"><h3>${o.name}</h3>${acc !== null && s.attempts >= 10 ? `<span class="acc">${acc}%<small>accuracy</small></span>` : ''}</div>
+          <div class="op-prog">
+            <span class="ring lg-ring"><svg viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="27"/><circle class="fill" cx="32" cy="32" r="27" style="stroke-dasharray:${2 * Math.PI * 27};--off:${2 * Math.PI * 27 * (1 - learnedN / o.lines.length)}"/></svg><b data-count="${learnedN}">0</b><small>/${o.lines.length}</small></span>
+            <div class="op-prog-body">
+              <span class="op-prog-label">Lines learned</span>
+              ${counts.length ? `<div class="medal-row">${counts.map(([t, n]) => `<span class="medal-stat ${t.toLowerCase()}"><b class="medal-core ${t.toLowerCase()}">${t[0]}</b><em data-count="${n}">0</em></span>`).join('')}</div>` : ''}
+              ${started ? `<div class="next-medal"><b class="medal-core ${started.t.next.name.toLowerCase()}">${started.t.next.name[0]}</b><div><span>${humanName(o.id, started.l)}</span><small>${started.t.next.at - started.t.clean} perfect run${started.t.next.at - started.t.clean === 1 ? '' : 's'} to ${started.t.next.name}</small><i class="nm-bar"><i style="width:${Math.round(started.t.progress * 100)}%"></i></i></div></div>` : `<p class="op-prog-hint">${learnedN ? 'Every learned line holds its top medal.' : 'Your first line earns a spot here.'}</p>`}
+            </div>
+          </div>
+          <p class="weak">${!s || s.attempts === 0 ? '' : spots.length === 0 ? 'No repeated mistakes.' : `Trips you up: ${spots.map((w) => { const l = tree.lineById(o, w.lineKey); return `<span class="tag">${l ? tree.lineFamily(o, l).replace(/ \(.*\)$/, '') : 'a line'}</span>`; }).join(' ')}`}</p>
         </div>`;
     }).join('')}`;
   countUp(els.progressCards);
@@ -1714,7 +1816,7 @@ els.restart.addEventListener('click', () => {
 });
 els.nextLine.addEventListener('click', () => {
   if (state.mode === 'weak') { state.weak.index += 1; loadWeakPosition(); return; }
-  if (state.mode === 'review') { setMode('train'); return; }
+  if (state.mode === 'review') { const l = state.lineObj; setMode('train'); resetLine(l); return; }
   if (state.after) { const f = state.after; state.after = null; f(); return; }
   if (state.justLearned) { const l = state.justLearned; state.justLearned = null; resetLine(l, { test: true }); return; }
   if (state.retry) { const l = state.retry; state.retry = null; resetLine(l, { test: true }); return; }
@@ -1723,7 +1825,9 @@ els.nextLine.addEventListener('click', () => {
 });
 els.planReview.addEventListener('click', () => {
   if (state.retry) { state.retry = null; if ((state.run?.results.length ?? 0) >= SESSION_LEN) showSessionEnd(); else resetLine(); return; }
-  const l = state.lineObj; setMode('review'); reviewLine(l);
+  const l = state.lineObj;
+  if (state.mode === 'review') { stepTo(0); return; }
+  setMode('review'); reviewLine(l);
 });
 els.dailyGoal.value = String(settings.dailyGoal ?? 5);
 els.dailyGoal.addEventListener('change', () => { settings = updateSetting('dailyGoal', Number(els.dailyGoal.value)); renderStreakChip(); });
@@ -1734,6 +1838,8 @@ els.hapticsToggle.addEventListener('change', () => {
   feedback.haptic('good');
 });
 
+for (const c of [els.streakTop, els.xpTop]) c.addEventListener('click', () => { els.back.click(); setTab(1); });
+for (const c of [els.homeStreak, els.homeLevel]) c.addEventListener('click', () => setTab(1));
 els.back.addEventListener('click', () => {
   state.session += 1;
   stopPlay();

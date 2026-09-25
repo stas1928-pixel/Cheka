@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/app-v3.css">
 <link rel="stylesheet" href="css/app-v5.css">
 <link rel="stylesheet" href="css/app-v6.css">
+<link rel="stylesheet" href="css/app-v7.css">
 </head>
 <body>
 
@@ -27,8 +28,8 @@
       </div>
     </div>
     <div class="top-stats">
-      <span id="home-streak" class="chip streak" title="Day streak">🔥 0</span>
-      <span id="home-level" class="chip level" title="Level">Lv 1</span>
+      <button id="home-streak" class="chip streak" title="Day streak">0</button>
+      <button id="home-level" class="chip level" title="Level"><b>Lv 1</b><i class="lv-bar"><i></i></i></button>
     </div>
   </header>
 
@@ -114,8 +115,8 @@
   </div>
 </main>
 
-<!-- ============ TRAINER — focus mode. The stage slides left when the lines drawer comes in from the right edge. ============ -->
 <main data-screen="trainer" hidden>
+ <!-- ONE SCREEN (owner rule 2026-09-25): header · coach card at eye level · board sized to the space left · bottom action bar. Nothing scrolls. -->
  <div id="stage" class="stage">
   <header class="trainer-header">
     <button id="back" class="icon-btn" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -123,93 +124,78 @@
       <span id="trainer-name"></span>
       <span id="trainer-side" class="sub"></span>
     </div>
-    <span id="streak-top" class="chip streak" title="Day streak">🔥 0</span>
-    <span id="xp-top" class="chip level" title="Level">Lv 1</span>
+    <span id="combo" class="combo" hidden></span>
+    <button id="streak-top" class="chip streak" title="Day streak">0</button>
+    <button id="xp-top" class="chip level" title="Level"><b>Lv 1</b><i class="lv-bar"><i></i></i></button>
   </header>
 
-  <!-- Session: 5 lines per run, one segment each; combo counts perfect lines in a row. -->
-  <div class="session" aria-label="Session progress">
-    <div id="session-bar" class="seg-bar"></div>
-    <span id="combo" class="combo" hidden></span>
-  </div>
-  <div class="goal slim" hidden><div class="bar"><i id="goal-fill"></i></div><b id="goal-text">0 / 5</b></div>
-
-  <div class="board-wrap">
-    <div id="board" class="board" role="grid" aria-label="Chess board"></div>
-    <svg id="arrows" class="arrows" viewBox="0 0 8 8" aria-hidden="true">
-      <defs>
-        <marker id="arrowhead" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="var(--ice-300)"/>
-        </marker>
-        <marker id="arrowhead-plan" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="var(--mint)"/>
-        </marker>
-        <marker id="arrowhead-them" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="var(--coral)"/>
-        </marker>
-      </defs>
-    </svg>
-  </div>
-  <div id="status" class="status neutral" role="status">Loading…</div>
-
-  <div class="controls">
-    <button id="restart" class="tool" aria-label="Restart line"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Restart</span></button>
-    <button id="hint-btn" class="tool" aria-label="Hint"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></svg><span>Hint</span></button>
-    <div id="mode-toggle" class="mode" role="tablist">
-      <button data-mode="train" role="tab"><svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>Train</button>
-      <button data-mode="review" role="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/></svg>Watch</button>
-    </div>
-  </div>
-
-  <div id="line-info" class="line-info"></div>
-
-  <!-- After a line: the plan, readable while the final position stays on the board. -->
-  <section id="after" class="after" hidden>
-    <div class="after-head">
+  <!-- Coach card: the coach's line, the part/plan after a line, the session summary, what-if — always above the board. -->
+  <section class="coach-top">
+    <p id="coach-meta" class="coach-meta"></p>
+    <div id="status" class="status neutral" role="status">Loading…</div>
+    <section id="after" class="after" hidden>
       <span id="after-kind" class="after-kind"></span>
       <h2 id="plan-title"></h2>
+      <p id="plan-label" class="plan-label">The plan from here</p>
+      <p id="plan-text" class="plan-text"></p>
+      <p id="plan-credit" class="plan-credit"></p>
+    </section>
+    <section id="session-end" class="after session-end" hidden></section>
+    <div id="whatif" class="whatif" hidden></div>
+  </section>
+
+  <div class="board-slot">
+    <div class="board-wrap">
+      <div id="board" class="board" role="grid" aria-label="Chess board"></div>
+      <svg id="arrows" class="arrows" viewBox="0 0 8 8" aria-hidden="true">
+        <defs>
+          <marker id="arrowhead" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ice-300)"/></marker>
+          <marker id="arrowhead-plan" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--mint)"/></marker>
+          <marker id="arrowhead-them" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--coral)"/></marker>
+        </defs>
+      </svg>
     </div>
-    <p id="plan-label" class="plan-label">The plan from here</p>
-    <p id="plan-text" class="plan-text"></p>
-    <p id="plan-credit" class="plan-credit"></p>
-    <div class="after-actions">
+  </div>
+
+  <!-- Bottom action bar: the mode switch plus whatever the moment needs. The one primary action lives here. -->
+  <div class="action-bar">
+    <div id="mode-toggle" class="mode" role="tablist">
+      <button data-mode="train" role="tab" aria-label="Train"><svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg><span>Train</span></button>
+      <button data-mode="review" role="tab" aria-label="Watch"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/></svg><span>Watch</span></button>
+    </div>
+    <div class="controls">
+      <button id="restart" class="tool" aria-label="Restart line"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Restart</span></button>
+      <button id="hint-btn" class="tool" aria-label="Hint"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></svg><span>Hint</span></button>
+    </div>
+    <div id="review-controls" class="review" hidden>
+      <button id="step-prev" class="tool" aria-label="Back one move"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button id="play-btn" class="play" aria-label="Next move"><svg viewBox="0 0 24 24"><path d="M9 5l8 7-8 7"/></svg></button>
+      <button id="step-first" hidden></button><button id="step-next" hidden></button><button id="step-last" hidden></button>
+      <span id="tut-fill" hidden></span>
+      <select id="line-select" hidden aria-hidden="true"></select>
+      <div hidden>
+        <div id="explorer-meta"></div><div id="explorer-body"></div>
+        <div id="engine-meta"></div><div id="engine-body"></div>
+        <button id="engine-check"></button><button id="engine-copy"></button><pre id="engine-json"></pre>
+      </div>
+    </div>
+    <div id="bar-actions" class="after-actions" hidden>
       <button id="plan-review" class="secondary">Watch it</button>
       <button id="next-line" class="primary">Next line</button>
     </div>
-  </section>
-
-  <!-- End of a 5-line session. -->
-  <section id="session-end" class="after session-end" hidden></section>
-
-  <!-- Watch mode: step through the line by hand; the coach explains each move with arrows and circles; try your own move any time. -->
-  <div id="review-controls" class="review" hidden>
-    <div class="tut">
-      <button id="step-first" class="tool" aria-label="Start"><svg viewBox="0 0 24 24"><path d="M6 5v14"/><path d="M18 5l-9 7 9 7V5z"/></svg></button>
-      <button id="step-prev" class="tool" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <button id="play-btn" class="play" aria-label="Next move"><svg viewBox="0 0 24 24"><path d="M9 5l8 7-8 7"/></svg></button>
-      <button id="step-next" class="tool" hidden aria-label="Forward"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
-      <button id="step-last" class="tool" aria-label="End"><svg viewBox="0 0 24 24"><path d="M18 5v14"/><path d="M6 5l9 7-9 7V5z"/></svg></button>
-    </div>
-    <div class="tut-track"><i id="tut-fill"></i></div>
-    <div id="whatif" class="whatif" hidden></div>
-    <label class="tut-pick"><span>Line</span><select id="line-select" aria-label="Line to watch"></select></label>
-    <p class="tut-tip">Tap → for the next move. Try your own move any time — “what if?”</p>
-    <div hidden>
-      <div id="explorer-meta"></div><div id="explorer-body"></div>
-      <div id="engine-meta"></div><div id="engine-body"></div>
-      <button id="engine-check"></button><button id="engine-copy"></button><pre id="engine-json"></pre>
-    </div>
+    <div id="se-actions" class="after-actions" hidden></div>
   </div>
-  <div id="moves" class="moves" hidden></div>
-  <div id="branch-note" class="note" hidden></div>
+
+  <!-- kept for the code paths that still reference them; never shown -->
+  <div hidden><div class="session"><div id="session-bar"></div></div><div class="goal slim"><i id="goal-fill"></i><b id="goal-text"></b></div><div id="line-info"></div><div id="moves"></div><div id="branch-note"></div></div>
  </div>
 
-  <!-- Lines drawer: slides in from the right edge and pushes the board aside. Swipe left/right to change category. -->
+  <!-- Lines drawer: comes in across the full width; the board slides down to the bottom and stays big. Swipe sideways to close. -->
   <aside id="lines-drawer" class="drawer" aria-label="Lines" aria-hidden="true">
     <div class="sheet-head">
       <div><h2 id="line-list-title">Lines</h2><span id="line-list-meta" class="dim"></span></div>
       <button id="edit-lines" class="text-btn">Edit</button>
-      <button id="close-lines" class="icon-btn" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+      <button id="close-lines" class="icon-btn" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg></button>
     </div>
     <div id="line-mode" class="cats" role="radiogroup" aria-label="Which lines to train">
       <button data-line="main" role="radio" class="cat-main">Main</button>

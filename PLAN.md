@@ -935,10 +935,59 @@ Content jobs still open: plan texts contain notation; per-move sourced ideas
     during learning.
 16. **Board coordinates are tiny and low-contrast** on the steel board.
     Raise them to about 11px at higher contrast.
-17. **The XP fly-up is easy to miss** because it lands on the small Lv
-    chip. Add a short "+4 XP" on the coach line as well, and show level
-    progress in the Lv chip's ring. The ring exists but is faint; make it
-    brighter.
+17. **XP reward, owner's spec: "really hard to notice".**
+    - "+N XP" pops big in the middle of the screen and stays for about
+      2–3 seconds.
+    - Then it flows to a visible XP/level bar and fills it with a nice
+      animation: the bar grows, glows and counts up.
+    - A level-up overflows the bar and triggers the celebration.
+    - A small Lv chip alone is not enough. The bar must be visible when
+      the XP lands, e.g. the session bar or a slim level bar under the
+      header.
+    - Respect reduced motion.
+
+**Built 2026-09-25, pass 7 (owner: "implement what we talked about… consistent… 20 min"):**
+- **Trainer is one fixed screen:** header, coach card, board, bottom
+  action bar.
+  - The board fills the space left (container units) and never scrolls.
+  - Every panel (coach line, part done, line done, Watch end, session
+    end, what-if) is the same white-text card above the board.
+  - Every action is in the bottom bar.
+  - Verified at 390×844, including drawer-open and plan states; nothing
+    scrolls.
+- **Coach text:** white, one highlighted word, left accent bar by state.
+  Learn mode never shows red; it says "Close! Follow the glow".
+- **Drawer:** full width across the top with the tabs in one row. The
+  board slides to the bottom at almost full size. Swipe along the tab
+  row to change category; swipe the list either way to close. Also used
+  in Watch to pick a line, which replaces the native select.
+- **XP:** a big "+N XP" for about 2 s, then it flows into the level chip's
+  bar. The chip is now a real bar, which glows and fills.
+- **Resume:** a new line's parts survive Back and app restarts. The home
+  card says "Continue: <line>", or "Next: <line>" instead of "39 new to
+  learn".
+- **Progress card:** a learned ring, earned medals only, and the line
+  closest to its next medal with a small bar. No empty grid.
+- **Small fixes:**
+  - Hint and Restart are hidden while learning;
+  - a first-run welcome in the coach line;
+  - learn moves do not count toward accuracy; accuracy is hidden under 10
+    tested moves;
+  - streak and level chips open Progress;
+  - larger board coordinates;
+  - the session bar is gone ("Line 2 of 5" and "Part 1 of 3" sit on the
+    coach card's meta line).
+- **Not done:** item 14, the Games tab flow.
+
+**Concept only — do NOT build yet (owner, 2026-09-25):**
+- **Beginner / Advanced mode.** "Having the game hold you and force you to
+  go with it is kinda too much" (owner tests constantly). Idea: ask once
+  whether you are a beginner or advanced, and give a different version.
+  - Beginner: today's guided flow, with learn glow, parts, from memory
+    and forced order.
+  - Advanced: free choice of line, no forced learn step, fewer
+    interruptions, and hints only on request.
+  Keep it as a concept until the owner asks for it.
 
 **Built 2026-09-25 (owner: "push it through, as well as all the ui changes"):**
 items 1–10 above, and the coach dialog in Train and Watch.

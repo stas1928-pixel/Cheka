@@ -1,0 +1,128 @@
+/* =================================================================
+   PASS 7 (2026-09-25): ONE SCREEN. Trainer = header · coach card at eye
+   level · board sized to the space left · bottom action bar. Nothing
+   scrolls. Coach text is clean white with one highlighted word. XP pops,
+   then flows into a real level bar. Drawer across the full width, board
+   slides down. Loaded last.
+   ================================================================= */
+
+/* ---------- trainer: a fixed one-screen column ---------- */
+main[data-screen="trainer"] { height: 100dvh; overflow: hidden; }
+main[data-screen="trainer"] .stage { height: 100dvh; gap: var(--sp-2); padding: 0 0 calc(var(--sp-2) + env(safe-area-inset-bottom)); }
+.trainer-header { position: static; flex: none; grid-template-columns: var(--tap) 1fr auto auto auto; width: min(calc(100vw - 16px), var(--board-max)); background: none; }
+.trainer-title #trainer-name { font-size: 18px; }
+
+/* coach card: the one place the app talks — white, crisp, left-aligned, at eye level */
+.coach-top { flex: none; width: min(calc(100vw - 16px), var(--board-max)); display: flex; flex-direction: column; gap: 6px; }
+.coach-meta { margin: 0; display: flex; justify-content: space-between; gap: var(--sp-2); font-size: 12px; color: var(--text-dim); min-height: 16px; }
+.coach-meta b { font-weight: 800; color: var(--ice-100); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.coach-meta span { flex: none; font-weight: 800; color: var(--ice-300); }
+.coach-top .status, .coach-top .status.two { width: 100%; min-height: 68px; margin: 0; padding: 10px 14px; border-radius: var(--r-2); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px; text-align: left; background: #151d25; color: #fff; font-size: 17px; font-weight: 800; line-height: 1.25; box-shadow: inset 3px 0 0 var(--ice-300), 0 6px 20px rgba(0, 0, 0, 0.35); animation: coach-in 260ms var(--ease-out); }
+.coach-top .status small { font-size: 13.5px; font-weight: 500; line-height: 1.35; color: rgba(255, 255, 255, 0.72); }
+.coach-top .status span { font-weight: 800; }
+.coach-top .status.good { box-shadow: inset 3px 0 0 var(--mint), 0 6px 20px rgba(0, 0, 0, 0.35); }
+.coach-top .status.bad { box-shadow: inset 3px 0 0 var(--coral), 0 6px 20px rgba(0, 0, 0, 0.35); }
+.coach-top .status.warn { box-shadow: inset 3px 0 0 var(--amber), 0 6px 20px rgba(0, 0, 0, 0.35); }
+.coach-top .status.good, .coach-top .status.bad, .coach-top .status.warn, .coach-top .status.intro, .coach-top .status.neutral { color: #fff; background: #151d25; }
+.coach-top .status[hidden] { display: none; }
+em.hl { font-style: normal; color: var(--ice-300); }
+.status.good em.hl { color: var(--mint); }
+.status.warn em.hl { color: var(--amber); }
+@keyframes coach-in { from { transform: translateY(-4px); opacity: 0.4; } }
+
+/* after-line / part / watched / session end: same card, same voice */
+.coach-top .after, .coach-top .session-end { width: 100%; margin: 0; padding: 12px 14px; border-radius: var(--r-2); background: #151d25; box-shadow: inset 3px 0 0 var(--ice-300), 0 6px 20px rgba(0, 0, 0, 0.35); color: #fff; animation: coach-in 260ms var(--ease-out); gap: 4px; }
+.coach-top .after.perfect { box-shadow: inset 3px 0 0 var(--mint), 0 6px 20px rgba(0, 0, 0, 0.35); }
+.coach-top .after h2 { margin: 0; font-size: 20px; font-weight: 900; color: #fff; }
+.coach-top .after-kind { font-size: 11px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ice-300); display: flex; align-items: center; }
+.coach-top .plan-label { display: none; }
+.coach-top .plan-text { margin: 2px 0 0; font-size: 14.5px; line-height: 1.45; color: rgba(255, 255, 255, 0.9); max-height: none; overflow: visible; }
+.coach-top .after.expanded .plan-text { max-height: 34dvh; overflow-y: auto; }
+.coach-top .plan-credit { margin: 2px 0 0; font-size: 11.5px; color: var(--text-dim); }
+.plan-text .more { display: inline; height: auto; min-height: 0; padding: 0 2px; background: none; box-shadow: none; color: var(--ice-300); font-weight: 800; font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
+.coach-top .session-end h2 { font-size: 20px; margin: 2px 0 6px; }
+.coach-top .se-stats { display: flex; gap: var(--sp-4); }
+.coach-top .se-stats b { font-size: 24px; }
+.coach-top .se-insight, .coach-top .se-next { margin: 6px 0 0; font-size: 13.5px; color: rgba(255, 255, 255, 0.8); }
+.coach-top .whatif { width: 100%; margin: 0; border-radius: var(--r-2); background: #151d25; box-shadow: inset 3px 0 0 var(--amber); color: #fff; }
+
+/* board fills whatever height is left — always square, never pushes anything off screen */
+.board-slot { flex: 1 1 auto; min-height: 0; width: 100%; container-type: size; display: grid; place-items: center; }
+.board-slot .board-wrap { width: min(calc(100cqw - 8px), 100cqh, var(--board-max)); transition: width 380ms var(--ease-out); }
+.stage.plan-view .board-wrap { width: min(calc(100cqw - 8px), 100cqh, var(--board-max)); }
+
+/* bottom action bar: fixed height, the one primary action lives here */
+.action-bar { flex: none; width: min(calc(100vw - 16px), var(--board-max)); min-height: 56px; display: flex; align-items: center; gap: var(--sp-2); }
+.action-bar .mode { margin: 0; flex: none; }
+.action-bar .mode[hidden] { display: none; }
+.action-bar .mode button { padding: 8px 10px; min-height: var(--tap); }
+.action-bar .controls { width: auto; flex: 1; justify-content: flex-end; gap: var(--sp-1); }
+.action-bar .review { width: auto; flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: var(--sp-2); }
+.action-bar .review[hidden] { display: none; }
+.action-bar .play { width: 88px; height: 52px; border-radius: var(--r-2); }
+.action-bar .after-actions { flex: 1; margin: 0; }
+.action-bar .after-actions[hidden] { display: none; }
+.action-bar .after-actions button { height: 52px; }
+.action-bar .tool { flex-direction: column; min-width: 56px; }
+
+/* learning: a soft "follow the glow" instead of an error */
+@keyframes flash-hint { 25% { box-shadow: inset 0 0 0 100vmax rgba(124, 200, 255, 0.35); } }
+.sq.flash-hint { animation: flash-hint 0.6s var(--ease-out); }
+
+/* coordinates: readable */
+.sq[data-rank-label]::before, .sq[data-file-label]::after { font-size: 11px; font-weight: 800; opacity: 0.9; }
+
+/* ---------- level chip = a real XP bar; XP pops big, then flows in and fills it ---------- */
+.chip.level { display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; }
+.chip.level::before { display: none; }
+.lv-bar { display: block; width: 44px; height: 6px; border-radius: 3px; background: rgba(124, 200, 255, 0.16); overflow: hidden; }
+.lv-bar > i { display: block; height: 100%; width: 0; border-radius: 3px; background: linear-gradient(90deg, var(--ice-400), var(--ice-200)); box-shadow: 0 0 8px rgba(124, 200, 255, 0.8); transition: width 900ms var(--ease-out); }
+.chip.level.fill { animation: lv-glow 1100ms var(--ease-out); }
+@keyframes lv-glow { 20% { box-shadow: 0 0 0 2px var(--ice-300), 0 0 22px rgba(124, 200, 255, 0.9); transform: scale(1.08); } }
+.chip { border: 0; cursor: pointer; }
+.xp-pop { position: fixed; left: 50%; top: 42%; z-index: 60; pointer-events: none; display: flex; align-items: baseline; gap: 6px; padding: 10px 20px; border-radius: var(--r-3); background: rgba(10, 14, 18, 0.82); box-shadow: 0 0 0 1px rgba(255, 209, 102, 0.35), 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 209, 102, 0.25); backdrop-filter: blur(6px); }
+.xp-pop b { font-size: 44px; font-weight: 900; color: var(--xp); line-height: 1; text-shadow: 0 0 18px rgba(255, 209, 102, 0.55); }
+.xp-pop span { font-size: 18px; font-weight: 900; color: var(--xp); letter-spacing: 0.06em; }
+
+/* ---------- drawer: full width on top; the board slides down and stays big ---------- */
+.drawer { top: 0; left: 0; right: 0; bottom: auto; width: auto; height: 55dvh; border-radius: 0 0 var(--r-3) var(--r-3); padding-bottom: var(--sp-3); transform: translateY(-104%); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(124, 200, 255, 0.18); }
+.drawer-open .drawer { transform: none; }
+.drawer-open .stage { transform: var(--drawer-t); filter: none; }
+.drawer-open .stage > :not(.board-slot) { opacity: 0; pointer-events: none; transition: opacity 200ms; }
+.drawer .cats { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.drawer .cats button { padding: 6px 2px; flex-direction: column; gap: 0; min-height: var(--tap); font-size: 12px; }
+.drawer .line-row { grid-template-columns: 1fr auto; padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-3); }
+.drawer .line-row .thumb { display: none; }
+.drawer .ring { width: 38px; height: 38px; }
+.drawer .line-list { overflow-y: auto; flex: 1; min-height: 0; }
+.drawer-edge { top: calc(env(safe-area-inset-top) + 64px); bottom: auto; height: 68px; }
+@media (min-width: 768px) { .drawer { left: auto; width: min(560px, 60vw); height: 100dvh; border-radius: 0; transform: translateX(104%); } .drawer-open .stage { transform: translateX(-18vw) scale(0.8); } }
+
+/* ---------- home ---------- */
+.op-next { margin: var(--sp-2) 0 0; font-size: 15px; font-weight: 800; color: #fff; display: flex; gap: 8px; align-items: baseline; }
+.op-next span { font-size: 11px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ice-300); }
+
+/* progress card: what you have and what is next */
+.op-prog { display: flex; gap: var(--sp-4); align-items: center; margin-top: var(--sp-3); }
+.lg-ring { width: 72px; height: 72px; }
+.lg-ring circle { stroke-width: 6; }
+.lg-ring b { font-size: 22px; font-weight: 900; line-height: 1; }
+.lg-ring small { position: absolute; bottom: 14px; font-size: 11px; color: var(--text-dim); font-weight: 800; }
+.op-prog-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
+.op-prog-label { font-size: 11px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+.op-prog .medal-row { display: flex; gap: 6px; }
+.op-prog .medal-stat { padding: 4px 8px 4px 4px; border-radius: var(--r-2); }
+.op-prog .medal-core { width: 24px; height: 24px; font-size: 11px; }
+.op-prog .next-medal { display: flex; gap: var(--sp-2); align-items: center; margin: 0; font-size: 13px; }
+.op-prog .next-medal > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.op-prog .next-medal span { font-weight: 800; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.op-prog .next-medal small { color: var(--text-dim); }
+.nm-bar { display: block; height: 5px; border-radius: 3px; background: var(--ice-900); overflow: hidden; }
+.nm-bar > i { display: block; height: 100%; background: var(--ice-300); border-radius: 3px; }
+.op-prog-hint { margin: 0; font-size: 13.5px; color: var(--text-dim); }
+.weak:empty { display: none; }
+
+@media (prefers-reduced-motion: reduce) { .coach-top .status, .coach-top .after, .chip.level.fill { animation: none; } .lv-bar > i { transition: none; } }
+/* board sits right under the coach card (eye travels coach → board); the edge handle never covers text */
+.board-slot { place-items: start center; }
+.coach-top { padding-right: 16px; }
