@@ -89,3 +89,6 @@
   .drawer .fam-head h3 { font-size: 14px; }
 }
 .drawer-edge { width: 22px; background: linear-gradient(180deg, rgba(124, 200, 255, 0.28), rgba(124, 200, 255, 0.5), rgba(124, 200, 255, 0.28)); }
+/* the handle must never sit over the board (it caught taps on h2/h3): park it low, hit area off the board */
+.drawer-edge { top: auto; bottom: calc(96px + env(safe-area-inset-bottom)); }
+.drawer-edge::after { inset: -10px 0 -10px -10px; }

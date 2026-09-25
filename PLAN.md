@@ -843,6 +843,103 @@ Content jobs still open: plan texts contain notation; per-move sourced ideas
     - Tapping a row shows that line's position on the small board before
       you commit.
 
+### Owner review notes on fee8f6a (2026-09-25) — collect, build later
+1. **The mastery ladder is "a step back from what we had — do better".**
+   39 empty grey cells plus "0 of 39 learned" and "Learn a line to start
+   the ladder" is a wall of nothing. It is worse than the medal coins it
+   replaced. What went wrong: it shows emptiness at the start and has no
+   visual reward.
+   Direction:
+   - Keep the colour and polish of the old medal card.
+   - Show progress that exists from day one: lines learned, the next
+     medal and how close it is.
+   - Never show a grid of empty cells.
+   Show the owner two options before building.
+2. **Drawer layout: "not good".** The board shrunk to a thumbnail on the
+   left is too small, and the drawer is too narrow: the category tabs wrap
+   2×2. New spec:
+   - Opening the drawer slides the board **down to the bottom** of the
+     screen. It shrinks only a little, because it has the full width.
+   - The lines panel stretches **across the full width** above it, so the
+     four category tabs sit in one row.
+   - Close it with a swipe as well as the close button.
+3. **The main button is cut off on the phone.** "Now from memory" is only
+   partly visible at the bottom of the screen. Every primary action must
+   be fully visible without scrolling. Pin it in a bottom action bar that
+   has its own reserved space, so it never covers text.
+4. **Coach dialog: clean white, crisp, at eye level ABOVE the board.**
+   - The status/coach line moves from under the board to the top.
+   - Plain white text on a dark surface, large and highly legible. No
+     tinted mint, coral or amber text; colour only as a small accent, such
+     as an edge or an icon.
+   - "Same with all future plans from now on": the plan text also goes
+     above the board, in the same clean white style. The board shrinks
+     for a moment if needed, and the buttons stay in the bottom bar.
+   - Owner, again on the Watch end screen: "text above is the better
+     option". The text is mainly white, or black on a white card; one
+     highlighted word in colour is fine for engagement, e.g.
+     "Now we **push** the pawn".
+   - The coach line data gets an optional highlight word, rendered as an
+     accent span.
+   - The long plan quote in a scroll box does not fit. The plan above the
+     board needs a short version: one or two plain sentences taken from
+     the sourced plan, with a "More" option for the full quote. This is
+     content work, sourced as before.
+5. **RULE: every screen snaps into one phone screen, with no scrolling
+   unless there is no other way.** Seen on Watch: the Train/Watch switch,
+   a line-info card (it should not show in Watch at all), the step buttons
+   and the native line picker stack below the fold.
+   Fix pattern for trainer screens:
+   - Fixed layout, top to bottom: header, coach line, board sized to the
+     space left, bottom action bar.
+   - Everything else goes into the bottom bar or the drawer.
+   - The native line select in Watch goes into the drawer.
+   - Verify at 360×800 and 390×844, with no vertical scroll in any
+     trainer state.
+
+**Found in my own UX pass (2026-09-25, owner: "find what I missed"):**
+- **FIXED now (v17): the edge handle caught taps on h2/h3.** It sat over
+  the board's h-file, so a move there opened the drawer. It is now parked
+  low, below the board.
+6. **No resume.** Leaving mid-line (Back, or closing the app) throws away
+   the parts already learned. The home card still says "39 new to learn".
+   Needs:
+   - resume state: the line and part, stored with progress;
+   - the home card's main action becomes "Continue: The Modern Attack,
+     part 2 of 3".
+7. **The home card should say what is next, not a backlog count.**
+   "39 new to learn" is daunting. Show the next line's name, and today's
+   step: "Next: Bishop out first", or "3 to review".
+8. **The session bar at the top is unexplained.** Five grey segments with
+   no label. Either label it ("Line 2 of 5") or merge it with the part dots
+   into one progress strip.
+9. **Learn mode shows controls that do nothing.** Hint does nothing while
+   the glow already shows the move, and Restart competes with the flow.
+   Hide both while learning. Show Hint only when playing from memory.
+10. **Back mid-line loses work silently.** Either resume (6) or ask "Leave
+    this line? Progress on this part is saved."
+11. **Streak and level chips are not tappable.** Tapping them should open
+    the Progress tab. Right now they look like buttons and do nothing.
+12. **Accuracy shows 100% before anything is learned.** Learn-mode moves
+    count as attempts. Show accuracy only for from-memory play; hide it
+    until there are at least 10 tested moves.
+13. **No first-run welcome.** Nothing explains parts, the edge drawer or
+    Watch. Add a one-time coach intro in the coach line style, three short
+    lines, dismissed by playing. No modal tour.
+14. **Games tab dead ends.** "Analyse my games" needs a username that is
+    typed in a different card. Show one flow: username once at the top,
+    then both actions. Remember it; it already persists in settings.
+15. **The wrong-move message in learn mode repeats the glow.** "Not that
+    one — pawn to e4" while e4 is already glowing. Make it encouraging
+    ("Close! Follow the glow") and use a softer colour than the error red
+    during learning.
+16. **Board coordinates are tiny and low-contrast** on the steel board.
+    Raise them to about 11px at higher contrast.
+17. **The XP fly-up is easy to miss** because it lands on the small Lv
+    chip. Add a short "+4 XP" on the coach line as well, and show level
+    progress in the Lv chip's ring. The ring exists but is faint; make it
+    brighter.
+
 **Built 2026-09-25 (owner: "push it through, as well as all the ui changes"):**
 items 1–10 above, and the coach dialog in Train and Watch.
 - **Watch:** stepped by hand with one big → button. There is no autoplay
