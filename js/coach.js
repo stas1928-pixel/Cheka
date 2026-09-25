@@ -6,6 +6,7 @@
    square it names comes from them (tests/coach.test.mjs checks this).
    Wording is picked deterministically per position so it never flickers.
 --------------------------------------------------------------- */
+import { Chess } from '../vendor/chess.js';
 import { NAME, factSentence } from './facts.js';
 
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
@@ -96,4 +97,60 @@ export function factMarks(f, threat) {
   for (const d of f.discovered.slice(0, 1)) arrows.push(`${d.by}-${d.square}`);
   if (threat && !threat.mate) { arrows.push(`${threat.from}-${threat.to}`); circles.push(threat.to); }
   return { arrows: [...new Set(arrows)], circles: [...new Set(circles)] };
+}
+
+/* ---------- plans in plain words + plan marks for the end of Watch ---------- */
+const PIECE_WORD = { K: 'king', Q: 'queen', R: 'rook', B: 'bishop', N: 'knight' };
+/** A move token without its dots/number → words: "Qxc3" → "queen takes on c3", "O-O-O" → "castle long". */
+function sanWords(tok) {
+  const t = tok.replace(/[+#!?]+$/, '');
+  const chk = /\+$/.test(tok.replace(/[!?]+$/, '')) ? ' with check' : /#/.test(tok) ? ' with mate' : '';
+  if (/^O-O-O$/.test(t)) return 'castle long' + chk;
+  if (/^O-O$/.test(t)) return 'castle' + chk;
+  let m = t.match(/^([KQRBN])[a-h]?[1-8]?(x?)([a-h][1-8])$/);
+  if (m) return `${PIECE_WORD[m[1]]} ${m[2] ? 'takes on' : 'to'} ${m[3]}${chk}`;
+  m = t.match(/^([a-h])x([a-h][1-8])$/);
+  if (m) return `pawn takes on ${m[2]}${chk}`;
+  return null;
+}
+/**
+ * Plan text with move notation turned into words. Squares ("f5", "c5") stay —
+ * they are readable; piece moves, captures, castling and move numbers go.
+ */
+export function plainNotation(text) {
+  return text
+    // "Rf1-f3", "Nbd2-e4": a piece route
+    .replace(/(?:\d+\.{1,3}\s?|\.\.\.|…)?\b([KQRBN])[a-h]?([a-h][1-8])-([a-h][1-8])\b/g, (_, p, a, b) => `${PIECE_WORD[p]} to ${a} and on to ${b}`)
+    // single tokens, optionally preceded by a move number or dots
+    .replace(/(?:\b\d+\.{1,3}\s?|\.\.\.|…)?(\bO-O-O\b|\bO-O\b|\b[KQRBN][a-h]?[1-8]?x?[a-h][1-8][+#]?|\b[a-h]x[a-h][1-8][+#]?)/g, (all, tok) => sanWords(tok) ?? all)
+    // leftover dots and move numbers in front of pawn moves: "...c5" → "c5", "11...Rb8" handled above
+    .replace(/(?:\b\d+\.{1,3}\s?|\.\.\.|…)(?=[a-h][1-8])/g, '');
+}
+
+/**
+ * Board marks for a sourced plan: our moves named in the plan that are legal
+ * from the final position become arrows; squares they name get circles.
+ * Nothing is added that the plan text does not name.
+ */
+export function planMarks(sans, plan, side) {
+  if (!plan) return { arrows: [], circles: [] };
+  const g = new Chess();
+  for (const s of sans) g.move(s);
+  const parts = g.fen().split(' ');
+  if (parts[1] !== side) { parts[1] = side; parts[3] = '-'; }
+  let base;
+  try { base = new Chess(parts.join(' ')); } catch { return { arrows: [], circles: [] }; }
+  const arrows = [], circles = [];
+  const toks = plan.match(/(?<![-\w])(?:\.\.\.|…)?(?:\bO-O(?:-O)?\b|\b[KQRBN][a-h]?[1-8]?x?[a-h][1-8]|\b[a-h]x[a-h][1-8]|\b[a-h][1-8]\b)/g) ?? [];
+  for (const raw of toks) {
+    const dotted = /^(\.\.\.|…)/.test(raw);
+    if ((side === 'b') !== dotted && /[A-Z]|x/.test(raw)) continue;   // the other side's move
+    const tok = raw.replace(/^(\.\.\.|…)/, '');
+    let mv = null;
+    try { mv = new Chess(base.fen()).move(tok); } catch { mv = null; }
+    if (mv && !(mv.piece === 'p' && !mv.captured && /^[a-h][1-8]$/.test(tok) && (side === 'b') !== dotted && dotted)) {
+      if (arrows.length < 3 && !arrows.includes(`${mv.from}-${mv.to}`)) arrows.push(`${mv.from}-${mv.to}`);
+    } else if (/^[a-h][1-8]$/.test(tok) && circles.length < 3 && !circles.includes(tok)) circles.push(tok);
+  }
+  return { arrows, circles: circles.filter((c) => !arrows.some((a) => a.endsWith(c))) };
 }

@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="css/app-v2.css">
 <link rel="stylesheet" href="css/app-v3.css">
 <link rel="stylesheet" href="css/app-v5.css">
+<link rel="stylesheet" href="css/app-v6.css">
 </head>
 <body>
 
@@ -89,7 +90,7 @@
       <div class="panel-card">
         <h3>Training</h3>
         <label class="row" for="daily-goal"><span>Daily goal</span>
-          <select id="daily-goal"><option value="3">3 perfect lines</option><option value="5">5 perfect lines</option><option value="10">10 perfect lines</option><option value="20">20 perfect lines</option></select></label>
+          <select id="daily-goal"><option value="3">3 lines</option><option value="5">5 lines</option><option value="10">10 lines</option><option value="20">20 lines</option></select></label>
         <label class="row switch" for="haptics-toggle"><span>Vibration</span><input id="haptics-toggle" type="checkbox"><i></i></label>
       </div>
       <div class="panel-card">
@@ -138,7 +139,13 @@
     <svg id="arrows" class="arrows" viewBox="0 0 8 8" aria-hidden="true">
       <defs>
         <marker id="arrowhead" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="var(--hint)"/>
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ice-300)"/>
+        </marker>
+        <marker id="arrowhead-plan" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--mint)"/>
+        </marker>
+        <marker id="arrowhead-them" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="3" markerHeight="3" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--coral)"/>
         </marker>
       </defs>
     </svg>
@@ -148,7 +155,6 @@
   <div class="controls">
     <button id="restart" class="tool" aria-label="Restart line"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Restart</span></button>
     <button id="hint-btn" class="tool" aria-label="Hint"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></svg><span>Hint</span></button>
-    <button id="open-lines" class="tool" aria-label="Choose a line"><svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg><span>Lines</span></button>
     <div id="mode-toggle" class="mode" role="tablist">
       <button data-mode="train" role="tab"><svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>Train</button>
       <button data-mode="review" role="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/></svg>Watch</button>
@@ -163,7 +169,7 @@
       <span id="after-kind" class="after-kind"></span>
       <h2 id="plan-title"></h2>
     </div>
-    <p class="plan-label">The plan from here</p>
+    <p id="plan-label" class="plan-label">The plan from here</p>
     <p id="plan-text" class="plan-text"></p>
     <p id="plan-credit" class="plan-credit"></p>
     <div class="after-actions">
@@ -175,19 +181,19 @@
   <!-- End of a 5-line session. -->
   <section id="session-end" class="after session-end" hidden></section>
 
-  <!-- Watch mode (Review): the line plays itself with arrows and a line of text per move; try your own move any time. -->
+  <!-- Watch mode: step through the line by hand; the coach explains each move with arrows and circles; try your own move any time. -->
   <div id="review-controls" class="review" hidden>
     <div class="tut">
       <button id="step-first" class="tool" aria-label="Start"><svg viewBox="0 0 24 24"><path d="M6 5v14"/><path d="M18 5l-9 7 9 7V5z"/></svg></button>
       <button id="step-prev" class="tool" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <button id="play-btn" class="play" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8V4z"/></svg></button>
-      <button id="step-next" class="tool" aria-label="Forward"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+      <button id="play-btn" class="play" aria-label="Next move"><svg viewBox="0 0 24 24"><path d="M9 5l8 7-8 7"/></svg></button>
+      <button id="step-next" class="tool" hidden aria-label="Forward"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
       <button id="step-last" class="tool" aria-label="End"><svg viewBox="0 0 24 24"><path d="M18 5v14"/><path d="M6 5l9 7-9 7V5z"/></svg></button>
     </div>
     <div class="tut-track"><i id="tut-fill"></i></div>
     <div id="whatif" class="whatif" hidden></div>
     <label class="tut-pick"><span>Line</span><select id="line-select" aria-label="Line to watch"></select></label>
-    <p class="tut-tip">Try your own move on the board any time — “what if?”</p>
+    <p class="tut-tip">Tap → for the next move. Try your own move any time — “what if?”</p>
     <div hidden>
       <div id="explorer-meta"></div><div id="explorer-body"></div>
       <div id="engine-meta"></div><div id="engine-body"></div>
@@ -214,7 +220,7 @@
     <input id="line-search" type="search" placeholder="Search a name or a move" autocomplete="off" spellcheck="false">
     <div id="line-list" class="line-list"><div id="line-rows"></div></div>
   </aside>
-  <div id="drawer-edge" class="drawer-edge" aria-hidden="true"></div>
+  <button id="drawer-edge" class="drawer-edge" aria-label="Choose a line"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
 </main>
 
 <!-- Milestone celebration: slides up over the lower screen, board stays visible above. -->

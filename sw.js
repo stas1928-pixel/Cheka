@@ -11,12 +11,12 @@
 
    Bump VERSION whenever vendor/ changes so the old cache is dropped.
 --------------------------------------------------------------- */
-const VERSION = 'v15';
+const VERSION = 'v16';
 const CACHE = `opening-trainer-${VERSION}`;
 
 const PRECACHE = [
-  './', './index.html', './css/tokens.css', './css/style.css', './css/app-v2.css', './css/app-v3.css', './css/app-v5.css', './manifest.webmanifest', './icon.svg',
-  './js/app.js', './js/names.js', './js/describe.js', './js/repertoire.js', './js/repertoire.data.js', './js/tree.js', './js/progress.js', './js/settings.js',
+  './', './index.html', './css/tokens.css', './css/style.css', './css/app-v2.css', './css/app-v3.css', './css/app-v5.css', './css/app-v6.css', './manifest.webmanifest', './icon.svg',
+  './js/app.js', './js/names.js', './js/describe.js', './js/coach.js', './js/facts.js', './js/ideas.data.js', './js/repertoire.js', './js/repertoire.data.js', './js/tree.js', './js/progress.js', './js/settings.js',
   './js/feedback.js', './js/explorer.js', './js/chesscom.js', './js/engine.js',
   './js/branchBuilder.js', './js/weakness.js',
   './vendor/chess.js',

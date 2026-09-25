@@ -843,6 +843,33 @@ Content jobs still open: plan texts contain notation; per-move sourced ideas
     - Tapping a row shows that line's position on the small board before
       you commit.
 
+**Built 2026-09-25 (owner: "push it through, as well as all the ui changes"):**
+items 1–10 above, and the coach dialog in Train and Watch.
+- **Watch:** stepped by hand with one big → button. There is no autoplay
+  and no arrow before each move. Each step shows the coach's line and its
+  reason, with teaching arrows and circles: ours in ice, theirs in coral.
+  At the end the sourced plan is drawn on the board in mint, the board
+  shrinks, and the plan text is in plain words (`plainNotation`).
+  Watching a line to the end earns 2 XP, once per line per day.
+- **Removed:** `#branch-note` and the move list; the plan panel carries a
+  short "Source:" credit instead.
+- **Plan panel:** buttons are one line and never float over text.
+- **XP, streak and levels** (`js/progress.js`, tests updated):
+  - every finished line counts toward Today;
+  - the streak counts any day with at least one finished line;
+  - XP: 10 perfect, 5 otherwise, 4 per learned part, 2 per watch;
+  - level 2 at 30 XP, then 20 more per level.
+- **Parts:** a cheer, part dots, an XP fly-up, and the plan label is hidden.
+- **Drawer:** 64% wide; the board scales down beside it and stays bright.
+  The Lines button is gone; the edge handle is a visible, tappable
+  button. On phones the drawer rows drop the thumbnails. Tapping a row
+  still starts the line (no preview step: the brief says tapping a row
+  starts it quickly).
+- **Progress:** the medal coins are replaced by a mastery ladder, one
+  segment per line coloured by its medal, plus "Next medal: <line> — N
+  perfect runs to <tier>".
+- **Layers:** CSS layer `css/app-v6.css`; SW v16.
+
 ### Revamp + coach dialog (owner, 2026-09-25: "the big ones")
 Owner: "revamp the whole app to work together and be consistent… research,
 go over the library and our sources, create dialog to all… add personality
