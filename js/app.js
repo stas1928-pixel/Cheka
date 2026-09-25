@@ -302,6 +302,7 @@ function openTrainer(openingId, mode) {
 
 function setMode(mode) {
   state.mode = mode;
+  state.hold = false;
   els.modeToggle.querySelectorAll('button').forEach((b) => {
     b.classList.toggle('active', b.dataset.mode === mode);
   });
@@ -589,6 +590,8 @@ function resetLine(lineObj = null, { test = false, chunkFrom = 0 } = {}) {
   state.hint = null;
   state.forceTest = test;
   state.session += 1;
+  state.hold = false;
+  els.status.classList.remove('hold');
   prog.resume ??= {};
   const resume = !lineObj && !test && !chunkFrom ? prog.resume[state.opening.id] : null;
   const resumeLine = resume ? tree.lineById(state.opening, resume.lineId) : null;
@@ -675,6 +678,7 @@ function renderCoachMeta() {
     where = `Part ${Math.ceil(upTo / CHUNK)} of ${Math.ceil(total / CHUNK)}`;
   } else if (state.run) where = `Line ${Math.min(SESSION_LEN, state.run.results.length + 1)} of ${SESSION_LEN}`;
   els.coachMeta.innerHTML = `<b>${esc(humanName(o.id, l))}</b>${where ? `<span>${where}</span>` : ''}`;
+  els.coachMeta.classList.toggle('dots', false);
 }
 function promptUser() {
   els.hintBtn.hidden = els.restart.hidden = state.learning;
@@ -694,6 +698,7 @@ function promptUser() {
 
 function onSquareClick(square) {
   const { game, opening } = state;
+  if (state.hold) { state.holdGo?.(); return; }
   if (state.mode === 'review') { if (state.whatif) return; }
   else {
     if (state.mode !== 'train' && state.mode !== 'weak') return;
@@ -773,9 +778,26 @@ function attemptUserMove(move) {
   else setStatus(`✓ ${describeMove(played)}`, 'good');
 
   if (state.ply >= state.line.length) finishLine();
+  else if (c && !state.learning && (c.src.some((x) => x !== 'position') || c.marks)) holdForTap();
   else scheduleOpponent();
 }
 
+/** Pause on a teaching move: the coach line and its marks stay until the board is tapped. */
+function holdForTap() {
+  const session = state.session;
+  const c = coachAt(state.ply);
+  if (c?.marks) drawMarks(c.marks);
+  state.hold = true;
+  els.status.classList.add('hold');
+  const go = () => {
+    if (session !== state.session || !state.hold) { state.hold = false; return; }
+    state.hold = false;
+    els.status.classList.remove('hold');
+    clearArrows();
+    playOpponentMove();
+  };
+  state.holdGo = go;
+}
 function scheduleOpponent() {
   const session = state.session;
   setTimeout(() => {
@@ -849,7 +871,7 @@ function finishLine() {
   if (daily.levelUp) milestones.push({ kind: 'level' });
   if (milestones.length) setTimeout(() => celebrate(gained, milestones), 700);
   feedback.haptic(milestones.length ? 'milestone' : 'complete');
-  els.nextLine.textContent = state.learning ? 'Now from memory' : !perfect ? 'Try again from memory' : run.results.length >= SESSION_LEN ? 'Finish session' : 'Next line';
+  els.nextLine.textContent = state.learning ? 'From memory' : !perfect ? 'Try again' : run.results.length >= SESSION_LEN ? 'Finish session' : 'Next line';
   state.retry = !state.learning && !perfect ? state.lineObj : null;
   els.planReview.textContent = state.retry ? 'Next line' : 'Watch it';
   state.justLearned = state.learning ? state.lineObj : null;
@@ -857,6 +879,7 @@ function finishLine() {
 
 /** End of a learning chunk: learn → from memory → continue with the next chunk. No progress is recorded until the whole line is done. */
 function showActions() {
+  els.coachMeta.querySelector('b')?.remove();   // the card title already names the line
   els.status.hidden = true;
   els.after.hidden = false;
   els.controls.hidden = els.review.hidden = true;
@@ -878,8 +901,8 @@ function finishChunk(perfect) {
   els.planCredit.textContent = '';
   els.planReview.hidden = true;
   els.nextLine.hidden = false;
-  if (state.learning) { els.nextLine.textContent = 'Now from memory'; state.after = () => resetLine(l, { test: true }); }
-  else if (!perfect) { els.nextLine.textContent = 'Try again from memory'; state.after = () => resetLine(l, { test: true }); }
+  if (state.learning) { els.nextLine.textContent = 'From memory'; state.after = () => resetLine(l, { test: true }); }
+  else if (!perfect) { els.nextLine.textContent = 'Try again'; state.after = () => resetLine(l, { test: true }); }
   else { els.nextLine.textContent = 'Continue the line'; state.after = () => resetLine(l, { chunkFrom: c.to }); prog.resume ??= {}; prog.resume[state.opening.id] = { lineId: l.id, from: c.to }; saveProg(); }
   // keep the chunk while testing it
   state.keepChunk = c;
@@ -931,19 +954,55 @@ function flyXp(n) {
   xpInFlight += 1;
   const bar = (els.xpTop.offsetParent ? els.xpTop : els.homeLevel);
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const b = els.board.getBoundingClientRect();
+  const cx = b.left + b.width / 2, cy = b.top + b.height / 2;
+  const to = bar.querySelector('.lv-bar')?.getBoundingClientRect() ?? bar.getBoundingClientRect();
+  const tx = to.left + to.width * 0.15 - cx, ty = to.top + to.height / 2 - cy;
+  // 1) the number pops big in the middle of the board
+  const num = document.createElement('div');
+  num.className = 'xp-pop';
+  num.innerHTML = `<b>+${n}</b><span>XP</span>`;
+  num.style.left = `${cx}px`; num.style.top = `${cy}px`;
+  document.body.appendChild(num);
+  num.animate(still ? [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }] : [
+    { transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0 },
+    { transform: 'translate(-50%, -50%) scale(1.25)', opacity: 1, offset: 0.25 },
+    { transform: 'translate(-50%, -50%) scale(0.95)', opacity: 1, offset: 0.4 },
+    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.85 },
+    { transform: 'translate(-50%, -50%) scale(0.6)', opacity: 0 },
+  ], { duration: 1600, easing: 'ease-out', fill: 'forwards' });
+  // 2) it melts into a blob of gold energy that wobbles, hops, stretches in flight and is sucked into the bar
   const el = document.createElement('div');
-  el.className = 'xp-pop';
-  el.innerHTML = `<b>+${n}</b><span>XP</span>`;
+  el.className = 'xp-blob';
+  el.style.left = `${cx}px`; el.style.top = `${cy}px`;
   document.body.appendChild(el);
-  const to = bar.getBoundingClientRect();
-  const dx = to.left + to.width / 2 - innerWidth / 2, dy = to.top + to.height / 2 - innerHeight * 0.42;
-  const anim = el.animate(still ? [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }] : [
-    { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0 },
-    { transform: 'translate(-50%, -50%) scale(1.15)', opacity: 1, offset: 0.12 },
-    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.2 },
-    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.72 },
-    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.25)`, opacity: 0.2 },
-  ], { duration: 2400, easing: 'cubic-bezier(0.3, 0.7, 0.2, 1)' });
+  const ang = Math.atan2(ty, tx) * 180 / Math.PI;
+  const anim = el.animate(still ? [{ opacity: 0 }, { opacity: 0 }] : [
+    { transform: 'translate(-50%, -50%) scale(0)', borderRadius: '50%', opacity: 0, offset: 0 },
+    { transform: 'translate(-50%, -50%) scale(0)', borderRadius: '50%', opacity: 0, offset: 0.36 },
+    { transform: 'translate(-50%, -50%) scale(1.25, 0.8)', borderRadius: '46% 54% 42% 58%', opacity: 1, offset: 0.44 },
+    { transform: 'translate(-50%, -50%) scale(0.85, 1.2)', borderRadius: '58% 42% 55% 45%', offset: 0.5 },
+    { transform: 'translate(-50%, calc(-50% - 46px)) scale(1.1, 0.95)', borderRadius: '50% 50% 45% 55%', offset: 0.58 },
+    { transform: `translate(calc(-50% + ${tx * 0.45}px), calc(-50% + ${ty * 0.45 - 70}px)) rotate(${ang}deg) scale(1.6, 0.7)`, borderRadius: '60% 40% 40% 60%', offset: 0.72 },
+    { transform: `translate(calc(-50% + ${tx * 0.85}px), calc(-50% + ${ty * 0.9}px)) rotate(${ang}deg) scale(1.8, 0.35)`, borderRadius: '70% 30% 30% 70%', opacity: 1, offset: 0.88 },
+    { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) rotate(${ang}deg) scale(0.2, 0.15)`, borderRadius: '50%', opacity: 0.9, offset: 1 },
+  ], { duration: 2600, easing: 'cubic-bezier(0.45, 0.05, 0.3, 1)' });
+  // droplets that break off and merge back in
+  if (!still) for (let i = 0; i < 4; i++) {
+    const d = document.createElement('div');
+    d.className = 'xp-drop';
+    d.style.left = `${cx}px`; d.style.top = `${cy}px`;
+    document.body.appendChild(d);
+    const ox = (i - 1.5) * 26, oy = -30 - (i % 2) * 24;
+    d.animate([
+      { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0 },
+      { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0.46 },
+      { transform: `translate(calc(-50% + ${ox}px), calc(-50% + ${oy}px)) scale(1)`, opacity: 1, offset: 0.58 },
+      { transform: `translate(calc(-50% + ${tx * 0.7 + ox * 0.4}px), calc(-50% + ${ty * 0.7 - 40}px)) scale(0.8)`, opacity: 1, offset: 0.8 },
+      { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0.2)`, opacity: 0, offset: 1 },
+    ], { duration: 2600 + i * 90, easing: 'cubic-bezier(0.45, 0.05, 0.3, 1)' }).onfinish = () => d.remove();
+  }
+  setTimeout(() => num.remove(), 1700);
   anim.onfinish = () => {
     el.remove();
     xpInFlight = Math.max(0, xpInFlight - 1);
@@ -1112,7 +1171,7 @@ function openDrawer() {
   renderLineMode(); renderLineList();
   // Board slides to the bottom; the drawer takes the top across the full width (owner, 2026-09-25).
   const b = document.querySelector('.board-wrap').getBoundingClientRect();
-  const top = innerHeight * 0.56;
+  const top = els.linesSheet.getBoundingClientRect().height ? Math.min(innerHeight * 0.55, innerHeight - 200) + 8 : innerHeight * 0.56;
   const room = innerHeight - top - 10;
   const k = Math.min(1, room / b.height);
   els.stage.style.transformOrigin = `${b.left + b.width / 2}px ${b.top}px`;
@@ -1123,17 +1182,19 @@ function openDrawer() {
 }
 function closeDrawer() {
   if (!els.trainerMain.classList.contains('drawer-open')) return;
+  els.linesSheet.classList.remove('full');
   els.trainerMain.classList.remove('drawer-open');
   els.linesSheet.setAttribute('aria-hidden', 'true');
 }
 els.drawerEdge.addEventListener('click', openDrawer);
 els.closeLines.addEventListener('click', closeDrawer);
+els.linesSheet.querySelector('.grab')?.addEventListener('click', () => els.linesSheet.classList.toggle('full'));
 els.stage.addEventListener('click', (e) => { if (els.trainerMain.classList.contains('drawer-open')) { e.stopPropagation(); e.preventDefault(); closeDrawer(); } }, true);
 // Edge swipe: drag in from the right edge to open; swipe sideways inside to change category.
 let edge = null;
 els.trainerMain.addEventListener('touchstart', (e) => {
   const t = e.touches[0];
-  edge = { x: t.clientX, y: t.clientY, fromEdge: t.clientX > innerWidth - 32, inDrawer: els.linesSheet.contains(e.target), onCats: els.lineMode.contains(e.target) };
+  edge = { x: t.clientX, y: t.clientY, fromEdge: t.clientX > innerWidth - 32, inDrawer: els.linesSheet.contains(e.target) && !e.target.closest('.grab'), onCats: els.lineMode.contains(e.target), onGrab: !!e.target.closest('#lines-drawer .grab') };
 }, { passive: true });
 els.trainerMain.addEventListener('touchend', (e) => {
   if (!edge) return;
@@ -1147,6 +1208,12 @@ els.trainerMain.addEventListener('touchend', (e) => {
     const i = order.indexOf(settings.lineMode);
     settings = updateSetting('lineMode', order[Math.max(0, Math.min(3, i + (dx < 0 ? 1 : -1)))]); renderLineMode(); renderLineList(); feedback.haptic('good');
   } else if (horiz && edge.inDrawer) closeDrawer();   // swipe either way on the list closes it
+  else if (edge.onGrab && Math.abs(dy) > 30) {
+    const full = els.linesSheet.classList.contains('full');
+    if (dy > 0) els.linesSheet.classList.add('full');           // pull down: cover the board
+    else if (full) els.linesSheet.classList.remove('full');     // push up: back to half
+    else closeDrawer();                                         // push up again: away
+  }
   edge = null;
 }, { passive: true });
 els.editLines.addEventListener('click', () => {

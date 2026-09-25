@@ -979,6 +979,153 @@ Content jobs still open: plan texts contain notation; per-move sourced ideas
     coach card's meta line).
 - **Not done:** item 14, the Games tab flow.
 
+### Owner review notes on af18bbc (2026-09-25, on the phone) — collect, build later
+1. **The primary button label is cut off:** "NOW FROM MEMO…" (Samsung,
+   about 412 px wide). The two bar buttons split 50/50 and the primary
+   label is longer.
+   Fix:
+   - The primary gets the wider share (about 1fr : 1.8fr), or the
+     secondary becomes icon-only ("Watch it" → eye icon).
+   - Shorter labels where possible ("From memory", "Next line").
+   - Never ellipsize a primary action; test the longest label at 360 px.
+   Seen on the same screen (mine, same job):
+   - The coach-card meta line repeats the line name that the card title
+     already shows. Drop the name from the meta line while a card title
+     is visible.
+   - The edge handle overlaps the top-right corner of the coach card.
+   - Plan text still has slash pairs from notation, e.g. "bishop to
+     e3/queen to d3". `plainNotation` should turn "/" between moves into
+     "or", or "and" where it means both.
+2. **The coach text disappears instantly during line play.** After your
+   move, the coach line is replaced by the opponent's reply about 0.5 s
+   later, so it is never read.
+   Owner's spec: the text stays until you tap anywhere on the board, "like
+   a lull in the flow". The opponent's reply comes after the tap.
+   - Show a small "tap the board to continue" cue, pulsing gently, after
+     about 1 s.
+   - Watch already waits for →; keep that.
+   - My suggestion to confirm when building: pause on moves that carry a
+     sourced idea or a threat, and let plain moves ("Knight to f3")
+     flow. Otherwise every line has about 10 stops. Ask the owner.
+3. **Coach card colours: like Chess Reps, black text on a white card.**
+   Refer to the owner's Chess Reps screenshots from the design phase.
+   The current card is dark with white text and a mint/green highlight in
+   the "good" state; that reads as green. New spec:
+   - a white (off-white) card, near-black text, and the reason in dark
+     grey;
+   - one highlighted word in the accent colour, chosen to read on white
+     (a deep ice or blue);
+   - the state shown only by a thin left edge or a small icon, never by
+     tinting the text;
+   - the same white card for every panel: coach line, part done, line
+     done, Watch end, session end, what-if.
+4. **Dead space between the board and the bottom bar.** On tall phones
+   (about 390×844) the board is width-limited, so about 200 px of empty
+   black sits under it. Owner: "bad choice — more going on at top and
+   move the board down, or find a use for it."
+   Options to pick from when building:
+   - (a) Distribute the space: header and coach card on top, the board
+     centred in the remaining space, the bar at the bottom. The board
+     moves down toward thumb reach and the gaps split evenly. Cheapest.
+   - (b) Use the space for a slim "line progress" strip under the board:
+     your moves in this part as dots, plus the session line count. This
+     replaces the meta line on top and gives the eye a reason to look
+     there.
+   - (c) Grow the coach card: the reason text, plus a small "idea"
+     preview of what comes next, only as useful content, never filler.
+   My pick: (a) + (b). The board sits lower and closer to the thumb, the
+   progress strip lives under it, and the top stays clean.
+   Rule for every screen: no dead band larger than about 48 px on
+   390×844 or 360×800; spare space is distributed, not dumped at one end.
+5. **XP animation is still imperceptible; too small and too fast.** Owner:
+   "pop up in the middle clearly, then jump and flow to the bar… slow it
+   down a little."
+   New spec:
+   - The pop sits at the centre of the board: about 72–88 px digits,
+     gold, with a soft burst or glow ring behind it. It scales in with
+     overshoot (about 350 ms) and holds clearly for about 1.2 s.
+   - Then a visible "jump" (a small hop up) and a flight along a curved
+     path to the level bar (about 700–900 ms), leaving a short trail or
+     sparkles.
+   - On landing, the bar fills slowly (about 1 s) with a glow sweep, and
+     the chip does a bump.
+   - Total about 3 s. It must not block play: taps pass through.
+   - Test it on the phone, not only in the hidden preview: the hidden
+     pane pauses animations, which is why this was not caught.
+   - **Owner, more:** "imagine some substance as the XP: it jumps, then
+     gets sucked into the bar, filling it, all while shrinking, expanding,
+     changing shape."
+     - The XP is a gooey liquid blob of energy, not a text label.
+     - After the pop, the number melts into a glowing blob that squashes
+       and stretches (it wobbles, elongates in flight, and squeezes
+       thinner as it nears the bar). Build it with an SVG goo filter
+       (blur plus alpha threshold) or with animated border-radius and
+       scale.
+     - It is sucked into the bar's fill end like a drop into a tube: the
+       blob narrows into a stream, and the bar fills from the entry point
+       with a ripple or slosh.
+     - A few droplets break off and merge back in: small, not confetti.
+   - **Bar colour:** use a distinct XP colour, not the ice accent used
+     everywhere else. Gold/amber matches the pop and reads as "reward".
+     Use it for the blob, the fill and the level chip, consistently.
+6. **Drawer: a pull-down to full screen (a "nice to have").** Owner: "a way
+   to scroll down again and expand the tab all the way down, covering the
+   board; likewise a scroll up or sideways shrinks or puts it away."
+   - Three states: closed; half (today: the list on top, the board below);
+     full (the list covers the whole screen, the board hidden).
+   - A grab bar at the drawer's bottom edge. Dragging it down goes from
+     half to full; dragging up goes from full to half, and from half to
+     closed. A horizontal swipe on the list closes it from any state.
+   - Pulling down past the end of the list's scroll also expands it, so
+     it feels like one continuous gesture.
+   - The drag follows the finger (live height), then snaps to the nearest
+     state with a spring.
+   Also seen on this screenshot: in the half state there is a dead gap
+   between the drawer and the board (the board's slide-down target is
+   computed from innerHeight × 0.56 while the drawer is 55dvh plus a
+   shadow). Dock the board right under the drawer edge, with an 8 px gap.
+7. **Progress card, third miss: "still not it, you're getting further from
+   what I want".** History:
+   - four medal coins: "well done but kinda off";
+   - a ladder of empty cells: "a step back";
+   - a ring plus "Your first line earns a spot here": "further away".
+   Stop guessing in code. Next time, show 3 visual mockups side by side
+   (a widget or HTML) and let the owner pick, before touching app.js.
+   What he has asked for so far, on this panel and in general:
+   - "more striking", "use more colours, expand the ice into a palette";
+   - the Duolingo feel, lively rather than static;
+   - progress should be felt;
+   - no empty states that say nothing.
+   Candidate directions for the mockups:
+   - (a) Duolingo-style path or "skill tree": lines as nodes along the
+     opening's families, coloured by medal, with the current node
+     pulsing.
+   - (b) A trophy cabinet: big, glossy medals per tier with counts and a
+     shine animation, plus a "next up" card.
+   - (c) A stats hero per opening: big bold numbers (learned, perfect
+     runs, best combo) in tier colours, plus a mini family bar chart.
+   Also in this card: "Trips you up: Modern Attack" is a family name in
+   coral. Make it actionable ("Drill it" opens that line) or drop it.
+
+**Built 2026-09-25, pass 8 (items 1–6 above; item 7 waits for mockups):**
+- **Coach card:** black text on a white card (Chess Reps), one blue
+  accent word; the state shows only as the left edge.
+- **Lull:** after your move, a teaching move (one with a sourced idea or
+  marks) holds with "Tap the board to continue". Plain moves still flow.
+  This is a one-line switch if the owner wants a stop on every move.
+- **Bottom bar:** the primary button gets the room (auto : 1fr) and
+  shorter labels ("From memory", "Try again"); the edge handle moves
+  beside the meta line.
+- **No dead band:** the board is centred in the space left; the meta line
+  sits under the coach card; the line name is dropped when a card title
+  shows it.
+- **XP:** a big gold "+N XP" pop, then a gold blob that squashes,
+  stretches, hops and is sucked into a gold level bar, with droplets.
+- **Drawer:** a grab bar at the bottom edge. Pull down (or tap) for full
+  screen, push up for half and then closed; swiping sideways closes it.
+  The board docks under it.
+- **Plans:** "a/b" between moves reads "a or b".
+
 **Concept only — do NOT build yet (owner, 2026-09-25):**
 - **Beginner / Advanced mode.** "Having the game hold you and force you to
   go with it is kinda too much" (owner tests constantly). Idea: ask once

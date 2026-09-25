@@ -124,7 +124,9 @@ export function plainNotation(text) {
     // single tokens, optionally preceded by a move number or dots
     .replace(/(?:\b\d+\.{1,3}\s?|\.\.\.|…)?(\bO-O-O\b|\bO-O\b|\b[KQRBN][a-h]?[1-8]?x?[a-h][1-8][+#]?|\b[a-h]x[a-h][1-8][+#]?)/g, (all, tok) => sanWords(tok) ?? all)
     // leftover dots and move numbers in front of pawn moves: "...c5" → "c5", "11...Rb8" handled above
-    .replace(/(?:\b\d+\.{1,3}\s?|\.\.\.|…)(?=[a-h][1-8])/g, '');
+    .replace(/(?:\b\d+\.{1,3}\s?|\.\.\.|…)(?=[a-h][1-8])/g, '')
+    // "bishop to e3/queen to d3", "e5/f5" → "… or …"
+    .replace(/([a-h][1-8]|castle(?: long)?)\/(?=(king|queen|rook|bishop|knight|pawn|castle|[a-h][1-8])\b)/g, '$1 or ');
 }
 
 /**
