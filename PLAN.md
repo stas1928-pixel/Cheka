@@ -662,6 +662,71 @@ sheet slide, pinging due dots, flame flicker, 6 s sheen cycle. SW v9.
 Still open: human line names (item 9 names still carry notation — content
 job), item 11 per-move ideas (content job), Review panels restyle depth.
 
+### Owner review notes on pass 4 (2026-09-25) — collect, build later
+- Home main panel: **good, leave as is for now.**
+- Scroll: no dead black space at the bottom anywhere — **fixed (6e14ab0)**.
+- **Trainer Train/Review switch** (pill segmented control, round ends,
+  bottom-right of the toolbar): owner dislikes the look and feel — **no
+  round/pill buttons**. Redesign next time, better integrated with the
+  toolbar (square-ish geometry, radius ≤ 8 px, matching the universal
+  button system).
+- **Hint = highlight the piece to move, never an arrow.** The hint button
+  (and the automatic hint after repeated misses) should light up the piece
+  that has to move (e.g. a pulsing ice glow on its square), not draw the
+  from→to arrow that gives the answer away. Proposal: 2nd miss / hint 1 →
+  piece glows; only if still stuck, hint 2 → also a soft dot on the target
+  square. Arrows removed from training entirely.
+- **Line-complete reward block is unclear** ("what the heck is that?"):
+  the dark box with "Line complete +3 XP", the "again in 1 day · 3 more
+  perfect to Bronze" sentence and an empty medal ring reads as nothing.
+  Redo. The green status bar "Line complete · +3 XP" is also flat.
+- **The plan must not cover the board.** The completion popup hides the
+  board, so the ideas can't be traced on the position. Show the plan in
+  a panel **below the board** (board stays fully visible; the toolbar area
+  turns into the plan panel + Next line), not a modal.
+- **Separate XP from the plan.** Two distinct moments: (1) the reward,
+  (2) the plan to study on the board.
+- **XP "lacklustre"** → Duolingo-style: the XP pops up **with a progress
+  update**. Reference (Duolingo lesson-complete flow): big animated XP
+  count-up, then progress bars that visibly fill (daily goal / quest),
+  streak flame update, medal progress; celebratory but brief, then back to
+  the board. Proposal in chat 2026-09-25.
+  Owner accepted the proposal: XP floats from the board into the level chip
+  + goal bar fills (every line); a short slide-up celebration only on
+  milestones (medal, goal met, level up); plan panel BELOW the board after
+  the line ends, with Next line / Review; green status bar removed.
+- **Review mode is "terrible" — rethink its purpose.** Now: greyed-out move
+  list tucked away, a fat unreadable note paragraph (provenance text),
+  a select box, a stepper, and Masters / Engine panels with no clear value.
+  New purpose: **a guided tutorial** — the line plays itself out with
+  stops, arrows (fine here, unlike training), short explanations per move
+  (item 11's one-liners) and lively animation; the benchmark "watch it
+  first" mode that was missing. Advanced: **"what if?"** — deviate from the
+  line on the board; Stockfish answers only then (that is its purpose),
+  and if the new move reaches a line we have, a pop-up says "this is the
+  X line — go there?". Masters data only if it serves that (e.g. "masters
+  play here: …" at a what-if), otherwise removed. Provenance text moves out
+  of the UI (library docs only).
+- **Trainer header** (name + side pill, streak and level chips, thin goal
+  bar) and the UI in general feel "super static, the same on every screen,
+  not alive, pointless". Needs a livelier, screen-specific treatment:
+  motion, state-driven changes (e.g. header reacts to progress, opening
+  identity colour/imagery per opening), not the same chip row everywhere.
+- **Lines sheet** (bottom sheet with categories, search, family groups,
+  rows with thumbnail boards): UI "not terrible", but it's in the way.
+  Replace with a **side drawer from the right edge**: swipe in from the
+  right (like Samsung's edge panel) → the lines panel slides in while the
+  **board slides away** in one smooth motion; pick a line, and the board
+  slides back into place. Left/right swipe also switches categories inside
+  it. Quick to open, quick to scroll, quick to close.
+- **Medal ring** on each row (empty dark circle when no progress): do it
+  better — an empty ring reads as a bug.
+- **Engagement — the core problem.** "I didn't feel a need to continue,
+  kinda forced myself." Goal: users keep playing as long as possible.
+  Make going from one line to the next effortless, encouraging and
+  insightful; nobody should feel stuck or alone. Needs a designed loop,
+  not decoration. Proposal in chat 2026-09-25.
+
 ### Next candidates (owner picks, one per session)
 - Owner reviews pass 4 on the phone.
 - Content: human line names (~60) and per-move one-liners (item 11).

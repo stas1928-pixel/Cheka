@@ -20,7 +20,9 @@ import { fetchExplorer } from './explorer.js';
 import { importGames, analyseGames, parseMoves, userSide, matchesOpening } from './chesscom.js';
 import * as weakness from './weakness.js';
 import { Engine } from './engine.js';
-import { buildBranch, toBranchJSON } from './branchBuilder.js';
+import { buildBranch, toBranchJSON, fromUserPov } from './branchBuilder.js';
+import { humanName } from './names.js';
+import { describeMove } from './describe.js';
 import { loadSettings, updateSetting } from './settings.js';
 
 const OPPONENT_DELAY_MS = 500;
@@ -45,7 +47,23 @@ const els = {
   tabs: $('#tabs'),
   greeting: $('#greeting'),
   todayHint: $('#today-hint'),
-  linesSheet: $('#lines-sheet'),
+  linesSheet: $('#lines-drawer'),
+  trainerMain: $('main[data-screen="trainer"]'),
+  stage: $('#stage'),
+  drawerEdge: $('#drawer-edge'),
+  sessionBar: $('#session-bar'),
+  combo: $('#combo'),
+  after: $('#after'),
+  afterKind: $('#after-kind'),
+  planTitle: $('#plan-title'),
+  planText: $('#plan-text'),
+  planCredit: $('#plan-credit'),
+  planReview: $('#plan-review'),
+  sessionEnd: $('#session-end'),
+  playBtn: $('#play-btn'),
+  tutFill: $('#tut-fill'),
+  whatif: $('#whatif'),
+  celebrate: $('#celebrate'),
   openLines: $('#open-lines'),
   closeLines: $('#close-lines'),
   editLines: $('#edit-lines'),
@@ -94,7 +112,6 @@ const els = {
   lineSearch: $('#line-search'),
   dailyGoal: $('#daily-goal'),
   hapticsToggle: $('#haptics-toggle'),
-  planDialogReward: $('#plan-dialog-reward'),
   board: $('#board'),
   arrows: $('#arrows'),
   status: $('#status'),
@@ -108,13 +125,6 @@ const els = {
   stepPrev: $('#step-prev'),
   stepNext: $('#step-next'),
   stepLast: $('#step-last'),
-  planDialog: $('#plan-dialog'),
-  planDialogTitle: $('#plan-dialog-title'),
-  planDialogText: $('#plan-dialog-text'),
-  planDialogCredit: $('#plan-dialog-credit'),
-  planDialogClose: $('#plan-dialog-close'),
-  planDialogReview: $('#plan-dialog-review'),
-  planDialogNext: $('#plan-dialog-next'),
 };
 
 const state = {
@@ -131,7 +141,12 @@ const state = {
   session: 0,           // bumped on every reset so stale timers do nothing
   weak: null,           // weak-spot drill state
   draft: null,          // a line built from a gap, not yet in the repertoire
+  hint: null,           // { from, to? } — the glowing piece (and later its target) after a hint
+  run: null,            // session: { results: [{ perfect }], combo, bestCombo, xp }
+  playing: null,        // Watch-mode autoplay timer
+  whatif: false,        // Watch mode: the board shows the user's own move, off the line
 };
+const SESSION_LEN = 5;
 
 /* ---------- screens ---------- */
 
@@ -164,7 +179,7 @@ function medalRing(t, big = false) {
   const earned = (t.tier ?? '').toLowerCase();
   return `<span class="ring ${big ? 'big' : ''} to-${target}" title="${t.tier ?? 'No medal yet'}">
     <svg viewBox="0 0 40 40"><circle class="track" cx="20" cy="20" r="${R}"/><circle class="fill" cx="20" cy="20" r="${R}" style="stroke-dasharray:${C};--off:${C * (1 - t.progress)}"/></svg>
-    <b class="medal-core ${earned || 'none'}">${earned ? t.tier[0] : ''}</b></span>`;
+    ${earned ? `<b class="medal-core ${earned}">${t.tier[0]}</b>` : `<b class="ring-count"><em>${t.clean}</em>/${t.next?.at ?? 15}</b>`}</span>`;
 }
 
 /** Pips for the runs still needed to the next medal. */
@@ -262,6 +277,8 @@ els.cards.addEventListener('click', (e) => {
 
 function openTrainer(openingId, mode) {
   state.opening = getOpening(openingId);
+  state.run = null;
+  state.lineObj = null;
   state.weak = null;
   state.draft = null;
   els.name.textContent = state.opening.name;
@@ -283,11 +300,16 @@ function setMode(mode) {
   els.restart.hidden = mode !== 'train';
   els.openLines.hidden = mode !== 'train';
 
+  stopPlay();
+  hideAfter();
+  els.whatif.hidden = true;
   if (mode === 'train') {
+    if (!state.run || state.run.results.length >= SESSION_LEN) startSession();
+    renderSession();
     resetLine();
   } else {
     populateLineSelect();
-    reviewLine(state.opening.lines[0]);
+    reviewLine(state.lineObj && state.opening.lines.concat(state.opening.surprise ?? []).includes(state.lineObj) ? state.lineObj : state.opening.lines[0]);
   }
 }
 
@@ -388,11 +410,18 @@ function clearArrows() {
   els.arrows.querySelectorAll('line').forEach((l) => l.remove());
 }
 
-/** Show the expected move as an arrow (after repeated misses). */
-function showHint() {
-  const expected = state.line[state.ply];
-  const move = state.game.moves({ verbose: true }).find((m) => m.san === expected);
-  if (move) drawArrow(move.from, move.to);
+/** Hint: level 1 lights up the piece that has to move; level 2 also marks its target. Never an arrow. */
+function showHint(level = 1) {
+  const move = state.game.moves({ verbose: true }).find((m) => m.san === state.line[state.ply]);
+  if (!move) return;
+  state.hint = { from: move.from, to: level >= 2 ? move.to : null };
+  paintHint();
+}
+function paintHint() {
+  els.board.querySelectorAll('.hint-from, .hint-to').forEach((e) => e.classList.remove('hint-from', 'hint-to'));
+  if (!state.hint || state.mode !== 'train') return;
+  els.board.querySelector(`[data-square="${state.hint.from}"]`)?.classList.add('hint-from');
+  if (state.hint.to) els.board.querySelector(`[data-square="${state.hint.to}"]`)?.classList.add('hint-to');
 }
 
 /** Daily loop: streak, level/XP and today's goal bar, in the trainer header and on home. */
@@ -499,7 +528,8 @@ function planLine() {
 }
 
 function resetLine(lineObj = null) {
-  if (els.planDialog.open) els.planDialog.close();
+  hideAfter();
+  state.hint = null;
   state.session += 1;
   state.lineObj = lineObj ?? planLine();
   state.line = state.lineObj.moves;
@@ -511,7 +541,6 @@ function resetLine(lineObj = null) {
   state.finished = false;
   els.nextLine.textContent = 'Next line';
   els.nextLine.hidden = true;
-  if (els.planDialog.open) els.planDialog.close();
 
   renderBoard();
   renderMoves();
@@ -528,13 +557,17 @@ function resetLine(lineObj = null) {
 
 function onSquareClick(square) {
   const { game, opening } = state;
-  if (state.mode !== 'train' && state.mode !== 'weak') return;
-  if (state.finished) return;
-  if (state.mode === 'train' && !tree.isUserPly(opening, state.ply)) return;
-  if (state.mode === 'weak' && game.turn() !== opening.side) return;
+  if (state.mode === 'review') { if (state.whatif) return; }
+  else {
+    if (state.mode !== 'train' && state.mode !== 'weak') return;
+    if (state.finished) return;
+    if (state.mode === 'train' && !tree.isUserPly(opening, state.ply)) return;
+    if (state.mode === 'weak' && game.turn() !== opening.side) return;
+  }
 
   const piece = game.get(square);
-  const ownPiece = piece && piece.color === opening.side;
+  const mover = state.mode === 'review' ? game.turn() : opening.side;
+  const ownPiece = piece && piece.color === mover;
 
   if (!state.selected) {
     if (ownPiece) { state.selected = square; renderBoard(); }
@@ -554,6 +587,7 @@ function onSquareClick(square) {
 
   state.selected = null;
   if (state.mode === 'weak') attemptWeakMove(matched);
+  else if (state.mode === 'review') whatIf(matched);
   else attemptUserMove(matched);
 }
 
@@ -574,22 +608,23 @@ function attemptUserMove(move) {
     feedback.shake(els.board.parentElement);
     feedback.haptic('bad');
     if (state.misses >= HINT_AFTER_MISSES) {
-      showHint();
-      setStatus(`Not the line — follow the arrow: ${expected}`, 'bad');
+      showHint(state.misses > HINT_AFTER_MISSES ? 2 : 1);
+      setStatus(state.misses > HINT_AFTER_MISSES ? 'Move the glowing piece to the marked square' : 'Not quite — the glowing piece moves', 'bad');
     } else {
       setStatus('Not the line — try again', 'bad');
     }
     return;
   }
 
-  state.game.move(move.san);
+  const played = state.game.move(move.san);
   state.ply += 1;
   state.misses = 0;
+  state.hint = null;
   renderBoard({ animate: true });
   renderMoves();
   feedback.flash(els.board, [move.from, move.to], 'good');
   feedback.haptic('good');
-  setStatus('Correct', 'good');
+  setStatus(`✓ ${describeMove(played)}`, 'good');
 
   if (state.ply >= state.line.length) finishLine();
   else scheduleOpponent();
@@ -610,57 +645,170 @@ function playOpponentMove() {
   const san = state.line[state.ply];
   const dev = tree.deviation(opening, state.lineObj);
   const leftBook = dev && dev.ply === state.ply;
-  state.game.move(san);
+  const theirs = state.game.move(san);
   state.ply += 1;
   renderBoard({ animate: true });
   renderMoves();
 
   if (state.ply >= state.line.length) { finishLine(); return; }
   if (leftBook) {
-    const kind = state.lineObj.kind === 'side' ? 'punish it' : state.lineObj.kind === 'trap' ? 'a trap may follow' : 'know your reply';
+    const kind = state.lineObj.kind === 'side' ? 'punish it' : state.lineObj.kind === 'trap' ? 'a trap is coming' : 'know your reply';
     feedback.haptic('deviation');
-    setStatus(`${tree.moveLabel(state.ply - 1, san)} — they left the main line: ${kind}`, 'warn');
+    feedback.shake(els.status);
+    setStatus(`New branch: ${humanName(opening.id, state.lineObj)} — ${kind}`, 'warn');
   } else {
-    setStatus('Your move');
+    setStatus(`They: ${describeMove(theirs).toLowerCase()} · your move`);
   }
 }
 
 function finishLine() {
   state.finished = true;
   state.selected = null;
+  state.hint = null;
   renderBoard();
   renderMoves();
+  const perfect = state.lineMistakes === 0;
   progress.recordLineComplete(prog, state.opening.id);
-  const entry = progress.scheduleLine(prog, state.opening.id, state.lineObj.id, { perfect: state.lineMistakes === 0 });
-  saveProg();
-  renderStreakChip();
-  renderLineList();
-  const when = entry.interval >= 1 ? `again in ${Math.round(entry.interval)} day${Math.round(entry.interval) === 1 ? '' : 's'}` : 'again tomorrow';
+  const entry = progress.scheduleLine(prog, state.opening.id, state.lineObj.id, { perfect });
   const tier = progress.tierFor(entry.clean);
-  const justEarned = state.lineMistakes === 0 && progress.TIERS.some((t) => t.at === entry.clean);
-  const tierMsg = justEarned ? `${tier.tier} unlocked` : tier.next ? `${tier.next.at - entry.clean} more perfect to ${tier.next.name}` : 'mastered';
-  const daily = progress.recordDaily(prog, { perfect: state.lineMistakes === 0 }, Number(settings.dailyGoal ?? 5));
+  const justEarned = perfect && progress.TIERS.some((t) => t.at === entry.clean);
+  const daily = progress.recordDaily(prog, { perfect }, Number(settings.dailyGoal ?? 5));
+
+  // session momentum: a perfect streak inside the session earns a small bonus
+  state.run ??= { results: [], combo: 0, bestCombo: 0, xp: 0 };
+  const run = state.run;
+  run.combo = perfect ? run.combo + 1 : 0;
+  run.bestCombo = Math.max(run.bestCombo, run.combo);
+  const bonus = perfect && run.combo >= 3 ? 5 : 0;
+  if (bonus) prog.daily.xp += bonus;
+  const gained = daily.gained + bonus;
+  run.xp += gained;
+  run.results.push({ perfect, id: state.lineObj.id });
   saveProg();
-  renderStreakChip();
-  setStatus(`${state.lineMistakes === 0 ? 'Perfect!' : 'Line complete'} · +${daily.gained} XP`, 'good');
-  const rewards = [];
-  if (justEarned) rewards.push(`<span class="medal ${tier.tier.toLowerCase()}">${tier.tier}</span> ${tier.tier} unlocked`);
-  if (daily.goalMet) rewards.push('<span class="medal goal">🔥</span> Daily goal met');
-  if (daily.levelUp) rewards.push(`<span class="medal lvl">↑</span> Level ${progress.levelFor(progress.totalXp(prog)).level}`);
-  els.planDialogReward.hidden = false;
-  els.planDialogReward.className = `reward${rewards.length ? ' big' : ''}`;
-  els.planDialogReward.innerHTML = `<b>${state.lineMistakes === 0 ? 'Perfect line' : 'Line complete'}</b> <span class="xp-gain">+${daily.gained} XP</span>${rewards.map((r) => `<div class="reward-row">${r}</div>`).join('')}<div class="reward-sub">${when} · ${tierMsg}</div>`;
-  els.planDialogReward.insertAdjacentHTML('beforeend', `<div class="reward-ring">${medalRing(progress.tierFor(entry.clean), true)}${pips(progress.tierFor(entry.clean))}</div>`);
+
+  flyXp(gained);
+  renderSession();
+  renderLineList();
+  setStatus(perfect ? (run.combo >= 2 ? `Perfect — ${run.combo} in a row` : 'Perfect line') : 'Line complete — make the next one perfect', 'good');
+
+  showAfter(perfect ? (justEarned ? `${tier.tier} medal` : 'Perfect') : 'Done', perfect);
+  const milestones = [];
+  if (justEarned) milestones.push({ kind: 'medal', tier });
+  if (daily.goalMet) milestones.push({ kind: 'goal' });
+  if (daily.levelUp) milestones.push({ kind: 'level' });
+  if (milestones.length) setTimeout(() => celebrate(gained, milestones), 700);
+  feedback.haptic(milestones.length ? 'milestone' : 'complete');
+  els.nextLine.textContent = run.results.length >= SESSION_LEN ? 'Finish session' : 'Next line';
+}
+
+/* ---------- after a line: the plan under the board ---------- */
+function showAfter(kind, perfect) {
+  const l = state.lineObj;
+  els.controls.hidden = true;
+  els.after.hidden = false;
+  els.after.classList.toggle('perfect', Boolean(perfect));
+  els.afterKind.textContent = kind;
+  els.planTitle.textContent = humanName(state.opening.id, l);
+  els.planText.textContent = l.plan ?? 'You reached the end of the line — play it again to lock it in.';
+  els.planCredit.textContent = l.planCredit ? `${l.planBasis === 'quoted' ? 'Source' : 'Based on'}: ${l.planCredit}` : '';
+  els.planReview.hidden = state.mode === 'review';
   els.nextLine.hidden = false;
-  feedback.haptic(rewards.length ? 'milestone' : 'complete');
-  if (state.lineObj.plan) {
-    els.planDialogTitle.textContent = lineTitle(state.lineObj);
-    const l = state.lineObj;
-    els.planDialogText.textContent = l.plan;
-    els.planDialogCredit.textContent = l.planCredit ? `${l.planBasis === 'quoted' ? 'Source' : 'Based on'}: ${l.planCredit}` : '';
-    if (!els.planDialog.open) els.planDialog.showModal();
-    els.planDialogNext.focus();
-  }
+  els.nextLine.classList.remove('nudge'); void els.nextLine.offsetWidth; els.nextLine.classList.add('nudge');
+  requestAnimationFrame(() => els.after.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
+}
+function hideAfter() {
+  els.after.hidden = true;
+  els.sessionEnd.hidden = true;
+  els.controls.hidden = false;
+}
+
+/* ---------- XP: "+10 XP" rises off the board and lands in the level chip ---------- */
+function flyXp(n) {
+  if (!n) return;
+  const from = els.board.getBoundingClientRect();
+  const to = els.xpTop.getBoundingClientRect();
+  const el = document.createElement('span');
+  el.className = 'xp-fly';
+  el.textContent = `+${n} XP`;
+  document.body.appendChild(el);
+  const x0 = from.left + from.width / 2, y0 = from.top + from.height * 0.45;
+  const x1 = to.left + to.width / 2, y1 = to.top + to.height / 2;
+  el.style.left = `${x0}px`; el.style.top = `${y0}px`;
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const anim = el.animate(still ? [{ opacity: 1 }, { opacity: 0 }] : [
+    { transform: 'translate(-50%, -50%) scale(0.4)', opacity: 0 },
+    { transform: 'translate(-50%, -80%) scale(1.25)', opacity: 1, offset: 0.25 },
+    { transform: 'translate(-50%, -80%) scale(1)', opacity: 1, offset: 0.55 },
+    { transform: `translate(calc(-50% + ${x1 - x0}px), calc(-50% + ${y1 - y0}px)) scale(0.4)`, opacity: 0.2 },
+  ], { duration: 1300, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' });
+  anim.onfinish = () => {
+    el.remove();
+    els.xpTop.classList.remove('bump'); void els.xpTop.offsetWidth; els.xpTop.classList.add('bump');
+    renderStreakChip();
+  };
+}
+
+/* ---------- milestone celebration: slides up, board stays visible above ---------- */
+function celebrate(gained, items) {
+  const goal = Number(settings.dailyGoal ?? 5);
+  const lvl = progress.levelFor(progress.totalXp(prog));
+  const rows = items.map((m) => {
+    if (m.kind === 'medal') return `<div class="cel-row"><span class="medal-core big ${m.tier.tier.toLowerCase()}">${m.tier.tier[0]}</span><div><b>${m.tier.tier} medal</b><small>${humanName(state.opening.id, state.lineObj)}</small></div></div>`;
+    if (m.kind === 'goal') return `<div class="cel-row"><span class="cel-flame">🔥</span><div><b>Daily goal met</b><small>Streak: ${progress.streakDays(prog, goal)} day${progress.streakDays(prog, goal) === 1 ? '' : 's'}</small><div class="bar done"><i class="fill-now"></i></div></div></div>`;
+    return `<div class="cel-row"><span class="cel-lvl">${lvl.level}</span><div><b>Level ${lvl.level}!</b><small>${lvl.need} XP to the next one</small></div></div>`;
+  }).join('');
+  els.celebrate.innerHTML = `<div class="cel-card"><div class="cel-xp"><b data-count="${gained}">0</b><span>XP</span></div>${rows}<button class="primary cel-ok">Keep going</button></div>`;
+  els.celebrate.hidden = false;
+  els.celebrate.classList.remove('out');
+  countUp(els.celebrate);
+  const close = () => { els.celebrate.classList.add('out'); setTimeout(() => { els.celebrate.hidden = true; }, 260); };
+  els.celebrate.querySelector('.cel-ok').onclick = close;
+  els.celebrate.onclick = (e) => { if (e.target === els.celebrate) close(); };
+}
+
+/* ---------- sessions: 5 lines, one segment each ---------- */
+function startSession() {
+  state.run = { results: [], combo: 0, bestCombo: 0, xp: 0 };
+  renderSession();
+}
+function renderSession() {
+  const run = state.run ?? { results: [], combo: 0 };
+  els.sessionBar.innerHTML = Array.from({ length: SESSION_LEN }, (_, i) => {
+    const r = run.results[i];
+    const cls = r ? (r.perfect ? 'done perfect' : 'done') : i === run.results.length ? 'current' : '';
+    return `<i class="${cls}"></i>`;
+  }).join('');
+  els.combo.hidden = run.combo < 2;
+  els.combo.textContent = `🔥 ×${run.combo}`;
+  if (run.combo >= 2) { els.combo.classList.remove('pop'); void els.combo.offsetWidth; els.combo.classList.add('pop'); }
+}
+function showSessionEnd() {
+  const run = state.run;
+  const perfect = run.results.filter((r) => r.perfect).length;
+  const goal = Number(settings.dailyGoal ?? 5);
+  const today = progress.todayCount(prog);
+  const o = state.opening;
+  const dueTomorrow = progress.dueCount(prog, o.id, o.lines.map((l) => l.id), new Date(Date.now() + 86400000));
+  const missed = run.results.filter((r) => !r.perfect).map((r) => humanName(o.id, tree.lineById(o, r.id)));
+  els.controls.hidden = true;
+  els.after.hidden = true;
+  els.sessionEnd.hidden = false;
+  els.sessionEnd.innerHTML = `
+    <div class="se-top"><span class="after-kind">Session complete</span><h2>${perfect === SESSION_LEN ? 'Flawless run!' : perfect >= 3 ? 'Strong session' : 'Good work — keep at it'}</h2></div>
+    <div class="se-stats">
+      <div><b data-count="${perfect}">0</b><small>/ ${SESSION_LEN} perfect</small></div>
+      <div><b data-count="${run.xp}">0</b><small>XP</small></div>
+      <div><b data-count="${run.bestCombo}">0</b><small>best combo</small></div>
+    </div>
+    <div class="se-goal"><span>Today</span><div class="bar${today >= goal ? ' done' : ''}"><i style="width:${Math.min(100, Math.round((today / goal) * 100))}%"></i></div><b>${Math.min(today, goal)} / ${goal}</b></div>
+    <p class="se-insight">${missed.length ? `Worth another look: <b>${[...new Set(missed)].slice(0, 2).join('</b>, <b>')}</b>. They'll come back first next time.` : 'Every line clean. Your medals are growing.'}</p>
+    <p class="se-next">Tomorrow: ${dueTomorrow} line${dueTomorrow === 1 ? '' : 's'} due in ${o.name}.</p>
+    <div class="after-actions"><button id="se-home" class="secondary">Home</button><button id="se-again" class="primary">Keep going</button></div>`;
+  countUp(els.sessionEnd);
+  els.sessionEnd.querySelector('#se-again').onclick = () => { startSession(); resetLine(); };
+  els.sessionEnd.querySelector('#se-home').onclick = () => els.back.click();
+  feedback.haptic('milestone');
+  requestAnimationFrame(() => els.sessionEnd.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
 }
 
 /* =================================================================
@@ -687,7 +835,7 @@ function renderLineList() {
   const hits = loadGapReport()?.report?.[opening.id]?.lineHits ?? {};
   const ticked = lines.filter((l) => !hidden[l.id]);
   const due = progress.dueCount(prog, opening.id, ticked.map((l) => l.id));
-  els.lineListTitle.textContent = opening.name;
+  els.lineListTitle.textContent = { main: 'Main lines', side: 'Traps & punishments', surprise: 'Surprise weapons', mine: 'From your games' }[settings.lineMode] ?? opening.name;
   els.lineListMeta.textContent = `${ticked.length} lines in rotation${due ? ` · ${due} due` : ''}`;
   const q = els.lineSearch?.value ?? '';
   const shown = lines.filter((l) => tree.matchesQuery(opening, l, q));
@@ -707,7 +855,7 @@ function renderLineList() {
         const t = progress.lineTier(prog, opening.id, l.id);
         const kind = l.kind === 'trap' ? '<span class="kind trap">trap</span>' : l.kind === 'side' ? '<span class="kind side">punish</span>' : l.kind === 'surprise' ? '<span class="kind sur">surprise</span>' : '';
         const freq = l.club ? `<span class="freq">${Math.round(l.club.share)}% of club players</span>` : hits[l.id] ? `<span class="freq">×${hits[l.id]} in your games</span>` : '';
-        const name = l.name.replace(/^[\d.]+\S*\s·\s/, '');
+        const name = humanName(opening.id, l);
         const playing = state.lineObj?.id === l.id;
         return `
         <div class="line-row${hidden[l.id] ? ' off' : ''}${playing ? ' playing' : ''}" data-play="${l.id}" role="button" style="--k:${k++}">
@@ -726,9 +874,40 @@ function renderLineList() {
 }
 
 els.lineSearch.addEventListener('input', () => renderLineList());
-els.openLines.addEventListener('click', () => { renderLineList(); els.linesSheet.showModal(); });
-els.closeLines.addEventListener('click', () => els.linesSheet.close());
-els.linesSheet.addEventListener('click', (e) => { if (e.target === els.linesSheet) els.linesSheet.close(); });
+function openDrawer() {
+  if (state.mode !== 'train') return;
+  renderLineMode(); renderLineList();
+  els.trainerMain.classList.add('drawer-open');
+  els.linesSheet.setAttribute('aria-hidden', 'false');
+  feedback.haptic('good');
+}
+function closeDrawer() {
+  els.trainerMain.classList.remove('drawer-open');
+  els.linesSheet.setAttribute('aria-hidden', 'true');
+}
+els.openLines.addEventListener('click', openDrawer);
+els.closeLines.addEventListener('click', closeDrawer);
+els.stage.addEventListener('click', (e) => { if (els.trainerMain.classList.contains('drawer-open')) { e.stopPropagation(); e.preventDefault(); closeDrawer(); } }, true);
+// Edge swipe: drag in from the right edge to open; swipe sideways inside to change category.
+let edge = null;
+els.trainerMain.addEventListener('touchstart', (e) => {
+  const t = e.touches[0];
+  edge = { x: t.clientX, y: t.clientY, fromEdge: t.clientX > innerWidth - 32, inDrawer: els.linesSheet.contains(e.target) };
+}, { passive: true });
+els.trainerMain.addEventListener('touchend', (e) => {
+  if (!edge) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - edge.x, dy = t.clientY - edge.y;
+  const horiz = Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5;
+  if (horiz && edge.fromEdge && dx < 0 && !els.trainerMain.classList.contains('drawer-open')) openDrawer();
+  else if (horiz && edge.inDrawer) {
+    const order = ['main', 'side', 'surprise', 'mine'];
+    const i = order.indexOf(settings.lineMode);
+    if (dx > 0 && i === 0) closeDrawer();
+    else { settings = updateSetting('lineMode', order[Math.max(0, Math.min(3, i + (dx < 0 ? 1 : -1)))]); renderLineMode(); renderLineList(); feedback.haptic('good'); }
+  }
+  edge = null;
+}, { passive: true });
 els.editLines.addEventListener('click', () => {
   const on = els.linesSheet.classList.toggle('editing');
   els.editLines.textContent = on ? 'Done' : 'Edit';
@@ -736,8 +915,9 @@ els.editLines.addEventListener('click', () => {
 els.hintBtn.addEventListener('click', () => {
   if (state.finished || !tree.isUserPly(state.opening, state.ply)) return;
   state.lineMistakes += 1;           // a hint means this run is not perfect
-  showHint();
-  setStatus(`Hint: ${state.line[state.ply]}`, 'warn');
+  const level = state.hint ? 2 : 1;
+  showHint(level);
+  setStatus(level === 1 ? 'Hint: this piece moves' : 'Hint: to the marked square', 'warn');
   feedback.haptic('deviation');
 });
 
@@ -757,8 +937,8 @@ els.lineRows.addEventListener('click', (e) => {
   const row = e.target.closest('.line-row[data-play]');
   if (row) {
     if (els.linesSheet.classList.contains('editing')) { row.querySelector('input[data-toggle]')?.click(); return; }
-    els.linesSheet.close();
-    resetLine(tree.lineById(state.opening, row.dataset.play));
+    closeDrawer();
+    setTimeout(() => resetLine(tree.lineById(state.opening, row.dataset.play)), 180);
   }
 });
 
@@ -785,11 +965,11 @@ function populateLineSelect() {
 
   const group = (kind, label) => {
     const ls = tree.linesOfKind(opening, kind);
-    return ls.length ? `<optgroup label="${label}">${ls.map((l) => `<option value="${l.id}">${lineTitle(l)}</option>`).join('')}</optgroup>` : '';
+    return ls.length ? `<optgroup label="${label}">${ls.map((l) => `<option value="${l.id}">${humanName(opening.id, l)}</option>`).join('')}</optgroup>` : '';
   };
   const sur = tree.surpriseLines(opening);
   els.lineSelect.innerHTML = group('main', 'Main lines') + group('side', 'Side lines') + group('trap', 'Traps')
-    + (sur.length ? `<optgroup label="Surprises (your alternatives)">${sur.map((l) => `<option value="${l.id}">${lineTitle(l)}</option>`).join('')}</optgroup>` : '');
+    + (sur.length ? `<optgroup label="Surprises (your alternatives)">${sur.map((l) => `<option value="${l.id}">${humanName(opening.id, l)}</option>`).join('')}</optgroup>` : '');
 }
 
 function reviewLine(lineObj) {
@@ -803,6 +983,8 @@ function reviewLine(lineObj) {
 }
 
 function stepTo(ply) {
+  state.whatif = false;
+  if (els.whatif) els.whatif.hidden = true;
   const target = Math.max(0, Math.min(ply, state.line.length));
   state.game.reset();
   for (let i = 0; i < target; i++) state.game.move(state.line[i]);
@@ -818,13 +1000,78 @@ function stepTo(ply) {
 function renderReviewStatus() {
   const { ply, line, opening } = state;
   if (ply === 0) {
-    setStatus('Start position — step forward or tap a move');
+    setStatus(`${humanName(opening.id, state.lineObj)} — press play`);
   } else {
-    const who = tree.isUserPly(opening, ply - 1) ? 'you' : 'opponent';
-    setStatus(`${tree.moveLabel(ply - 1, line[ply - 1])}  ·  ${who}`);
+    const g = new Chess(); line.slice(0, ply - 1).forEach((m) => g.move(m));
+    const mv = g.move(line[ply - 1]);
+    const mine = tree.isUserPly(opening, ply - 1);
+    setStatus(`${mine ? 'You' : 'They'}: ${describeMove(mv).toLowerCase()}`, mine ? 'good' : 'neutral');
   }
+  els.tutFill.style.width = `${Math.round((ply / Math.max(1, line.length)) * 100)}%`;
   els.stepFirst.disabled = els.stepPrev.disabled = ply === 0;
   els.stepNext.disabled = els.stepLast.disabled = ply >= line.length;
+  if (ply >= line.length && state.mode === 'review') { stopPlay(); showAfter('Watched', false); els.nextLine.textContent = 'Train this line'; }
+  else if (state.mode === 'review') hideAfter();
+}
+
+/* ---------- Watch mode: autoplay with an arrow before each move ---------- */
+function play() {
+  if (state.playing) { stopPlay(); return; }
+  if (state.ply >= state.line.length) stepTo(0);
+  els.playBtn.classList.add('on');
+  const tick = () => {
+    if (state.ply >= state.line.length) { stopPlay(); return; }
+    const g = new Chess(); state.line.slice(0, state.ply).forEach((m) => g.move(m));
+    const mv = g.move(state.line[state.ply]);
+    clearArrows(); drawArrow(mv.from, mv.to);
+    const mine = tree.isUserPly(state.opening, state.ply);
+    state.playing = setTimeout(() => { clearArrows(); stepTo(state.ply + 1); state.playing = setTimeout(tick, mine ? 1500 : 900); }, 700);
+  };
+  tick();
+}
+function stopPlay() {
+  clearTimeout(state.playing);
+  state.playing = null;
+  els.playBtn?.classList.remove('on');
+  clearArrows();
+}
+els.playBtn.addEventListener('click', () => { feedback.haptic('good'); play(); });
+
+/** "What if?" — in Watch mode the user plays a move of their own. */
+async function whatIf(move) {
+  stopPlay();
+  const prefix = state.line.slice(0, state.ply);
+  const book = state.line[state.ply];
+  if (move.san === book) { stepTo(state.ply + 1); return; }
+  const tried = [...prefix, move.san];
+  const all = state.opening.lines.concat(state.opening.surprise ?? []);
+  const known = all.find((l) => tree.startsWith(l.moves, tried));
+  state.game.move(move.san);
+  state.whatif = true;
+  renderBoard({ animate: true });
+  els.whatif.hidden = false;
+  if (known) {
+    els.whatif.innerHTML = `<b>That's a line you have!</b><span>${humanName(state.opening.id, known)}</span><div class="wi-actions"><button class="secondary" id="wi-back">Back</button><button class="primary" id="wi-go">Watch it</button></div>`;
+    els.whatif.querySelector('#wi-go').onclick = () => { els.whatif.hidden = true; state.whatif = false; reviewLine(known); stepTo(tried.length); play(); };
+  } else {
+    const mineMove = tree.isUserPly(state.opening, prefix.length);
+    els.whatif.innerHTML = `<b>What if ${describeMove(move).toLowerCase()}?</b><span class="wi-verdict">Asking Stockfish…</span><div class="wi-actions"><button class="secondary" id="wi-back">Back to the line</button></div>`;
+    try {
+      engine ??= new Engine();
+      await engine.start();
+      const before = await engine.evaluate([...prefix, book], { depth: 12 });
+      const after = await engine.evaluate(tried, { depth: 12 });
+      const side = state.opening.side;
+      const diff = (fromUserPov(after.cp ?? 0, side) - fromUserPov(before.cp ?? 0, side)) / 100;
+      const g = new Chess(); prefix.forEach((m) => g.move(m));
+      const bookDesc = describeMove(g.move(book)).toLowerCase();
+      const v = els.whatif.querySelector('.wi-verdict');
+      if (!v) return;
+      if (mineMove) v.innerHTML = Math.abs(diff) < 0.3 ? 'Playable — about as good as the book move.' : diff < 0 ? `Costs you about <b>${(-diff).toFixed(1)}</b> pawns. The book: ${bookDesc}.` : `Stockfish even likes it a bit more (+${diff.toFixed(1)}).`;
+      else v.innerHTML = Math.abs(diff) < 0.3 ? 'A sound try — not in your lines yet. Stockfish: about equal.' : diff > 0 ? `A mistake by them — you'd be about <b>+${diff.toFixed(1)}</b> better than in the book line.` : `A strong try — about ${(-diff).toFixed(1)} better for them than the book move.`;
+    } catch { const v = els.whatif.querySelector('.wi-verdict'); if (v) v.textContent = 'Stockfish is not available offline yet.'; }
+  }
+  els.whatif.querySelector('#wi-back').onclick = () => { els.whatif.hidden = true; state.whatif = false; stepTo(state.ply); };
 }
 
 els.lineSelect.addEventListener('change', () => {
@@ -1314,9 +1561,12 @@ els.restart.addEventListener('click', () => {
   else resetLine(state.finished ? null : state.lineObj);
 });
 els.nextLine.addEventListener('click', () => {
-  if (state.mode === 'weak') { state.weak.index += 1; loadWeakPosition(); }
-  else resetLine();
+  if (state.mode === 'weak') { state.weak.index += 1; loadWeakPosition(); return; }
+  if (state.mode === 'review') { setMode('train'); return; }
+  if ((state.run?.results.length ?? 0) >= SESSION_LEN) { showSessionEnd(); return; }
+  resetLine();
 });
+els.planReview.addEventListener('click', () => { const l = state.lineObj; setMode('review'); reviewLine(l); play(); });
 els.dailyGoal.value = String(settings.dailyGoal ?? 5);
 els.dailyGoal.addEventListener('change', () => { settings = updateSetting('dailyGoal', Number(els.dailyGoal.value)); renderStreakChip(); });
 els.hapticsToggle.checked = settings.haptics !== false;
@@ -1325,19 +1575,18 @@ els.hapticsToggle.addEventListener('change', () => {
   feedback.setHapticsEnabled(settings.haptics);
   feedback.haptic('good');
 });
-els.planDialogClose.addEventListener('click', () => els.planDialog.close());
-els.planDialogReview.addEventListener('click', () => els.planDialog.close());
-els.planDialogNext.addEventListener('click', () => resetLine());
-els.planDialog.addEventListener('click', (e) => {
-  if (e.target === els.planDialog) els.planDialog.close();
-});
+
 els.back.addEventListener('click', () => {
   state.session += 1;
+  stopPlay();
+  closeDrawer();
   renderProgress();
   renderHome();
   renderStreakChip();
   showScreen('home');
 });
+
+{ const base = renderBoard; renderBoard = (...a) => { base(...a); paintHint(); }; }
 
 renderHome();
 renderProgress();

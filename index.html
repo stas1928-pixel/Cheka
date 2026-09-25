@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/app-v2.css">
 <link rel="stylesheet" href="css/app-v3.css">
+<link rel="stylesheet" href="css/app-v5.css">
 </head>
 <body>
 
@@ -112,8 +113,9 @@
   </div>
 </main>
 
-<!-- ============ TRAINER — focus mode: board first, everything else one tap away ============ -->
+<!-- ============ TRAINER — focus mode. The stage slides left when the lines drawer comes in from the right edge. ============ -->
 <main data-screen="trainer" hidden>
+ <div id="stage" class="stage">
   <header class="trainer-header">
     <button id="back" class="icon-btn" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="trainer-title">
@@ -123,10 +125,13 @@
     <span id="streak-top" class="chip streak" title="Day streak">🔥 0</span>
     <span id="xp-top" class="chip level" title="Level">Lv 1</span>
   </header>
-  <div class="goal slim" aria-label="Today's goal">
-    <div class="bar"><i id="goal-fill"></i></div>
-    <b id="goal-text">0 / 5</b>
+
+  <!-- Session: 5 lines per run, one segment each; combo counts perfect lines in a row. -->
+  <div class="session" aria-label="Session progress">
+    <div id="session-bar" class="seg-bar"></div>
+    <span id="combo" class="combo" hidden></span>
   </div>
+  <div class="goal slim" hidden><div class="bar"><i id="goal-fill"></i></div><b id="goal-text">0 / 5</b></div>
 
   <div class="board-wrap">
     <div id="board" class="board" role="grid" aria-label="Chess board"></div>
@@ -140,78 +145,78 @@
   </div>
   <div id="status" class="status neutral" role="status">Loading…</div>
 
-  <!-- Toolbar: restart · hint · lines · Train/Review. Next line appears only when a line is done. -->
   <div class="controls">
     <button id="restart" class="tool" aria-label="Restart line"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Restart</span></button>
     <button id="hint-btn" class="tool" aria-label="Hint"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></svg><span>Hint</span></button>
     <button id="open-lines" class="tool" aria-label="Choose a line"><svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg><span>Lines</span></button>
     <div id="mode-toggle" class="mode" role="tablist">
-      <button data-mode="train" role="tab">Train</button>
-      <button data-mode="review" role="tab">Review</button>
+      <button data-mode="train" role="tab"><svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>Train</button>
+      <button data-mode="review" role="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/></svg>Watch</button>
     </div>
   </div>
-  <button id="next-line" class="primary next" hidden>Next line</button>
 
+  <!-- After a line: the plan, readable while the final position stays on the board. -->
+  <section id="after" class="after" hidden>
+    <div class="after-head">
+      <span id="after-kind" class="after-kind"></span>
+      <h2 id="plan-title"></h2>
+    </div>
+    <p class="plan-label">The plan from here</p>
+    <p id="plan-text" class="plan-text"></p>
+    <p id="plan-credit" class="plan-credit"></p>
+    <div class="after-actions">
+      <button id="plan-review" class="secondary">Watch it</button>
+      <button id="next-line" class="primary">Next line</button>
+    </div>
+  </section>
+
+  <!-- End of a 5-line session. -->
+  <section id="session-end" class="after session-end" hidden></section>
+
+  <!-- Watch mode (Review): the line plays itself with arrows and a line of text per move; try your own move any time. -->
+  <div id="review-controls" class="review" hidden>
+    <div class="tut">
+      <button id="step-first" class="tool" aria-label="Start"><svg viewBox="0 0 24 24"><path d="M6 5v14"/><path d="M18 5l-9 7 9 7V5z"/></svg></button>
+      <button id="step-prev" class="tool" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button id="play-btn" class="play" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8V4z"/></svg></button>
+      <button id="step-next" class="tool" aria-label="Forward"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+      <button id="step-last" class="tool" aria-label="End"><svg viewBox="0 0 24 24"><path d="M18 5v14"/><path d="M6 5l9 7-9 7V5z"/></svg></button>
+    </div>
+    <div class="tut-track"><i id="tut-fill"></i></div>
+    <div id="whatif" class="whatif" hidden></div>
+    <label class="tut-pick"><span>Line</span><select id="line-select" aria-label="Line to watch"></select></label>
+    <p class="tut-tip">Try your own move on the board any time — “what if?”</p>
+    <div hidden>
+      <div id="explorer-meta"></div><div id="explorer-body"></div>
+      <div id="engine-meta"></div><div id="engine-body"></div>
+      <button id="engine-check"></button><button id="engine-copy"></button><pre id="engine-json"></pre>
+    </div>
+  </div>
   <div id="moves" class="moves" hidden></div>
   <div id="branch-note" class="note" hidden></div>
+ </div>
 
-  <div id="review-controls" class="review" hidden>
-    <select id="line-select" aria-label="Line to review"></select>
-    <div class="stepper">
-      <button id="step-first" class="tool" aria-label="Start position">⏮</button>
-      <button id="step-prev" class="tool" aria-label="Previous move">◀</button>
-      <button id="step-next" class="tool" aria-label="Next move">▶</button>
-      <button id="step-last" class="tool" aria-label="End of line">⏭</button>
+  <!-- Lines drawer: slides in from the right edge and pushes the board aside. Swipe left/right to change category. -->
+  <aside id="lines-drawer" class="drawer" aria-label="Lines" aria-hidden="true">
+    <div class="sheet-head">
+      <div><h2 id="line-list-title">Lines</h2><span id="line-list-meta" class="dim"></span></div>
+      <button id="edit-lines" class="text-btn">Edit</button>
+      <button id="close-lines" class="icon-btn" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
     </div>
-    <div class="explorer" aria-label="Masters database">
-      <div class="explorer-head"><span>Masters</span><span id="explorer-meta" class="dim"></span></div>
-      <div id="explorer-body" class="explorer-body"></div>
+    <div id="line-mode" class="cats" role="radiogroup" aria-label="Which lines to train">
+      <button data-line="main" role="radio" class="cat-main">Main</button>
+      <button data-line="side" role="radio" class="cat-side">Traps</button>
+      <button data-line="surprise" role="radio" class="cat-sur">Surprises</button>
+      <button data-line="mine" role="radio" class="cat-mine">My games</button>
     </div>
-    <div class="explorer" aria-label="Engine check">
-      <div class="explorer-head"><span>Engine</span><span id="engine-meta" class="dim"></span></div>
-      <div id="engine-body" class="explorer-body"></div>
-      <div class="row-buttons">
-        <button id="engine-check" class="secondary">Check with Stockfish</button>
-        <button id="engine-copy" class="secondary" hidden>Copy JSON</button>
-      </div>
-      <pre id="engine-json" class="json" hidden></pre>
-    </div>
-  </div>
+    <input id="line-search" type="search" placeholder="Search a name or a move" autocomplete="off" spellcheck="false">
+    <div id="line-list" class="line-list"><div id="line-rows"></div></div>
+  </aside>
+  <div id="drawer-edge" class="drawer-edge" aria-hidden="true"></div>
 </main>
 
-<!-- ============ LINES SHEET — slides up over the board ============ -->
-<dialog id="lines-sheet" class="sheet" aria-label="Lines">
-  <div class="sheet-grab" aria-hidden="true"></div>
-  <div class="sheet-head">
-    <div><h2 id="line-list-title">Lines</h2><span id="line-list-meta" class="dim"></span></div>
-    <button id="edit-lines" class="text-btn">Edit</button>
-    <button id="close-lines" class="icon-btn" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-  </div>
-  <div id="line-mode" class="cats" role="radiogroup" aria-label="Which lines to train">
-    <button data-line="main" role="radio" class="cat-main">Main</button>
-    <button data-line="side" role="radio" class="cat-side">Traps</button>
-    <button data-line="surprise" role="radio" class="cat-sur">Surprises</button>
-    <button data-line="mine" role="radio" class="cat-mine">My games</button>
-  </div>
-  <input id="line-search" type="search" placeholder="Search a name or a move" autocomplete="off" spellcheck="false">
-  <div id="line-list" class="line-list"><div id="line-rows"></div></div>
-</dialog>
-
-<!-- ============ LINE COMPLETE ============ -->
-<dialog id="plan-dialog" class="plan-dialog" aria-labelledby="plan-dialog-title">
-  <div class="plan-dialog-body">
-    <div id="plan-dialog-reward" class="reward" hidden></div>
-    <h2 id="plan-dialog-title"></h2>
-    <p class="plan-label">The plan from here</p>
-    <p id="plan-dialog-text"></p>
-    <p id="plan-dialog-credit" class="plan-credit"></p>
-  </div>
-  <div class="plan-dialog-actions">
-    <button id="plan-dialog-close" class="icon-btn" aria-label="Close">×</button>
-    <button id="plan-dialog-review" class="secondary">Review</button>
-    <button id="plan-dialog-next" class="primary">Next line</button>
-  </div>
-</dialog>
+<!-- Milestone celebration: slides up over the lower screen, board stays visible above. -->
+<div id="celebrate" class="celebrate" hidden></div>
 
 <script type="module" src="js/app.js"></script>
 </body>
