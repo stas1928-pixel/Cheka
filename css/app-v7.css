@@ -179,3 +179,12 @@ em.hl { font-style: normal; color: var(--ice-300); }
 .drawer { transition: transform 420ms var(--ease-out), height 380ms var(--ease-out); }
 .drawer.full { height: 100dvh; border-radius: 0; }
 .coach-top .status.two small, .coach-top .status.good.two small { color: #3d4b57; }
+
+/* softer contrast (owner: the white card was "super bright against black"):
+   a cool paper card and a slightly lifted night background */
+:root { --bg: #111820; --surface: #17212b; --surface-2: #1e2a35; --card: #dde5ec; --card-ink: #0f1a24; --card-sub: #3f4d59; }
+body { background: var(--bg); }
+.coach-top .status, .coach-top .status.two,
+.coach-top .status.good, .coach-top .status.bad, .coach-top .status.warn, .coach-top .status.intro, .coach-top .status.neutral,
+.coach-top .after, .coach-top .session-end, .coach-top .whatif { background: var(--card); color: var(--card-ink); }
+.coach-top .status small, .coach-top .status.two small, .coach-top .status.good.two small, .coach-top .plan-text, .coach-top .se-insight, .coach-top .se-next { color: var(--card-sub); }
