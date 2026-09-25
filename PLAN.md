@@ -1133,6 +1133,9 @@ be a major obstacle". Rule now:
   tap.
 - When drilling (from memory, due reviews, retries), there are no stops:
   the coach line shows and play continues.
+- Drilling shows ONE coach line per move: the key line only, no reason
+  text. It stays until your next move. Opponent moves do not replace it;
+  only a real deviation ("Black switches to …") does (owner, 2026-09-25).
 If the owner wants it adjustable later, it belongs to the Beginner/
 Advanced concept below. Don't add a settings toggle unasked.
 

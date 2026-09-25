@@ -774,7 +774,8 @@ function attemptUserMove(move) {
   feedback.flash(els.board, [move.from, move.to], 'good');
   feedback.haptic('good');
   const c = coachAt(state.ply);
-  if (c) setStatusHTML(`<span>${coachHTML(c.say)}</span><small>${esc(c.why)}</small>`, 'good');
+  if (c && state.learning) setStatusHTML(`<span>${coachHTML(c.say)}</span><small>${esc(c.why)}</small>`, 'good');
+  else if (c) setStatusHTML(`<span>${coachHTML(c.say)}</span>`, 'good');   // drilling: one line, key info only, stays until your next move
   else setStatus(`✓ ${describeMove(played)}`, 'good');
 
   if (state.ply >= state.line.length) finishLine();
@@ -830,7 +831,7 @@ function playOpponentMove() {
   } else {
     const them = opening.side === 'w' ? 'Black' : 'White';
     if (state.learning) promptUser();
-    else { const c = coachAt(state.ply); setStatusHTML(`<span>${coachHTML(c?.say ?? `${them} ${playsPhrase(theirs)}`)}</span><small>Your move</small>`); }
+    // drilling: the opponent's move does not replace the coach line (owner: one dialog per move)
   }
 }
 
