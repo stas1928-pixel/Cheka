@@ -217,21 +217,39 @@ function renderHome() {
   countUp(els.cards);
 }
 
-/* ---------- home tabs: swipe between pages (Instagram-style), or tap a tab ---------- */
-function setTab(i, smooth = true) {
-  els.pager.scrollTo({ left: i * els.pager.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
+/* ---------- home tabs: swipe between pages (Instagram-style), or tap a tab ----------
+   Only the active page is laid out, so the screen is exactly as tall as its
+   content (no scrolling into empty space under a short tab). A horizontal
+   swipe slides to the neighbouring page. */
+let tabIndex = 0;
+function setTab(i) {
+  const pages = [...els.pager.children];
+  i = Math.max(0, Math.min(pages.length - 1, i));
+  if (i === tabIndex && pages[i].classList.contains('on')) return;
+  const dir = i > tabIndex ? 'from-right' : 'from-left';
+  pages.forEach((p, k) => { p.classList.toggle('on', k === i); p.classList.remove('from-right', 'from-left'); });
+  void pages[i].offsetWidth;
+  pages[i].classList.add(dir);
+  tabIndex = i;
+  els.tabs.style.setProperty('--x', i);
+  els.tabs.querySelectorAll('[data-page]').forEach((b) => b.classList.toggle('on', Number(b.dataset.page) === i));
+  if (i === 1) renderProgress();
+  window.scrollTo({ top: Math.min(window.scrollY, els.tabs.offsetTop - 8), behavior: 'smooth' });
 }
 els.tabs.addEventListener('click', (e) => {
   const b = e.target.closest('[data-page]');
   if (b) { setTab(Number(b.dataset.page)); feedback.haptic('good'); }
 });
-els.pager.addEventListener('scroll', () => {
-  const x = els.pager.scrollLeft / Math.max(1, els.pager.clientWidth);
-  els.tabs.style.setProperty('--x', x);
-  const i = Math.round(x);
-  els.tabs.querySelectorAll('[data-page]').forEach((b) => b.classList.toggle('on', Number(b.dataset.page) === i));
-  if (i === 1 && !els.progressCards.dataset.done) { renderProgress(); els.progressCards.dataset.done = '1'; }
+let swipe = null;
+els.pager.addEventListener('touchstart', (e) => { const t = e.touches[0]; swipe = { x: t.clientX, y: t.clientY }; }, { passive: true });
+els.pager.addEventListener('touchend', (e) => {
+  if (!swipe) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - swipe.x, dy = t.clientY - swipe.y;
+  swipe = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { setTab(tabIndex + (dx < 0 ? 1 : -1)); feedback.haptic('good'); }
 }, { passive: true });
+els.pager.children[0].classList.add('on');
 
 els.cards.addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-train], button[data-review]');

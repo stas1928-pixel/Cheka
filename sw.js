@@ -11,7 +11,7 @@
 
    Bump VERSION whenever vendor/ changes so the old cache is dropped.
 --------------------------------------------------------------- */
-const VERSION = 'v9';
+const VERSION = 'v10';
 const CACHE = `opening-trainer-${VERSION}`;
 
 const PRECACHE = [
