@@ -483,6 +483,15 @@ els.moves.addEventListener('click', (e) => {
   if (span && state.mode === 'review') stepTo(Number(span.dataset.ply) + 1);
 });
 
+/** "castles kingside" / "plays knight to f6" — verb-first phrase for a side's move. */
+function playsPhrase(mv) {
+  const d = describeMove(mv).toLowerCase();
+  return d.startsWith('castles') ? d : `plays ${d}`;
+}
+function setStatusHTML(html, kind = 'neutral') {
+  els.status.className = `status ${kind} two`;
+  els.status.innerHTML = html;
+}
 function setStatus(text, kind = 'neutral') {
   els.status.className = `status ${kind}`;
   els.status.textContent = text;
@@ -535,7 +544,8 @@ function planLine() {
   return tree.pickWeighted(pool, weights) ?? pool[0];
 }
 
-function resetLine(lineObj = null, { test = false } = {}) {
+const CHUNK = 6;   // your moves per learning chunk
+function resetLine(lineObj = null, { test = false, chunkFrom = 0 } = {}) {
   hideAfter();
   state.hint = null;
   state.forceTest = test;
@@ -553,6 +563,7 @@ function resetLine(lineObj = null, { test = false } = {}) {
 
   const o = state.opening;
   state.learning = !test && progress.lineStatus(prog, o.id, state.lineObj.id).state === 'new';
+  if (!test) state.keepChunk = null;
   // Moves you already know are played for you, fast: everything before this line leaves the trunk,
   // once the trunk itself has been played (and at least the opening's signature moves).
   const trunk = o.lines[0];
@@ -563,7 +574,17 @@ function resetLine(lineObj = null, { test = false } = {}) {
   if (state.forceTest) auto = Math.min(auto, o.signaturePlies);
   if (state.lineObj.kind === 'surprise') auto = Math.min(auto, (state.lineObj.deviatesAt ?? auto));
   while (auto > 0 && !tree.isUserPly(o, auto)) auto--;   // stop so that it is the user's move
+  if (chunkFrom) auto = Math.max(auto, chunkFrom);
   state.autoTo = Math.min(auto, state.line.length - 1);
+  // cut the line into a chunk while it is still new (learning) or while a chunk is being tested
+  state.chunk = null;
+  const newLine = progress.lineStatus(prog, o.id, state.lineObj.id).state === 'new';
+  if (test && state.keepChunk) { state.chunk = state.keepChunk; state.line = state.lineObj.moves.slice(0, state.chunk.to); state.autoTo = Math.min(state.autoTo, state.chunk.from); }
+  else if (newLine && !test) {
+    let mine = 0, end = state.line.length;
+    for (let p = state.autoTo; p < state.line.length; p++) if (tree.isUserPly(o, p) && ++mine === CHUNK) { end = p + 1; break; }
+    if (end < state.line.length - 1) { state.chunk = { from: state.autoTo, to: end }; state.line = state.lineObj.moves.slice(0, end); }
+  }
 
   renderBoard();
   renderMoves();
@@ -578,13 +599,13 @@ function resetLine(lineObj = null, { test = false } = {}) {
       const mv = state.game.move(state.line[state.ply]);
       state.ply += 1;
       renderBoard({ animate: true });
-      setTimeout(step, 260);
+      setTimeout(step, 150);
       return;
     }
     if (tree.isUserPly(o, state.ply)) promptUser();
     else scheduleOpponent();
   };
-  setTimeout(step, 700);
+  setTimeout(step, state.autoTo ? 350 : 500);
 }
 
 /** Your turn: on a new line the move is shown first (learn), otherwise just asked. */
@@ -602,7 +623,7 @@ function promptUser() {
     const g = new Chess(); state.line.slice(0, state.ply).forEach((m) => g.move(m));
     const prev = state.ply > 0 && !tree.isUserPly(state.opening, state.ply - 1) ? g.history({ verbose: true }).at(-1) : null;
     const them = state.opening.side === 'w' ? 'Black' : 'White';
-    setStatus(`${prev ? `${them}: ${describeMove(prev).toLowerCase()} · ` : ''}Learn: ${describeMove(g.move(state.line[state.ply])).toLowerCase()}`, 'intro');
+    setStatusHTML(`${prev ? `<small>${them} ${playsPhrase(prev)}</small>` : ''}<span>Learn: ${describeMove(g.move(state.line[state.ply])).toLowerCase()}</span>`, 'intro');
   } else {
     setStatus(`${state.opening.side === 'w' ? 'White' : 'Black'} to play — your move`);
   }
@@ -713,12 +734,12 @@ function playOpponentMove() {
     const kind = state.lineObj.kind === 'side' ? 'punish it' : state.lineObj.kind === 'trap' ? 'a trap is coming' : 'find the reply';
     feedback.haptic('deviation');
     feedback.shake(els.status);
-    setStatus(`New: ${humanName(opening.id, state.lineObj)}. ${kind[0].toUpperCase() + kind.slice(1)}.`, 'warn');
+    setStatus(`${opening.side === 'w' ? 'Black' : 'White'} switches to “${humanName(opening.id, state.lineObj)}” — ${kind}`, 'warn');
     if (state.learning) { showHint(2); setStatus(`New: ${humanName(opening.id, state.lineObj)} — watch the glow`, 'warn'); }
   } else {
     const them = opening.side === 'w' ? 'Black' : 'White';
     if (state.learning) promptUser();
-    else setStatus(`${them} plays ${describeMove(theirs).toLowerCase()} — your turn`);
+    else setStatus(`${them} ${playsPhrase(theirs)} — your turn`);
   }
 }
 
@@ -729,6 +750,7 @@ function finishLine() {
   renderBoard();
   renderMoves();
   const perfect = state.lineMistakes === 0 && !state.learning;
+  if (state.chunk) { finishChunk(perfect); return; }
   progress.recordLineComplete(prog, state.opening.id);
   const entry = progress.scheduleLine(prog, state.opening.id, state.lineObj.id, { perfect });
   const tier = progress.tierFor(entry.clean);
@@ -750,7 +772,7 @@ function finishLine() {
   flyXp(gained);
   renderSession();
   renderLineList();
-  setStatus(state.learning ? 'Learned — next time it counts' : perfect ? (run.combo >= 2 ? `${run.combo} perfect in a row` : 'Clean — no mistakes') : 'Finished — replay it for a perfect run', perfect ? 'good' : 'neutral');
+  setStatus(state.learning ? 'Learned — now from memory' : perfect ? (run.combo >= 2 ? `Perfect — ${run.combo} in a row` : 'Perfect') : 'Finished — try it again for a perfect run', perfect ? 'good' : 'neutral');
 
   showAfter(state.learning ? 'Learned' : perfect ? (justEarned ? `${tier.tier} medal` : 'Perfect') : 'Completed', perfect);
   const milestones = [];
@@ -759,8 +781,34 @@ function finishLine() {
   if (daily.levelUp) milestones.push({ kind: 'level' });
   if (milestones.length) setTimeout(() => celebrate(gained, milestones), 700);
   feedback.haptic(milestones.length ? 'milestone' : 'complete');
-  els.nextLine.textContent = state.learning ? 'Now from memory' : run.results.length >= SESSION_LEN ? 'Finish session' : 'Next line';
+  els.nextLine.textContent = state.learning ? 'Now from memory' : !perfect ? 'Try again from memory' : run.results.length >= SESSION_LEN ? 'Finish session' : 'Next line';
+  state.retry = !state.learning && !perfect ? state.lineObj : null;
+  els.planReview.textContent = state.retry ? 'Next line' : 'Watch it';
   state.justLearned = state.learning ? state.lineObj : null;
+}
+
+/** End of a learning chunk: learn → from memory → continue with the next chunk. No progress is recorded until the whole line is done. */
+function finishChunk(perfect) {
+  const l = state.lineObj, c = state.chunk;
+  const total = l.moves.filter((_, i) => tree.isUserPly(state.opening, i)).length;
+  const done = l.moves.slice(0, c.to).filter((_, i) => tree.isUserPly(state.opening, i)).length;
+  els.controls.hidden = true;
+  els.after.hidden = false;
+  els.after.classList.toggle('perfect', perfect);
+  els.afterKind.textContent = `Part ${Math.ceil(done / CHUNK)} · ${done} of ${total} moves`;
+  els.planTitle.textContent = humanName(state.opening.id, l);
+  els.planText.textContent = state.learning ? 'Good — now play this part from memory.' : perfect ? 'Locked in. Next part of the line.' : 'Almost — once more from memory, then the next part.';
+  els.planCredit.textContent = '';
+  els.planReview.hidden = true;
+  els.nextLine.hidden = false;
+  if (state.learning) { els.nextLine.textContent = 'Now from memory'; state.after = () => resetLine(l, { test: true }); }
+  else if (!perfect) { els.nextLine.textContent = 'Try again from memory'; state.after = () => resetLine(l, { test: true }); }
+  else { els.nextLine.textContent = 'Continue the line'; state.after = () => resetLine(l, { chunkFrom: c.to }); }
+  // keep the chunk while testing it
+  state.keepChunk = c;
+  setStatus(state.learning ? 'Part learned' : perfect ? 'Perfect part' : 'Nearly there', perfect || state.learning ? 'good' : 'neutral');
+  feedback.haptic('complete');
+  els.nextLine.classList.remove('nudge'); void els.nextLine.offsetWidth; els.nextLine.classList.add('nudge');
 }
 
 /* ---------- after a line: the plan under the board ---------- */
@@ -857,7 +905,7 @@ function showSessionEnd() {
   els.after.hidden = true;
   els.sessionEnd.hidden = false;
   els.sessionEnd.innerHTML = `
-    <div class="se-top"><span class="after-kind">Session complete</span><h2>${perfect === SESSION_LEN ? 'Flawless run!' : learned && !perfect ? `${learned} new line${learned === 1 ? '' : 's'} learned` : perfect >= 3 ? 'Strong session' : 'Good work — keep at it'}</h2></div>
+    <div class="se-top"><span class="after-kind">Session complete</span><h2>${perfect === SESSION_LEN ? 'Flawless — 5 perfect lines' : [learned ? `${learned} learned` : '', perfect ? `${perfect} perfect` : '', run.results.length - learned - perfect > 0 ? `${run.results.length - learned - perfect} to polish` : ''].filter(Boolean).join(' · ')}</h2></div>
     <div class="se-stats">
       ${learned ? `<div><b data-count="${learned}">0</b><small>learned</small></div>` : ''}<div><b data-count="${perfect}">0</b><small>perfect</small></div>
       <div><b data-count="${run.xp}">0</b><small>XP</small></div>
@@ -1071,7 +1119,7 @@ function renderReviewStatus() {
     const mv = g.move(line[ply - 1]);
     const mine = tree.isUserPly(opening, ply - 1);
     const col = (ply - 1) % 2 === 0 ? 'White' : 'Black';
-    setStatus(`${col} plays ${describeMove(mv).toLowerCase()}`, mine ? 'good' : 'neutral');
+    setStatus(`${col} ${playsPhrase(mv)}`, mine ? 'good' : 'neutral');
   }
   els.tutFill.style.width = `${Math.round((ply / Math.max(1, line.length)) * 100)}%`;
   els.stepFirst.disabled = els.stepPrev.disabled = ply === 0;
@@ -1631,11 +1679,16 @@ els.restart.addEventListener('click', () => {
 els.nextLine.addEventListener('click', () => {
   if (state.mode === 'weak') { state.weak.index += 1; loadWeakPosition(); return; }
   if (state.mode === 'review') { setMode('train'); return; }
+  if (state.after) { const f = state.after; state.after = null; f(); return; }
   if (state.justLearned) { const l = state.justLearned; state.justLearned = null; resetLine(l, { test: true }); return; }
+  if (state.retry) { const l = state.retry; state.retry = null; resetLine(l, { test: true }); return; }
   if ((state.run?.results.length ?? 0) >= SESSION_LEN) { showSessionEnd(); return; }
   resetLine();
 });
-els.planReview.addEventListener('click', () => { const l = state.lineObj; setMode('review'); reviewLine(l); play(); });
+els.planReview.addEventListener('click', () => {
+  if (state.retry) { state.retry = null; if ((state.run?.results.length ?? 0) >= SESSION_LEN) showSessionEnd(); else resetLine(); return; }
+  const l = state.lineObj; setMode('review'); reviewLine(l); play();
+});
 els.dailyGoal.value = String(settings.dailyGoal ?? 5);
 els.dailyGoal.addEventListener('change', () => { settings = updateSetting('dailyGoal', Number(els.dailyGoal.value)); renderStreakChip(); });
 els.hapticsToggle.checked = settings.haptics !== false;

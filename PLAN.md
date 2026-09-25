@@ -745,6 +745,20 @@ Critic agent (owner request): 3 rounds, ≥ 8.5 = PASS.
   jump (sticky header, plan replaces toolbar), LEARN mode on a line's first
   run, known moves auto-played, one progress bar in the trainer, 8 px corners
   / 44 px targets, plain family names, distinct hint ring, flame SVG, wording.
+- Round 2: **7.5/10**. Fixed (297d2c3): learn → "Now from memory" test of
+  the same line, lines taught in order from move 1 (main line first, no
+  auto-play until known), one new/review definition everywhere, pinned end
+  actions + scrolling plan text, line-info card, segment colours.
+- Round 3 (final): **8.3/10 — FAIL (just under 8.5)**. Its three majors fixed
+  afterwards (not re-scored): "Try again from memory" as the primary action
+  after an imperfect run; **new lines taught in parts of 6 moves** (learn →
+  from memory → continue; progress recorded only when the whole line is
+  done); faster start (known moves at 150 ms). Minor: castles wording, two-
+  line learn status, capture target ring, pinned session-end buttons,
+  specific session titles, taller line-info card.
+Remaining per the critic: the final whole-line test after the last part is
+still long; some plan texts carry notation; Watch line picker is a native
+select.
 Content jobs still open: plan texts contain notation; per-move sourced ideas
 (item 11) — the app shows factual plain-language descriptions meanwhile.
 
