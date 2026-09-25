@@ -756,6 +756,7 @@ Critic agent (owner request): 3 rounds, ≥ 8.5 = PASS.
   done); faster start (known moves at 150 ms). Minor: castles wording, two-
   line learn status, capture target ring, pinned session-end buttons,
   specific session titles, taller line-info card.
+Cleanup 2026-09-25: `design.html` gallery removed (its palettes/layouts are decided and frozen in css/tokens.css); docs/LAYOUT.md lists the CSS layers and new modules.
 Remaining per the critic: the final whole-line test after the last part is
 still long; some plan texts carry notation; Watch line picker is a native
 select.
