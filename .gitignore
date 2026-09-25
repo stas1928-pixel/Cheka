@@ -17,3 +17,6 @@ Thumbs.db
 *.env
 *.env.*
 secret*
+
+# third-party text harvested for research (public repo: never commit)
+library/ideas-cache/

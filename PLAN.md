@@ -763,6 +763,166 @@ select.
 Content jobs still open: plan texts contain notation; per-move sourced ideas
 (item 11) — the app shows factual plain-language descriptions meanwhile.
 
+### Owner review notes on ac933b6 (2026-09-25) — collect, build later
+"Better, still lots of room to improve."
+1. **Watch: no arrow before every move.** An arrow showing the move about
+   to be played is redundant ("stupid"). Drop it.
+2. **Watch: no autoplay by default.** Step through by hand instead. Arrows
+   earn their place as *teaching* marks: several at once where it makes
+   sense, plus highlighted squares of interest, tied to the text that
+   explains the idea (what is attacked, where a piece is heading, the
+   weak square).
+3. **Remove the raw source note under the board** (`#branch-note`: book
+   citations, game counts, notation). Nobody reads it. Remove it, or
+   replace it with something easy on the eyes, e.g. a one-line "Source:
+   Fishbein, Smirnov" credit.
+4. **Plan panel overlap:** the pinned "Train this line" button sits on
+   top of the plan text at the end of Watch. The button must never cover
+   text.
+5. **Watch end: draw the plan on the board.** Arrows, circles or light
+   square highlights for the plan (e.g. f-pawn push, rook to e1, blockade
+   squares). If there is no room, shrink the board for a moment while the
+   plan shows, then bring it back to full size.
+   Depends on: plan texts without notation plus a machine-readable
+   "plan marks" field per line in `library/lines.mjs` (content job,
+   sourced like the plan itself).
+6. **Streak and level never move ("for dayssss… discouraging").**
+   Causes found in the code:
+   - Parts of a new line (`finishChunk`) give no XP and no daily count.
+   - Learn runs and runs with mistakes give only 3 XP and never count
+     toward Today.
+   - The streak needs all 5 perfect lines in a day. A day with one line
+     shows 0.
+   - Level 2 needs 100 XP, which is about 10 perfect lines.
+   - Watch gives nothing.
+   - The preview and the phone keep separate progress, so testing on
+     the PC never shows up on the phone.
+   Proposed fix:
+   - XP for every finished part and every learned line.
+   - Today counts any finished line; perfect runs earn extra.
+   - The streak counts any day with at least one finished line; the
+     goal is a separate bonus.
+   - Levels start small (Lv 2 at 30 XP, rising).
+   - A small XP tick for watching a line through to the end.
+   - Numbers bump visibly the moment they change.
+7. **Progress tab: keep it (owner likes it). Change the medal row.**
+   The four M/G/S/B coins with counts are "well done but kinda off; try
+   something different". They read like a game currency, and four zeros
+   say nothing.
+   Direction to propose (show 2 options before building):
+   - (a) A single mastery ladder per opening: one segmented bar,
+     Bronze → Master, showing how many lines sit at each tier, plus
+     "next medal: <line name>, 1 perfect run away".
+   - (b) A small trophy shelf showing only earned medals, with a
+     "closest to next" line underneath.
+8. **Remove the "Lines" button from the toolbar.** The drawer opens from
+   the right edge now, so the button is redundant. Keep the edge handle
+   (`#drawer-edge`) clearly visible so the swipe can still be found.
+   Keyboard/screen-reader users still need a way in, so the handle stays
+   a focusable button.
+9. **No reward when a part is finished.** "Now from memory" and "Perfect
+   part" appear with no XP pop and no encouragement. Parts must reward
+   like lines:
+   - an XP fly-up;
+   - a short cheer ("Part 1 learned!", "Perfect part!");
+   - progress dots for the parts of the line (● ● ○).
+   Goes together with item 6.
+   Also seen on the same panel:
+   - "The plan from here" label shows on part screens, where there is no
+     plan. Hide it, or replace it with a short encouragement.
+   - Buttons wrap onto two lines ("NOW FROM / MEMORY", "CONTINUE THE /
+     LINE"). They should be full width, one line.
+   - The board-wrap keeps its `shake` class after a perfect part. Check
+     that no shake plays on success.
+10. **Drawer must push and shrink the board, not cover it.** Today the
+    drawer takes 88% of the width, and the board slides off, dimmed. That
+    is not what we agreed. New spec:
+    - The drawer takes about 62% of the width.
+    - The board scales down and stays visible and bright in the remaining
+      strip, like a Samsung edge panel.
+    - Tapping a row shows that line's position on the small board before
+      you commit.
+
+### Revamp + coach dialog (owner, 2026-09-25: "the big ones")
+Owner: "revamp the whole app to work together and be consistent… research,
+go over the library and our sources, create dialog to all… add personality
+like 'now we pussshh the pawn!'"
+
+**Ownership (decided before content is written):**
+- `library/ideas.mjs` owns the coach dialog. Entries are keyed by the SAN
+  path of the position after the move. Each entry has:
+  - `say`: the personality line, at most about 12 words, plain language,
+    no SAN;
+  - `why`: the sourced idea, one sentence, plain language;
+  - `marks`: optional teaching arrows and squares;
+  - `src`: source ids.
+- Source ids are the existing `SOURCES` map in `library/lines.mjs`; add
+  new entries there. The harvested raw text in `library/ideas-cache/` is
+  git-ignored: it is third-party text, and the repo is public. `why` is
+  always our paraphrase, never a copy.
+- Provenance per segment (rule 18): `why` must come from a named source
+  that covers that move. `say` is our voice and carries no chess claim
+  beyond `why`.
+- Plan marks for the end of a line live on the same key as the line's last
+  move.
+- `tools/verify-repertoire.mjs` copies `ideas` into the generated data. A
+  test proves that every shipped ply has an entry with `src`, and that
+  `say` and `why` contain no SAN.
+- Opponent moves also get a line ("Black hits your bishop — move it!"), so
+  every ply talks.
+
+**Voice guide.** Text only: NO SOUND, no speech (owner, 2026-09-25). "Voice"
+means writing style.
+- A friendly coach at the board, short and energetic.
+- Uses "we" for our moves and "they" for theirs.
+- An exclamation where it is earned: pushes, sacrifices, traps.
+- Calm on quiet moves.
+- Never mocks the player.
+- No notation. Squares are allowed in words ("pawn to e5").
+
+**Where to find sources, per move:**
+- Lichess study PGN comments. These are public; export with
+  `lichess.org/api/study/<id>.pgn`, no token. Studies listed in the library.
+- Wikibooks Chess Opening Theory pages, one page per position.
+- NIC excerpt PDFs: Exhilarating Elephant Gambit, Scotch Gambit.
+- ianchessgambits, chessdoctrine, the Chessable blog, the chessmood
+  refutation article.
+- The library's existing notes and plans.
+- **Unsourced moves (owner, 2026-09-25): "don't invent anything".** R1
+  found a sourced comment for only 53 of 575 plies. For every other ply,
+  `why` is one of these, and nothing else:
+  - a **board fact computed by code** (`src: 'position'`): capture, check,
+    what it attacks, defends, pins or opens, development, castling;
+  - an **engine-inferred idea** (`src: 'sf'`), allowed only when it is
+    unmistakable: a null-move search shows a concrete threat, winning
+    at least 1.5 pawns or giving mate, and the threat is named in words.
+  No "coach opinion" lines. `say` may only rephrase its own `why` with
+  personality. A test checks that every square named in `say` appears
+  in that ply's facts or `why`.
+
+**Jobs:**
+- **R1 — source harvest (tool done, 2026-09-25: studies 5 of 8 commented, Wikibooks 12 pages, 53/575 plies covered).** `tools/fetch-ideas.mjs` caches study PGNs and
+  Wikibooks pages to `library/ideas-cache/`, then reports per-ply
+  coverage.
+- **R2 status (2026-09-25):** foundation done.
+  - `js/facts.js` computes the board facts; `js/coach.js` holds the voice
+    and threat filter.
+  - `tools/build-ideas.mjs` generates `js/ideas.data.js` and a review
+    copy in `docs/COACH.md`.
+  - `library/ideas.mjs` holds the sourced ideas.
+  - `tests/coach.test.mjs` checks coverage, sources, no notation, no
+    invented squares, and that the generated file matches the library.
+  - Coverage: 572 plies. 39 sourced, 32 with an engine threat, the rest
+    board facts.
+  - Next: more sourced ideas from the Fishbein and Elephant excerpts and
+    the articles; plan texts without notation; plan marks.
+- **R2 — write `library/ideas.mjs`** for all about 575 plies, starting
+  with the trunks. Wire the data and tests.
+- **R3 — Watch revamp:** items 1–5, coach dialog in Train and Watch.
+- **R4 — engagement and consistency:** items 6–10, plus a consistency pass
+  over every screen (one button style, one panel style, the same
+  motions).
+
 ### Next candidates (owner picks, one per session)
 - Owner reviews pass 4 on the phone.
 - Content: human line names (~60) and per-move one-liners (item 11).

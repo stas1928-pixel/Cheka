@@ -1,0 +1,1579 @@
+{
+ "e4": null,
+ "e4 e5": null,
+ "e4 e5 Nf3": null,
+ "e4 e5 Nf3 Nc6": null,
+ "e4 e5 Nf3 Nc6 d4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5": {
+  "from": "d5",
+  "to": "c4",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4": {
+  "from": "d4",
+  "to": "c6",
+  "piece": "n",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7": {
+  "from": "c6",
+  "to": "e5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6": {
+  "from": "c6",
+  "to": "d7",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3": {
+  "from": "f3",
+  "to": "e4",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3 Ng5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3 Ng5 f4": {
+  "from": "f4",
+  "to": "g5",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3 Ng5 f4 Ne4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3 Ng5 f4 Ne4 Be3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3 Ng5 f4 Ne4 Be3 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3 Ng5 f4 Ne4 Be3 O-O Nd2": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3 Ng5 f4 Ne4 Be3 O-O Nd2 Nxd2": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Bc5 f3 Ng5 f4 Ne4 Be3 O-O Nd2 Nxd2 Qxd2": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3": {
+  "from": "d4",
+  "to": "c6",
+  "piece": "n",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bd7": {
+  "from": "c6",
+  "to": "e5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bd7 Bxc6": {
+  "from": "c6",
+  "to": "d7",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bd7 Bxc6 bxc6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bd7 Bxc6 bxc6 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bd7 Bxc6 bxc6 O-O O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bd7 Bxc6 bxc6 O-O O-O f3": {
+  "from": "f3",
+  "to": "e4",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 O-O": {
+  "from": "c6",
+  "to": "e5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 O-O Nxc6": {
+  "from": "c6",
+  "to": "d8",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 O-O Nxc6 bxc6": {
+  "from": "c5",
+  "to": "e3",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 O-O Nxc6 bxc6 Bxc5": {
+  "from": "c5",
+  "to": "f8",
+  "piece": "b",
+  "captured": "r"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 O-O Nxc6 bxc6 Bxc5 Nxc5": {
+  "from": "c6",
+  "to": "b5",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 O-O Nxc6 bxc6 Bxc5 Nxc5 Bxc6": {
+  "from": "c6",
+  "to": "a8",
+  "piece": "b",
+  "captured": "r"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bxd4": {
+  "from": "d4",
+  "to": "e5",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bxd4 Qxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bxd4 Qxd4 O-O": {
+  "from": "c6",
+  "to": "d4",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bxd4 Qxd4 O-O Bxc6": {
+  "from": "c6",
+  "to": "d5",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bxd4 Qxd4 O-O Bxc6 bxc6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bc5 Be3 Bxd4 Qxd4 O-O Bxc6 bxc6 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7 O-O Be7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7 O-O Be7 Bxc6": {
+  "from": "c6",
+  "to": "d7",
+  "piece": "b",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7 O-O Be7 Bxc6 bxc6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7 O-O Be7 Bxc6 bxc6 Nxd4": {
+  "from": "d4",
+  "to": "c6",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7 O-O Be7 Bxc6 bxc6 Nxd4 Nb8": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7 O-O Be7 Bxc6 bxc6 Nxd4 Nb8 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7 O-O Be7 Bxc6 bxc6 Nxd4 Nb8 Nc3 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Nd7 O-O Be7 Bxc6 bxc6 Nxd4 Nb8 Nc3 O-O Qf3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3": {
+  "from": "f3",
+  "to": "e4",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Nc5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Nc5 f4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Nc5 f4 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Nc5 f4 O-O f5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Nc5 f4 O-O f5 Ne4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Nc5 f4 O-O f5 Ne4 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Nc5 f4 Ne4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Nc5 f4 Ne4 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Nc5 f4 Ne4 Nc3 Nxc3": {
+  "from": "c3",
+  "to": "d1",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Nc5 f4 Ne4 Nc3 Nxc3 bxc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Ng5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Ng5 f4": {
+  "from": "f4",
+  "to": "g5",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Ng5 f4 Ne4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Ng5 f4 Ne4 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Ng5 f4 Ne4 Nc3 Nxc3": {
+  "from": "c3",
+  "to": "d1",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Ng5 f4 Ne4 Nc3 Nxc3 bxc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Ng5 f4 Ne6": {
+  "from": "e6",
+  "to": "d4",
+  "piece": "n",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Ng5 f4 Ne6 f5": {
+  "from": "f5",
+  "to": "e6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Ng5 f4 Ne6 f5 Nxd4": {
+  "from": "d4",
+  "to": "f5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 d5 Bb5 Ne4 Nxd4 Bd7 Bxc6 bxc6 O-O Be7 f3 Ng5 f4 Ne6 f5 Nxd4 Qxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4": {
+  "from": "g4",
+  "to": "e5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6": {
+  "from": "g4",
+  "to": "e5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Kf8": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Kf8 h3": {
+  "from": "h3",
+  "to": "g4",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Kf8 h3 Nge5": {
+  "from": "e5",
+  "to": "c4",
+  "piece": "n",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Kf8 h3 Nge5 Nxe5": {
+  "from": "e5",
+  "to": "f7",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Kf8 h3 Nge5 Nxe5 Nxe5": {
+  "from": "e5",
+  "to": "c4",
+  "piece": "n",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Kf8 h3 Nge5 Nxe5 Nxe5 Bb3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Be7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Be7 Bg5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Be7 Bg5 O-O": {
+  "from": "e7",
+  "to": "g5",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Be7 Bg5 O-O Bxe7": {
+  "from": "e7",
+  "to": "d8",
+  "piece": "b",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Be7 Bg5 O-O Bxe7 Nxe7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Be7 Bg5 O-O Bxe7 Nxe7 Qxd4": {
+  "from": "d4",
+  "to": "d8",
+  "piece": "q",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Be7 Bg5 O-O Bxe7 Nxe7 Qxd4 Qxd4": {
+  "from": "d4",
+  "to": "f2",
+  "piece": "q",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O d6 exd6 Bxd6 Re1+ Be7 Bg5 O-O Bxe7 Nxe7 Qxd4 Qxd4 Nxd4": {
+  "from": "e1",
+  "to": "e7",
+  "piece": "r",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Be7": {
+  "from": "g4",
+  "to": "e5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Be7 Re1": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Be7 Re1 d6": {
+  "from": "g4",
+  "to": "e5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Be7 Re1 d6 exd6": {
+  "from": "d6",
+  "to": "e7",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Be7 Re1 d6 exd6 cxd6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Be7 Re1 d6 exd6 cxd6 Nxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Be7 Re1 d6 exd6 cxd6 Nxd4 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Be7 Re1 d6 exd6 cxd6 Nxd4 O-O Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Bc5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Bc5 Bf4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Bc5 Bf4 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Bc5 Bf4 O-O h3": {
+  "from": "h3",
+  "to": "g4",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Bc5 Bf4 O-O h3 Nh6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Bc5 Bf4 O-O h3 Nh6 Bxh6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Bc5 Bf4 O-O h3 Nh6 Bxh6 gxh6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Bc5 Bf4 O-O h3 Nh6 Bxh6 gxh6 c3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Ngxe5": {
+  "from": "e5",
+  "to": "c4",
+  "piece": "n",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Ngxe5 Nxe5": {
+  "from": "c4",
+  "to": "f7",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Ngxe5 Nxe5 Nxe5": {
+  "from": "e5",
+  "to": "c4",
+  "piece": "n",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Ngxe5 Nxe5 Nxe5 Re1": {
+  "from": "e1",
+  "to": "e5",
+  "piece": "r",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Ngxe5 Nxe5 Nxe5 Re1 d6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ng4 O-O Ngxe5 Nxe5 Nxe5 Re1 d6 f4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2": {
+  "from": "e2",
+  "to": "e4",
+  "piece": "q",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6 dxe6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6 dxe6 Rd1": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6 dxe6 Rd1 Be7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6 dxe6 Rd1 Be7 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6 dxe6 Rd1 Be7 Nc3 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6 dxe6 Rd1 Be7 Nc3 O-O Nb5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6 dxe6 Rd1 Be7 Nc3 O-O Nb5 Bd7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6 dxe6 Rd1 Be7 Nc3 O-O Nb5 Bd7 a4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6 dxe6 Rd1 Be7 Nc3 O-O Nb5 Bd7 a4 Qc8": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Ne6 Bxe6 dxe6 Rd1 Be7 Nc3 O-O Nb5 Bd7 a4 Qc8 Nbxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 d5": {
+  "from": "d5",
+  "to": "c4",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 d5 exd6": {
+  "from": "d6",
+  "to": "e7",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 d5 exd6 Qxd6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 d5 exd6 Qxd6 b4": {
+  "from": "b4",
+  "to": "c5",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 d5 exd6 Qxd6 b4 d3": {
+  "from": "d3",
+  "to": "e2",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 d5 exd6 Qxd6 b4 d3 cxd3": {
+  "from": "b4",
+  "to": "c5",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 d5 exd6 Qxd6 b4 d3 cxd3 Nxb4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 d5 exd6 Qxd6 b4 d3 cxd3 Nxb4 d4": {
+  "from": "d4",
+  "to": "c5",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 O-O Nxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 O-O Nxd4 Nxd4": {
+  "from": "d4",
+  "to": "e2",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Ne4 Qe2 Nc5 O-O Be7 Rd1 O-O Nxd4 Nxd4 Rxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Qe7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Qe7 O-O": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Qe7 O-O Nxe5": {
+  "from": "e5",
+  "to": "f3",
+  "piece": "n",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Qe7 O-O Nxe5 Nxe5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Qe7 O-O Nxe5 Nxe5 Qxe5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Qe7 O-O Nxe5 Nxe5 Qxe5 Re1": {
+  "from": "e1",
+  "to": "e5",
+  "piece": "r",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Qe7 O-O Nxe5 Nxe5 Qxe5 Re1 Ne4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 e5 Qe7 O-O Nxe5 Nxe5 Qxe5 Re1 Ne4 f4": {
+  "from": "f4",
+  "to": "e5",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6": {
+  "from": "f6",
+  "to": "e4",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5": {
+  "from": "d5",
+  "to": "c4",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4": {
+  "from": "d4",
+  "to": "c3",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4": {
+  "from": "d4",
+  "to": "c5",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 O-O Be3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 O-O Be3 Bg4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 O-O Be3 Bg4 h3": {
+  "from": "h3",
+  "to": "g4",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 Bg4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 Bg4 Be3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 Bg4 Be3 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 Bg4 Be3 O-O h3": {
+  "from": "h3",
+  "to": "g4",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 O-O Be3 f5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb6 Nc3 O-O Be3 f5 exf6": {
+  "from": "f6",
+  "to": "g7",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb4+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb4+ Bd2": {
+  "from": "d2",
+  "to": "b4",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb4+ Bd2 Nxd2": {
+  "from": "d2",
+  "to": "f3",
+  "piece": "n",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4 cxd4 Bb4+ Bd2 Nxd2 Nbxd2": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3": {
+  "from": "c3",
+  "to": "b2",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Ke8": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Ke8 Qh5+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Ke8 Qh5+ g6": {
+  "from": "g6",
+  "to": "h5",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Ke8 Qh5+ g6 Qxc5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6": {
+  "from": "d6",
+  "to": "c5",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6 Qxc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6 Qxc3 Nf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6 Qxc3 Nf6 Nbd2": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6 Qxc3 Nf6 Nbd2 Be6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6 Qxc3 Nf6 Nbd2 Be6 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6 Qxc3 Nf6 Nbd2 Be6 O-O Kf7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6 Qxc3 Nf6 Nbd2 Be6 O-O Kf7 Ng5+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6 Qxc3 Nf6 Nbd2 Be6 O-O Kf7 Ng5+ Ke7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 dxc3 Bxf7+ Kxf7 Qd5+ Kf8 Qxc5+ d6 Qxc3 Nf6 Nbd2 Be6 O-O Kf7 Ng5+ Ke7 Nxe6": {
+  "from": "e6",
+  "to": "d8",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3": {
+  "from": "c3",
+  "to": "b4",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3": {
+  "from": "c3",
+  "to": "b2",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3": {
+  "from": "c3",
+  "to": "b4",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3": {
+  "from": "c4",
+  "to": "f7",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qe7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qe7 e5": {
+  "from": "e5",
+  "to": "d6",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qe7 e5 dxe5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qe7 e5 dxe5 Ba3": {
+  "from": "a3",
+  "to": "e7",
+  "piece": "b",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qe7 e5 dxe5 Ba3 Qf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qe7 e5 dxe5 Ba3 Qf6 Nbd2": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qe7 e5 dxe5 Ba3 Qf6 Nbd2 Nge7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qe7 e5 dxe5 Ba3 Qf6 Nbd2 Nge7 Ne4": {
+  "from": "e4",
+  "to": "f6",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O d6 Qb3 Qf6 Bg5": {
+  "from": "g5",
+  "to": "f6",
+  "piece": "b",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O Nge7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O Nge7 Ng5": {
+  "from": "g5",
+  "to": "f7",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O Nge7 Ng5 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O Nge7 Ng5 O-O Qh5": {
+  "mate": true,
+  "from": "h5",
+  "to": "h7"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O Nge7 Ng5 O-O Qh5 h6": {
+  "from": "h6",
+  "to": "g5",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O Nge7 Ng5 O-O Qh5 h6 Nxf7": {
+  "mate": true,
+  "from": "f7",
+  "to": "h6"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O Nge7 Ng5 O-O Qh5 h6 Nxf7 Rxf7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Ba5 O-O Nge7 Ng5 O-O Qh5 h6 Nxf7 Rxf7 Bxf7+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Bc5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Bc5 Bxf7+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Bc5 Bxf7+ Kxf7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Bc5 Bxf7+ Kxf7 Qd5+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Bc5 Bxf7+ Kxf7 Qd5+ Ke8": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Bc5 Bxf7+ Kxf7 Qd5+ Ke8 Qxc5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Bc5 Bxf7+ Kxf7 Qd5+ Ke8 Qxc5 d6": {
+  "from": "d6",
+  "to": "c5",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Bc5 Bxf7+ Kxf7 Qd5+ Ke8 Qxc5 d6 Qh5+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Be7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Be7 Qd5": {
+  "mate": true,
+  "from": "d5",
+  "to": "f7"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Be7 Qd5 Nh6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 bxc3 Be7 Qd5 Nh6 Bxh6": {
+  "mate": true,
+  "from": "d5",
+  "to": "f7"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3 Be7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3 Be7 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3 Be7 O-O O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3 Be7 O-O O-O h3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3 Be7 O-O O-O h3 Ne5": {
+  "from": "e5",
+  "to": "c4",
+  "piece": "n",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3 Be7 O-O O-O h3 Ne5 Be2": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3 Be7 O-O O-O h3 Ne5 Be2 Re8": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3 Be7 O-O O-O h3 Ne5 Be2 Re8 f4": {
+  "from": "f4",
+  "to": "e5",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3 Be7 O-O O-O h3 Ne5 Be2 Re8 f4 Ng6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nf6 Nc3 Be7 O-O O-O h3 Ne5 Be2 Re8 f4 Ng6 g4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be7 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be7 O-O O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be7 O-O O-O Bg5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be7 O-O O-O Bg5 h6": {
+  "from": "h6",
+  "to": "g5",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be7 O-O O-O Bg5 h6 Bh4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be7 O-O O-O Bg5 h6 Bh4 Be6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be7 O-O O-O Bg5 h6 Bh4 Be6 Rad1": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be6 Bg5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be6 Bg5 Be7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be6 Bg5 Be7 O-O-O": {
+  "from": "c4",
+  "to": "e6",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be6 Bg5 Be7 O-O-O O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be6 Bg5 Be7 O-O-O O-O Bxe6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be6 Bg5 Be7 O-O-O O-O Bxe6 fxe6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 d6 Nxd4 Nxd4 Qxd4 Nf6 Nc3 Be6 Bg5 Be7 O-O-O O-O Bxe6 fxe6 e5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6 Nxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6 Nxd4 Nxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6 Nxd4 Nxd4 Qxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6 Nxd4 Nxd4 Qxd4 d6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6 Nxd4 Nxd4 Qxd4 d6 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6 Nxd4 Nxd4 Qxd4 d6 Nc3 Nf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 h6 Nxd4 Nxd4 Qxd4 d6 Nc3 Nf6 Bf4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nf6 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nf6 Nc3 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nf6 Nc3 O-O Re1": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nf6 Nc3 O-O Re1 Nxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nf6 Nc3 O-O Re1 Nxd4 Qxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nf6 Nc3 O-O Re1 Nxd4 Qxd4 Be6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nf6 Nc3 O-O Re1 Nxd4 Qxd4 Be6 Bxe6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nf6 Nc3 O-O Re1 Nxd4 Qxd4 Be6 Bxe6 fxe6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nf6 Nc3 O-O Re1 Nxd4 Qxd4 Be6 Bxe6 fxe6 e5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nxd4 Qxd4": {
+  "from": "d4",
+  "to": "g7",
+  "piece": "q",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nxd4 Qxd4 Nf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nxd4 Qxd4 Nf6 Nc3": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nxd4 Qxd4 Nf6 Nc3 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nxd4 Qxd4 Nf6 Nc3 O-O Bg5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nxd4 Qxd4 Nf6 Nc3 O-O Bg5 h6": {
+  "from": "h6",
+  "to": "g5",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nxd4 Qxd4 Nf6 Nc3 O-O Bg5 h6 Bh4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nxd4 Qxd4 Nf6 Nc3 O-O Bg5 h6 Bh4 Be6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 d6 O-O Nxd4 Qxd4 Nf6 Nc3 O-O Bg5 h6 Bh4 Be6 Rad1": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4": {
+  "from": "d4",
+  "to": "g7",
+  "piece": "q",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6": {
+  "from": "f6",
+  "to": "d4",
+  "piece": "b",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5 Qe7": {
+  "from": "f6",
+  "to": "e5",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5 Qe7 f4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5 Qe7 f4 d6": {
+  "from": "d6",
+  "to": "e5",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5 Qe7 f4 d6 O-O": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5 Qe7 f4 d6 O-O dxe5": {
+  "from": "e5",
+  "to": "d4",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5 Qe7 f4 d6 O-O dxe5 fxe5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5 Qe7 f4 d6 O-O dxe5 fxe5 Bxe5": {
+  "from": "e5",
+  "to": "d4",
+  "piece": "b",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5 Qe7 f4 d6 O-O dxe5 fxe5 Bxe5 Bxf7+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5 Qe7 f4 d6 O-O dxe5 fxe5 Bxe5 Bxf7+ Qxf7": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Bf6 e5 Qe7 f4 d6 O-O dxe5 fxe5 Bxe5 Bxf7+ Qxf7 Qxe5+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Nf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Nf6 e5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Nf6 e5 c5": {
+  "from": "c5",
+  "to": "d4",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Be7 Nxd4 Nxd4 Qxd4 Nf6 e5 c5 Qf4": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 d6": null,
+ "e4 e5 Nf3 Nc6 d4 d6 dxe5": null,
+ "e4 e5 Nf3 Nc6 d4 d6 dxe5 dxe5": null,
+ "e4 e5 Nf3 Nc6 d4 d6 dxe5 dxe5 Qxd8+": null,
+ "e4 e5 Nf3 Nc6 d4 d6 dxe5 dxe5 Qxd8+ Kxd8": null,
+ "e4 e5 Nf3 Nc6 d4 d6 dxe5 dxe5 Qxd8+ Kxd8 Bb5": {
+  "from": "b5",
+  "to": "c6",
+  "piece": "b",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 d6 dxe5 dxe5 Qxd8+ Kxd8 Bb5 Bd7": null,
+ "e4 e5 Nf3 Nc6 d4 d6 dxe5 dxe5 Qxd8+ Kxd8 Bb5 Bd7 Bxc6": {
+  "from": "c6",
+  "to": "b7",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 d6 dxe5 dxe5 Qxd8+ Kxd8 Bb5 Bd7 Bxc6 Bxc6": null,
+ "e4 e5 Nf3 Nc6 d4 d6 dxe5 dxe5 Qxd8+ Kxd8 Bb5 Bd7 Bxc6 Bxc6 Nxe5": {
+  "from": "e5",
+  "to": "f7",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 Nf6": {
+  "from": "e5",
+  "to": "d4",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 Nf6 d5": {
+  "from": "d5",
+  "to": "c6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 Nf6 d5 Ne7": null,
+ "e4 e5 Nf3 Nc6 d4 Nf6 d5 Ne7 Nxe5": null,
+ "e4 e5 Nf3 Nc6 d4 Nf6 d5 Ne7 Nxe5 Nxe4": null,
+ "e4 e5 Nf3 Nc6 d4 Nf6 d5 Ne7 Nxe5 Nxe4 Qe2": {
+  "from": "e2",
+  "to": "e4",
+  "piece": "q",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 Nf6 d5 Ne7 Nxe5 Nxe4 Qe2 Nf6": {
+  "from": "f6",
+  "to": "d5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 Nf6 d5 Ne7 Nxe5 Nxe4 Qe2 Nf6 d6": null,
+ "e4 e5 Nf3 Nc6 d4 Nf6 d5 Ne7 Nxe5 Nxe4 Qe2 Nf6 d6 cxd6": {
+  "from": "d6",
+  "to": "e5",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 Nf6 d5 Ne7 Nxe5 Nxe4 Qe2 Nf6 d6 cxd6 Nc4": {
+  "mate": true,
+  "from": "c4",
+  "to": "d6"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5": {
+  "from": "d5",
+  "to": "c4",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6": {
+  "from": "f6",
+  "to": "g7",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4": {
+  "from": "d8",
+  "to": "f6",
+  "piece": "q",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+ Be6": {
+  "from": "d8",
+  "to": "f6",
+  "piece": "q",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+ Be6 Ng5": {
+  "from": "g5",
+  "to": "e6",
+  "piece": "n",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+ Be6 Ng5 Qd5": {
+  "from": "g7",
+  "to": "f6",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+ Be6 Ng5 Qd5 Nc3": {
+  "from": "c3",
+  "to": "d5",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+ Be6 Ng5 Qd5 Nc3 Qf5": {
+  "from": "d4",
+  "to": "c3",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+ Be6 Ng5 Qd5 Nc3 Qf5 Nce4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+ Be6 Ng5 Qd5 Nc3 Qf5 Nce4 O-O-O": {
+  "from": "g7",
+  "to": "f6",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 O-O Nf6 e5 d5 exf6 dxc4 Re1+ Be6 Ng5 Qd5 Nc3 Qf5 Nce4 O-O-O g4": {
+  "from": "g4",
+  "to": "f5",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Nxe4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Nxe4 Re1": {
+  "from": "e1",
+  "to": "e4",
+  "piece": "r",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Nxe4 Re1 d5": {
+  "from": "d5",
+  "to": "c4",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Nxe4 Re1 d5 Bxd5": {
+  "from": "d5",
+  "to": "c6",
+  "piece": "b",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Nxe4 Re1 d5 Bxd5 Qxd5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Nxe4 Re1 d5 Bxd5 Qxd5 Nc3": {
+  "from": "c3",
+  "to": "d5",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Nxe4 Re1 d5 Bxd5 Qxd5 Nc3 Qf5": {
+  "from": "d4",
+  "to": "c3",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Nf6 O-O Nxe4 Re1 d5 Bxd5 Qxd5 Nc3 Qf5 Nxe4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2": {
+  "from": "b2",
+  "to": "a1",
+  "piece": "p",
+  "captured": "r"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2": {
+  "from": "b2",
+  "to": "g7",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5": {
+  "from": "e5",
+  "to": "f6",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4 a3": {
+  "from": "a3",
+  "to": "b4",
+  "piece": "p",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4 a3 Ba5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4 a3 Ba5 Qd5": {
+  "mate": true,
+  "from": "d5",
+  "to": "f7"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4 a3 Ba5 Qd5 Ng5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4 a3 Ba5 Qd5 Ng5 Nxg5": {
+  "mate": true,
+  "from": "d5",
+  "to": "f7"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4 a3 Ba5 Qd5 Ng5 Nxg5 Qxg5": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4 a3 Ba5 Qd5 Ng5 Nxg5 Qxg5 Qxf7+": null,
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4 a3 Ba5 Qd5 Ng5 Nxg5 Qxg5 Qxf7+ Kd8": {
+  "from": "c6",
+  "to": "e5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bb4+ c3 dxc3 O-O cxb2 Bxb2 Nf6 e5 Ne4 a3 Ba5 Qd5 Ng5 Nxg5 Qxg5 Qxf7+ Kd8 e6": {
+  "from": "b2",
+  "to": "g7",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5": {
+  "from": "d5",
+  "to": "e4",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 exd5": null,
+ "e4 e5 Nf3 d5 exd5 e4": {
+  "from": "e4",
+  "to": "f3",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3": {
+  "from": "c3",
+  "to": "e4",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7": {
+  "from": "e4",
+  "to": "f3",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4": {
+  "from": "e4",
+  "to": "f6",
+  "piece": "n",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O": {
+  "from": "f6",
+  "to": "d5",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O d3": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O d3 Nxd5": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O d3 Nxd5 Qd1": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O d3 Nxd5 Qd1 Re8": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O Nxf6+": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O Nxf6+ Bxf6": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O Nxf6+ Bxf6 d3": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O Nxf6+ Bxf6 d3 Re8": {
+  "from": "e8",
+  "to": "e2",
+  "piece": "r",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O Nxf6+ Bxf6 d3 Re8 Be3": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O Nxf6+ Bxf6 d3 Re8 Be3 Bxb2": {
+  "from": "b2",
+  "to": "a1",
+  "piece": "b",
+  "captured": "r"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O Nxf6+ Bxf6 d3 Re8 Be3 Bxb2 Rb1": {
+  "from": "b1",
+  "to": "b2",
+  "piece": "r",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 Nc3 Be7 Nxe4 O-O Nxf6+ Bxf6 d3 Re8 Be3 Bxb2 Rb1 Bc3+": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3": {
+  "from": "d3",
+  "to": "e4",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3": {
+  "from": "c3",
+  "to": "d5",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2": {
+  "from": "c3",
+  "to": "d5",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3": {
+  "from": "c3",
+  "to": "d2",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3 O-O": {
+  "from": "e4",
+  "to": "f3",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3 O-O dxe4": {
+  "from": "e4",
+  "to": "d5",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3 O-O dxe4 Nxe4": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3 O-O dxe4 Nxe4 Rd1": {
+  "from": "d1",
+  "to": "d5",
+  "piece": "r",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3 O-O dxe4 Nxe4 Rd1 Nxc3": {
+  "from": "c3",
+  "to": "d1",
+  "piece": "n",
+  "captured": "r"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3 O-O dxe4 Nxe4 Qd3": {
+  "from": "d3",
+  "to": "d5",
+  "piece": "q",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3 O-O dxe4 Nxe4 Qd3 Nxc3": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3 O-O Bxf6": {
+  "from": "d3",
+  "to": "e4",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 Bd2 Bxc3 Bxc3 O-O Bxf6 exf3": {
+  "from": "f3",
+  "to": "e2",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 dxe4": {
+  "from": "e4",
+  "to": "d5",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 dxe4 Qxe4": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 dxe4 Qxe4 Bd2": {
+  "from": "c3",
+  "to": "e4",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 dxe4 Qxe4 Bd2 Qxe2+": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 dxe4 Qxe4 Bd2 Qxe2+ Bxe2": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 dxe4 Qxe4 Bd2 Qxe2+ Bxe2 O-O": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 dxe4 Qxe4 Bd2 Qxe2+ Bxe2 O-O O-O-O": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 Nc3 Bb4 dxe4 Qxe4 Bd2 Qxe2+ Bxe2 O-O O-O-O Nc6": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4": {
+  "from": "e4",
+  "to": "d5",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Qxe4+": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Qxe4+ Nxe4": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Qxe4+ Nxe4 Bd3": {
+  "from": "d3",
+  "to": "e4",
+  "piece": "b",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Qxe4+ Nxe4 Bd3 Nc5": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Qxe4+ Nxe4 Bd3 Nc5 Bc4": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Qxe4+ Nxe4 Bd3 Nc5 Bc4 Be6": {
+  "from": "e6",
+  "to": "c4",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Nc3": {
+  "from": "c3",
+  "to": "e4",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Nc3 Bb4": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Nc3 Bb4 Bd2": {
+  "from": "c3",
+  "to": "e4",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Nc3 Bb4 Bd2 Qxe2+": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Nc3 Bb4 Bd2 Qxe2+ Bxe2": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Nc3 Bb4 Bd2 Qxe2+ Bxe2 O-O": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Nc3 Bb4 Bd2 Qxe2+ Bxe2 O-O O-O-O": null,
+ "e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5 dxe4 Qxe4 Nc3 Bb4 Bd2 Qxe2+ Bxe2 O-O O-O-O Nc6": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5": {
+  "from": "d5",
+  "to": "d4",
+  "piece": "q",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6 Nc3": {
+  "from": "c3",
+  "to": "d5",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6 Nc3 Qe5": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6 Nc3 Qe5 Be2": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6 Nc3 Qe5 Be2 Nc6": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6 Nc3 Qe5 Be2 Nc6 O-O": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6 Nc3 Qe5 Be2 Nc6 O-O Bd6": {
+  "mate": true,
+  "from": "e5",
+  "to": "h2"
+ },
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6 Nc3 Qe5 Be2 Nc6 O-O Bd6 g3": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6 Nc3 Qe5 Be2 Nc6 O-O Bd6 g3 Bh3": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6 Nc3 Qe5 Be2 Nc6 O-O Bd6 g3 Bh3 Re1": null,
+ "e4 e5 Nf3 d5 exd5 e4 Nd4 Qxd5 Nb3 Nf6 Nc3 Qe5 Be2 Nc6 O-O Bd6 g3 Bh3 Re1 O-O-O": null,
+ "e4 e5 Nf3 d5 d4": null,
+ "e4 e5 Nf3 d5 d4 dxe4": {
+  "from": "e4",
+  "to": "f3",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 d4 dxe4 Nxe5": null,
+ "e4 e5 Nf3 d5 d4 dxe4 Nxe5 Nd7": null,
+ "e4 e5 Nf3 d5 d4 dxe4 Nxe5 Nd7 Nd2": null,
+ "e4 e5 Nf3 d5 d4 dxe4 Nxe5 Nd7 Nd2 Nxe5": {
+  "from": "d8",
+  "to": "d4",
+  "piece": "q",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 d4 dxe4 Nxe5 Nd7 Nd2 Nxe5 dxe5": null,
+ "e4 e5 Nf3 d5 d4 dxe4 Nxe5 Nd7 Nd2 Nxe5 dxe5 Bf5": null,
+ "e4 e5 Nf3 d5 Nxe5": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6": {
+  "from": "d6",
+  "to": "e5",
+  "piece": "b",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4": {
+  "from": "e5",
+  "to": "f7",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5": {
+  "from": "e5",
+  "to": "d4",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5": {
+  "from": "c4",
+  "to": "f7",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+ Kxd1": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+ Kxd1 Nc6": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bg4+": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bg4+ Ke1": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bg4+ Ke1 Nge7": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bg4+ Be2": {
+  "from": "e2",
+  "to": "g4",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bg4+ Be2 O-O-O+": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bg4+ Be2 O-O-O+ Ke1": {
+  "from": "e2",
+  "to": "g4",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bg4+ Be2 O-O-O+ Ke1 Bxe2": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5": {
+  "from": "e5",
+  "to": "d4",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5": {
+  "from": "d1",
+  "to": "d8",
+  "piece": "q",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Nxd1": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Nxd1 Nc6": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Nxd1 Nc6 Bf4": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Nxd1 Nc6 Bf4 Be6": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Kxd1": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Kxd1 Nc6": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bf5": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bf5 Bb5": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bf5 Bb5 O-O-O+": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bf5 Bb5 O-O-O+ Ke2": {
+  "from": "b5",
+  "to": "c6",
+  "piece": "b",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bf5 Bb5 O-O-O+ Ke2 Nd4+": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bf5 Bb5 O-O-O+ Ke2 Nd4+ Kf1": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Kxd1 Nc6 Bf4 Bf5 Bb5 O-O-O+ Ke2 Nd4+ Kf1 Nxc2": {
+  "from": "c2",
+  "to": "a1",
+  "piece": "n",
+  "captured": "r"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc4": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc4 Nf6": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc4 Nf6 Nxd6+": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc4 Nf6 Nxd6+ Qxd6": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc4 Nf6 Nxd6+ Qxd6 Nc3": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc4 Nf6 Nxd6+ Qxd6 Nc3 O-O": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc4 Nf6 Nxd6+ Qxd6 Nc3 O-O Be2": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc4 Nf6 Nxd6+ Qxd6 Nc3 O-O Be2 Nc6": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Nxd1 Nc6 Bb5": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Nxd1 Nc6 Bb5 Bd7": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Nxd1 Nc6 Bb5 Bd7 Bf4": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Nxd1 Nc6 Bb5 Bd7 Bf4 Nge7": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Nxd1 Nc6 Bb5 Bd7 Bf4 Nge7 Nc3": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Nc3 Bxe5 dxe5 Qxd1+ Nxd1 Nc6 Bb5 Bd7 Bf4 Nge7 Nc3 O-O-O": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5": {
+  "mate": true,
+  "from": "h5",
+  "to": "f7"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7": {
+  "from": "e5",
+  "to": "d4",
+  "piece": "b",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5": {
+  "from": "e5",
+  "to": "g7",
+  "piece": "q",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Bf4": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Bf4 Nge7": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Bf4 Nge7 Bb5": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Bf4 Nge7 Bb5 Bf5": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Bf4 Nge7 Bb5 Bf5 Nd2": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Bf4 Nge7 Bb5 Bf5 Nd2 O-O-O": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Nc3": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Nc3 Nxe5": {
+  "from": "e5",
+  "to": "c4",
+  "piece": "n",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Nc3 Nxe5 Bb3": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Nc3 Nxe5 Bb3 Bd7": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Nc3 Nxe5 Bb3 Bd7 Bf4": {
+  "from": "f4",
+  "to": "e5",
+  "piece": "b",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Nc3 Nxe5 Bb3 Bd7 Bf4 f6": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Nc3 Nxe5 Bb3 Bd7 Bf4 f6 Nxe4": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 d4 dxe4 Bc4 Bxe5 Qh5 Qe7 Qxe5 Qxe5 dxe5 Nc6 Nc3 Nxe5 Bb3 Bd7 Bf4 f6 Nxe4 O-O-O": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 Nxf7": {
+  "from": "f7",
+  "to": "d8",
+  "piece": "n",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 Nxf7 Kxf7": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 Nxf7 Kxf7 Qh5+": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 Nxf7 Kxf7 Qh5+ g6": {
+  "from": "g6",
+  "to": "h5",
+  "piece": "p",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 Nxe5 Bd6 Nxf7 Kxf7 Qh5+ g6 Qxd5+": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 Nxf7 Kxf7 Qh5+ g6 Qxd5+ Kg7": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 Nxf7 Kxf7 Qh5+ g6 Qxd5+ Kg7 b3": null,
+ "e4 e5 Nf3 d5 Nxe5 Bd6 Nxf7 Kxf7 Qh5+ g6 Qxd5+ Kg7 b3 Qf6": {
+  "from": "f6",
+  "to": "a1",
+  "piece": "q",
+  "captured": "r"
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 d4": {
+  "from": "d4",
+  "to": "e5",
+  "piece": "p",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4": {
+  "from": "e4",
+  "to": "f3",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+ Nbd7": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+ Nbd7 Bg5": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+ Nbd7 Bg5 O-O": {
+  "from": "d7",
+  "to": "e5",
+  "piece": "n",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+ Nbd7 Bg5 O-O Bxd7": {
+  "from": "d7",
+  "to": "c8",
+  "piece": "b",
+  "captured": "b"
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+ Nbd7 Bg5 O-O Bxd7 Bxd7": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+ Nbd7 Bg5 O-O Bxd7 Bxd7 Bxf6": {
+  "from": "f6",
+  "to": "d8",
+  "piece": "b",
+  "captured": "q"
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+ Nbd7 Bg5 O-O Bxd7 Bxd7 Bxf6 gxf6": {
+  "from": "f6",
+  "to": "e5",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+ Nbd7 Bg5 O-O Bxd7 Bxd7 Bxf6 gxf6 Nxd7": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 d4 e4 Ne5 Nf6 Bb5+ Nbd7 Bg5 O-O Bxd7 Bxd7 Bxf6 gxf6 Nxd7 Qxd7": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4 e4": {
+  "from": "e4",
+  "to": "f3",
+  "piece": "p",
+  "captured": "n"
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4 e4 Nd4": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4 e4 Nd4 O-O": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4 e4 Nd4 O-O O-O": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4 e4 Nd4 O-O O-O Bxh2+": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4 e4 Nd4 O-O O-O Bxh2+ Kxh2": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4 e4 Nd4 O-O O-O Bxh2+ Kxh2 Ng4+": null,
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4 e4 Nd4 O-O O-O Bxh2+ Kxh2 Ng4+ Kg1": {
+  "from": "c3",
+  "to": "e4",
+  "piece": "n",
+  "captured": "p"
+ },
+ "e4 e5 Nf3 d5 exd5 Bd6 Nc3 Nf6 Bc4 e4 Nd4 O-O O-O Bxh2+ Kxh2 Ng4+ Kg1 Qh4": {
+  "mate": true,
+  "from": "h4",
+  "to": "h2"
+ }
+}

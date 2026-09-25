@@ -67,7 +67,30 @@ export async function createNodeEngine({ defaultDepth = 16 } = {}) {
     };
   }
 
+  /** Same contract from a FEN (used for null-move threat checks). cp/mate are from White's side. */
+  async function doEvaluateFen(fen, depth) {
+    const game = new Chess(fen);
+    const sign = game.turn() === 'w' ? 1 : -1;
+    let last = { cp: null, mate: null, depth: 0 };
+    const onInfo = (l) => { const p = parseInfo(l); if (p && p.depth >= last.depth) last = p; };
+    listeners.add(onInfo);
+    send(`position fen ${fen}`);
+    const best = await command(`go depth ${depth}`, 'bestmove');
+    listeners.delete(onInfo);
+    const bestUci = best.split(' ')[1];
+    let bestMove = null;
+    if (bestUci && bestUci !== '(none)') {
+      try { bestMove = game.move({ from: bestUci.slice(0, 2), to: bestUci.slice(2, 4), promotion: bestUci[4] }); } catch { bestMove = null; }
+    }
+    return { cp: last.cp === null ? null : last.cp * sign, mate: last.mate === null ? null : last.mate * sign, depth: last.depth, bestMove };
+  }
+
   return {
+    evaluateFen(fen, { depth = defaultDepth } = {}) {
+      const job = queue.then(() => doEvaluateFen(fen, depth));
+      queue = job.catch(() => {});
+      return job;
+    },
     evaluate(sans, { depth = defaultDepth } = {}) {
       const job = queue.then(() => doEvaluate(sans, depth));
       queue = job.catch(() => {});
