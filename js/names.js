@@ -9,7 +9,7 @@ export const NAMES = {
   scotch: {
     main: 'The Modern Attack',
     bc5: 'Bishop out first, then trade',
-    'bc5-oo': 'Early castle — grab the c6 pawn',
+    'bc5-oo': 'They castle early — win c6',
     'bc5-bxd4': 'Bishop swap on d4',
     nd7: 'Knight retreats to d7',
     'be7-9': 'Quiet bishop — the f-pawn storm',
@@ -78,4 +78,28 @@ export const NAMES = {
 /** Human name for a line; falls back to the stored name without leading notation. */
 export function humanName(openingId, line) {
   return NAMES[openingId]?.[line.id] ?? line.name;
+}
+
+/** Family headers in plain words (the family key itself carries notation). */
+const FAMILIES = {
+  'Modern Attack (4...Nf6 5.e5 d5)': 'Modern Attack',
+  '5...Ng4': 'Knight jump to g4',
+  '5...Ne4': 'Knight jump to e4',
+  '5...Qe7': 'Queen pin on e7',
+  'Greco Gambit (4...Bc5 5.c3)': 'Greco Gambit',
+  'London Defence (4...Bb4+)': 'London Defence',
+  'Hungarian (4...Be7)': 'Hungarian Defence',
+  'Paris (4...d6)': 'Pawn given back',
+  '4...h6': 'Slow h6',
+  '3rd-move sidelines': 'Early sidelines',
+  'Surprise weapons': 'Surprise weapons',
+  'Paulsen 5.Nc3': 'Paulsen — knight to c3',
+  'Paulsen 5.d3 Qxd5 6.Nc3': 'Paulsen — the c3 pin',
+  'Paulsen 5.d3 Qxd5 6.dxe4': 'Paulsen — early queen trade',
+  '4.Nd4': 'Knight to d4',
+  '3.Nxe5 Bd6': 'Knight takes e5',
+  '3.d4 (declined)': 'Gambit declined',
+};
+export function familyName(openingId, key) {
+  return FAMILIES[key] ?? key.replace(/\s*\(.*\)$/, '');
 }

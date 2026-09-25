@@ -83,6 +83,7 @@ const PATTERNS = {
 };
 export function haptic(kind) {
   if (!hapticsOn || typeof navigator === 'undefined' || !navigator.vibrate) return;
+  if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;   // browsers block it before the first tap
   if (globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches && kind === 'good') return;
   try { navigator.vibrate(PATTERNS[kind] ?? 10); } catch { /* ignored */ }
 }

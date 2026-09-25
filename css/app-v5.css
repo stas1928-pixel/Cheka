@@ -125,3 +125,25 @@ button.nudge { animation: nudge 1.8s ease-in-out 1.2s infinite; }
 .whatif b { font-size: 15px; } .whatif span { color: var(--ice-100); font-size: 14px; }
 .wi-actions { display: flex; gap: var(--sp-2); margin-top: 4px; } .wi-actions button { flex: 1; height: 44px; }
 .controls[hidden] { display: none; }
+
+/* ---------- critic round 1 fixes ---------- */
+.goal[hidden], .combo[hidden] { display: none !important; }
+.trainer-header { position: sticky; top: 0; z-index: 5; padding-top: calc(4px + env(safe-area-inset-top)); background: linear-gradient(180deg, var(--bg) 70%, transparent); }
+.tool { border-radius: var(--r-2); min-height: var(--tap); }
+.play { border-radius: var(--r-2); }
+.icon-btn { border-radius: var(--r-2); }
+#line-search { height: var(--tap) !important; min-height: var(--tap); border-radius: var(--r-2); flex: none; }
+.drawer #line-search { display: block; }
+.sq.hint-from { box-shadow: inset 0 0 0 3px var(--ice-100), inset 0 0 0 100vmax rgba(124, 200, 255, 0.18); animation: hint-ring 1.2s ease-in-out infinite; }
+@keyframes hint-ring { 50% { box-shadow: inset 0 0 0 5px var(--ice-300), inset 0 0 0 100vmax rgba(124, 200, 255, 0.32); } }
+.flame { width: 14px; height: 14px; fill: var(--amber); vertical-align: -2px; margin-right: 4px; filter: drop-shadow(0 0 4px rgba(255, 194, 107, 0.6)); }
+.chip.streak.cold .flame { fill: var(--text-dim); filter: none; }
+.chip b { font-weight: 900; }
+.combo .flame { width: 12px; height: 12px; margin-right: 2px; }
+.status.intro { background: rgba(124, 200, 255, 0.12); color: var(--ice-100); animation: status-in 320ms var(--ease-out); }
+.played { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--r-2); background: rgba(255, 194, 107, 0.12); color: var(--amber); font-weight: 900; }
+.after-kind { color: var(--ice-200); }
+.panel-card .row > span:first-child { white-space: nowrap; }
+.cats button { font-size: 12px; white-space: nowrap; }
+.thumb { width: 60px; }
+.line-row { grid-template-columns: 60px 1fr auto; }

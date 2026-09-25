@@ -21,7 +21,7 @@ import { importGames, analyseGames, parseMoves, userSide, matchesOpening } from 
 import * as weakness from './weakness.js';
 import { Engine } from './engine.js';
 import { buildBranch, toBranchJSON, fromUserPov } from './branchBuilder.js';
-import { humanName } from './names.js';
+import { humanName, familyName } from './names.js';
 import { describeMove } from './describe.js';
 import { loadSettings, updateSetting } from './settings.js';
 
@@ -147,6 +147,7 @@ const state = {
   whatif: false,        // Watch mode: the board shows the user's own move, off the line
 };
 const SESSION_LEN = 5;
+const FLAME = '<svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.2-4 2.5-5 .1 2 1 3 2 3.2C11 8.6 11.3 5 12 2z"/></svg>';
 
 /* ---------- screens ---------- */
 
@@ -206,7 +207,7 @@ function renderHome() {
   els.greeting.textContent = h < 5 ? 'Late-night prep' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   els.cards.innerHTML = OPENINGS.map((o, i) => {
     const ids = visibleLines(o, o.lines).map((l) => l.id);
-    const due = progress.dueCount(prog, o.id, ids);
+    const due = ids.filter((id) => progress.lineStatus(prog, o.id, id).state === 'due').length;
     const fresh = ids.filter((id) => progress.lineStatus(prog, o.id, id).state === 'new').length;
     const medals = o.lines.filter((l) => progress.lineTier(prog, o.id, l.id).tier).length;
     const pct = Math.round((medals / o.lines.length) * 100);
@@ -434,7 +435,7 @@ function renderStreakChip() {
   const lvl = progress.levelFor(progress.totalXp(prog));
   const pct = `${Math.min(100, Math.round((today / goal) * 100))}%`;
   for (const [chip, fill, text, lv] of [[els.streakTop, els.goalFill, els.goalText, els.xpTop], [els.homeStreak, els.homeGoalFill, els.homeGoalText, els.homeLevel]]) {
-    chip.textContent = `🔥 ${streak}`;
+    chip.innerHTML = `${FLAME}<b>${streak}</b>`;
     chip.classList.toggle('cold', streak === 0);
     fill.style.width = pct;
     fill.parentElement.classList.toggle('done', today >= goal);
@@ -504,7 +505,7 @@ function tabLines(opening, mode = settings.lineMode) {
   if (mode === 'surprise') return tree.surpriseLines(opening);                                        // our own offbeat weapons, kept apart
   const hits = loadGapReport()?.report?.[opening.id]?.lineHits ?? {};
   const mine = opening.lines.filter((l) => (hits[l.id] ?? 0) > 0).sort((a, b) => hits[b.id] - hits[a.id]);
-  return mine.length ? mine : opening.lines;
+  return mine;   // empty until a Chess.com scan finds lines — the drawer explains how
 }
 
 /**
@@ -542,16 +543,49 @@ function resetLine(lineObj = null) {
   els.nextLine.textContent = 'Next line';
   els.nextLine.hidden = true;
 
+  const o = state.opening;
+  state.learning = progress.lineStatus(prog, o.id, state.lineObj.id).state === 'new';
+  // Moves you already know are played for you, fast: everything before this line leaves the trunk,
+  // once the trunk itself has been played (and at least the opening's signature moves).
+  const trunk = o.lines[0];
+  const dev = tree.deviation(o, state.lineObj);
+  const trunkKnown = progress.lineStatus(prog, o.id, trunk.id).state !== 'new';
+  let auto = o.signaturePlies;
+  if (dev && trunkKnown) auto = Math.max(auto, dev.ply);
+  if (state.lineObj.kind === 'surprise') auto = Math.min(auto, (state.lineObj.deviatesAt ?? auto));
+  while (auto > 0 && !tree.isUserPly(o, auto)) auto--;   // stop so that it is the user's move
+  state.autoTo = Math.min(auto, state.line.length - 1);
+
   renderBoard();
   renderMoves();
   renderLineMode();
   renderLineList();
   renderStreakChip();
-  if (tree.isUserPly(state.opening, 0)) {
-    setStatus('Your move');
+  setStatus(`${state.learning ? 'New line' : 'Next'}: ${humanName(o.id, state.lineObj)}`, 'intro');
+  const session = state.session;
+  const step = () => {
+    if (session !== state.session) return;
+    if (state.ply < state.autoTo) {
+      const mv = state.game.move(state.line[state.ply]);
+      state.ply += 1;
+      renderBoard({ animate: true });
+      setTimeout(step, 260);
+      return;
+    }
+    if (tree.isUserPly(o, state.ply)) promptUser();
+    else scheduleOpponent();
+  };
+  setTimeout(step, 700);
+}
+
+/** Your turn: on a new line the move is shown first (learn), otherwise just asked. */
+function promptUser() {
+  if (state.learning) {
+    showHint(2);
+    const g = new Chess(); state.line.slice(0, state.ply).forEach((m) => g.move(m));
+    setStatus(`Learn: ${describeMove(g.move(state.line[state.ply])).toLowerCase()}`, 'intro');
   } else {
-    setStatus('Opponent to move…');
-    scheduleOpponent();
+    setStatus(`${state.opening.side === 'w' ? 'White' : 'Black'} to play — your move`);
   }
 }
 
@@ -602,7 +636,7 @@ function attemptUserMove(move) {
 
   if (!correct) {
     state.misses += 1;
-    state.lineMistakes += 1;
+    if (!state.learning) state.lineMistakes += 1;
     renderBoard();
     feedback.flash(els.board, [move.from, move.to], 'bad');
     feedback.shake(els.board.parentElement);
@@ -640,7 +674,7 @@ function scheduleOpponent() {
 function playOpponentMove() {
   const { opening } = state;
   if (state.ply >= state.line.length) { finishLine(); return; }
-  if (tree.isUserPly(opening, state.ply)) { setStatus('Your move'); return; }
+  if (tree.isUserPly(opening, state.ply)) { promptUser(); return; }
 
   const san = state.line[state.ply];
   const dev = tree.deviation(opening, state.lineObj);
@@ -652,12 +686,15 @@ function playOpponentMove() {
 
   if (state.ply >= state.line.length) { finishLine(); return; }
   if (leftBook) {
-    const kind = state.lineObj.kind === 'side' ? 'punish it' : state.lineObj.kind === 'trap' ? 'a trap is coming' : 'know your reply';
+    const kind = state.lineObj.kind === 'side' ? 'punish it' : state.lineObj.kind === 'trap' ? 'a trap is coming' : 'find the reply';
     feedback.haptic('deviation');
     feedback.shake(els.status);
-    setStatus(`New branch: ${humanName(opening.id, state.lineObj)} — ${kind}`, 'warn');
+    setStatus(`New: ${humanName(opening.id, state.lineObj)}. ${kind[0].toUpperCase() + kind.slice(1)}.`, 'warn');
+    if (state.learning) showHint(2);
   } else {
-    setStatus(`They: ${describeMove(theirs).toLowerCase()} · your move`);
+    const them = opening.side === 'w' ? 'Black' : 'White';
+    if (state.learning) promptUser();
+    else setStatus(`${them} plays ${describeMove(theirs).toLowerCase()} — your turn`);
   }
 }
 
@@ -667,7 +704,7 @@ function finishLine() {
   state.hint = null;
   renderBoard();
   renderMoves();
-  const perfect = state.lineMistakes === 0;
+  const perfect = state.lineMistakes === 0 && !state.learning;
   progress.recordLineComplete(prog, state.opening.id);
   const entry = progress.scheduleLine(prog, state.opening.id, state.lineObj.id, { perfect });
   const tier = progress.tierFor(entry.clean);
@@ -689,9 +726,9 @@ function finishLine() {
   flyXp(gained);
   renderSession();
   renderLineList();
-  setStatus(perfect ? (run.combo >= 2 ? `Perfect — ${run.combo} in a row` : 'Perfect line') : 'Line complete — make the next one perfect', 'good');
+  setStatus(state.learning ? 'Learned — next time it counts' : perfect ? (run.combo >= 2 ? `${run.combo} perfect in a row` : 'Clean — no mistakes') : 'Finished — replay it for a perfect run', perfect ? 'good' : 'neutral');
 
-  showAfter(perfect ? (justEarned ? `${tier.tier} medal` : 'Perfect') : 'Done', perfect);
+  showAfter(state.learning ? 'Learned' : perfect ? (justEarned ? `${tier.tier} medal` : 'Perfect') : 'Completed', perfect);
   const milestones = [];
   if (justEarned) milestones.push({ kind: 'medal', tier });
   if (daily.goalMet) milestones.push({ kind: 'goal' });
@@ -714,7 +751,6 @@ function showAfter(kind, perfect) {
   els.planReview.hidden = state.mode === 'review';
   els.nextLine.hidden = false;
   els.nextLine.classList.remove('nudge'); void els.nextLine.offsetWidth; els.nextLine.classList.add('nudge');
-  requestAnimationFrame(() => els.after.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
 }
 function hideAfter() {
   els.after.hidden = true;
@@ -779,7 +815,7 @@ function renderSession() {
     return `<i class="${cls}"></i>`;
   }).join('');
   els.combo.hidden = run.combo < 2;
-  els.combo.textContent = `🔥 ×${run.combo}`;
+  els.combo.innerHTML = `${FLAME}×${run.combo}`;
   if (run.combo >= 2) { els.combo.classList.remove('pop'); void els.combo.offsetWidth; els.combo.classList.add('pop'); }
 }
 function showSessionEnd() {
@@ -849,7 +885,7 @@ function renderLineList() {
     const dueN = g.lines.filter((l) => progress.lineStatus(prog, opening.id, l.id).state === 'due').length;
     const medals = g.lines.map((l) => { const t = progress.lineTier(prog, opening.id, l.id).tier; return `<i class="${(t ?? '').toLowerCase()}"></i>`; }).join('');
     return `<section class="fam">
-      <header class="fam-head"><h3>${g.name.replace(/ \((.*)\)$/, '')}</h3>${g.name.match(/\((.*)\)$/) ? `<small>${g.name.match(/\((.*)\)$/)[1]}</small>` : ''}<span class="fam-medals">${medals}</span>${dueN ? `<span class="fam-due">${dueN}</span>` : ''}</header>
+      <header class="fam-head"><h3>${familyName(opening.id, g.name)}</h3><span class="fam-medals">${medals}</span>${dueN ? `<span class="fam-due">${dueN}</span>` : ''}</header>
       ${g.lines.map((l) => {
         const st = progress.lineStatus(prog, opening.id, l.id);
         const t = progress.lineTier(prog, opening.id, l.id);
@@ -865,7 +901,7 @@ function renderLineList() {
             <div class="lr-sub">${kind}${freq}${q ? `<span class="lr-moves">${tree.formatMoves(l.moves).slice(tree.definingPly(opening, l)).map((m) => m.text).join(' ')}</span>` : ''}</div>
             ${pips(t)}
           </div>
-          ${medalRing(t)}
+          ${!t.tier && st.state !== 'new' && t.clean === 0 ? '<span class="played" title="Played — not perfect yet">✓</span>' : medalRing(t)}
           <label class="keep"><input type="checkbox" ${hidden[l.id] ? '' : 'checked'} data-toggle="${l.id}"><i></i></label>
         </div>`;
       }).join('')}
@@ -1025,7 +1061,7 @@ function play() {
     const mv = g.move(state.line[state.ply]);
     clearArrows(); drawArrow(mv.from, mv.to);
     const mine = tree.isUserPly(state.opening, state.ply);
-    state.playing = setTimeout(() => { clearArrows(); stepTo(state.ply + 1); state.playing = setTimeout(tick, mine ? 1500 : 900); }, 700);
+    state.playing = setTimeout(() => { clearArrows(); stepTo(state.ply + 1); state.playing = setTimeout(tick, mine ? 800 : 450); }, 450);
   };
   tick();
 }
@@ -1049,7 +1085,9 @@ async function whatIf(move) {
   state.game.move(move.san);
   state.whatif = true;
   renderBoard({ animate: true });
+  setStatus(`What if: ${describeMove(move).toLowerCase()}?`, 'warn');
   els.whatif.hidden = false;
+  requestAnimationFrame(() => els.whatif.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
   if (known) {
     els.whatif.innerHTML = `<b>That's a line you have!</b><span>${humanName(state.opening.id, known)}</span><div class="wi-actions"><button class="secondary" id="wi-back">Back</button><button class="primary" id="wi-go">Watch it</button></div>`;
     els.whatif.querySelector('#wi-go').onclick = () => { els.whatif.hidden = true; state.whatif = false; reviewLine(known); stepTo(tried.length); play(); };
@@ -1378,7 +1416,7 @@ function showWeakMsg(text, kind = 'neutral') {
 
 els.analyseBtn.addEventListener('click', async () => {
   const username = (els.chesscomUser.value || settings.chesscomUser).trim();
-  if (!username) { showWeakMsg('Enter your Chess.com username in the Gaps panel first.', 'bad'); return; }
+  if (!username) { showWeakMsg('Type your Chess.com username in the scan box above first.', 'bad'); return; }
   analyseStopFlag = false;
   els.analyseBtn.disabled = true;
   els.analyseStop.hidden = false;
