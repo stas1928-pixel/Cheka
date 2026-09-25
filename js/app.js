@@ -778,7 +778,9 @@ function attemptUserMove(move) {
   else setStatus(`✓ ${describeMove(played)}`, 'good');
 
   if (state.ply >= state.line.length) finishLine();
-  else if (c) holdForTap();   // owner: the coach line stays until you tap the board — every move
+  // Learning a line: the coach line waits for a tap (a lull to read it).
+  // Drilling a known line (from memory, reviews): no stops — the owner wants to go fast.
+  else if (c && state.learning) holdForTap();
   else scheduleOpponent();
 }
 

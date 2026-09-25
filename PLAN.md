@@ -1126,6 +1126,16 @@ Content jobs still open: plan texts contain notation; per-move sourced ideas
   The board docks under it.
 - **Plans:** "a/b" between moves reads "a or b".
 
+**Coach pause rule (owner, 2026-09-25):** the pause after every move was
+"better", but "when I want to go over lines fast, drill them, this will
+be a major obstacle". Rule now:
+- While learning (a new line or a new part), the coach line waits for a
+  tap.
+- When drilling (from memory, due reviews, retries), there are no stops:
+  the coach line shows and play continues.
+If the owner wants it adjustable later, it belongs to the Beginner/
+Advanced concept below. Don't add a settings toggle unasked.
+
 **Concept only — do NOT build yet (owner, 2026-09-25):**
 - **Beginner / Advanced mode.** "Having the game hold you and force you to
   go with it is kinda too much" (owner tests constantly). Idea: ask once
