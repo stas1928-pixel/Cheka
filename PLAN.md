@@ -1139,6 +1139,53 @@ be a major obstacle". Rule now:
 If the owner wants it adjustable later, it belongs to the Beginner/
 Advanced concept below. Don't add a settings toggle unasked.
 
+### Owner notes 2026-09-26
+- **Done (v23):**
+  - ↻ "Again" after any finished line, so a perfect line can be replayed.
+  - The drawer: a swipe left or right anywhere switches category. Close
+    with ✕, the grab bar pushed up, or a tap on the board.
+  - Smoother scrolling: no per-row animations, filters or heavy shadows
+    in the list.
+  - XP: a blob floats with its number until you tap anywhere (or 6 s
+    pass), then leaps above the bar and is sucked down into it.
+  - The coach card shows ONE text per move, never a header over a
+    paraphrase of itself. Headers only for the plan.
+- **Coach text rewrite: the big one (plan, not built).** Owner: "a massive
+  part of it is trash, stating the obvious ('the knight is out'),
+  duplicates. Bare minimum: 'the knight defends the pawn', 'bishop to
+  pin and protect', 'rook to block', presenting a threat — useful."
+  1. **Purpose, not motion.** Every line says what the move DOES. The fact
+     engine gains purpose facts, computed from the position and the
+     line itself:
+     - defends: the moved piece now protects an attacked or loose
+       piece;
+     - blocks: it interposes on a check or an attack line;
+     - pins or unpins;
+     - threatens: an unmistakable engine null-move threat;
+     - trades; wins or regains material; gives a pawn back;
+     - stops: it takes a square or line from a threat the opponent had
+       before the move;
+     - prepares: the moved piece defends or controls the square that OUR
+       next move in the line uses ("supports the push to d4", "clears
+       the way to castle");
+     - opens a line: a discovered rook, bishop or queen line.
+     Ranked, with the strongest one said.
+  2. **Banned filler:** "another piece out", "comes out", "jumps into the
+     game", "calmly", and a bare "X to sq" with no purpose. A test fails
+     on these phrases.
+  3. **Sources first:** re-mine every library note and plan, the study
+     comments and Wikibooks per position. Add the Scotch Gambit and
+     Elephant articles already listed (ianchessgambits, chessdoctrine,
+     chessmood, the Chessable blog, the NIC excerpts) and fetch more free
+     annotated sources for the trunks. A sourced idea wins over a
+     computed purpose.
+  4. **If a move has no purpose fact and no source**, it gets no coach
+     line of its own (the card keeps the last useful one), rather than
+     filler.
+  5. **Review gate:** a regenerated `docs/COACH.md`, plus a count of
+     sourced / purpose / silent moves, for the owner to read before it
+     ships.
+
 **Concept only — do NOT build yet (owner, 2026-09-25):**
 - **Beginner / Advanced mode.** "Having the game hold you and force you to
   go with it is kinda too much" (owner tests constantly). Idea: ask once

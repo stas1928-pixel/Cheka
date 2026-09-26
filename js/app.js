@@ -67,6 +67,7 @@ const els = {
   whatif: $('#whatif'),
   celebrate: $('#celebrate'),
   planLabel: $('#plan-label'),
+  againBtn: $('#again-btn'),
   coachMeta: $('#coach-meta'),
   barActions: $('#bar-actions'),
   seActions: $('#se-actions'),
@@ -449,6 +450,10 @@ function coachHTML(text) {
   const t = esc(text);
   return t.replace(HL, '<em class="hl">$&</em>');
 }
+/** One text per move, no header over a paraphrase of itself (owner, 2026-09-26): the sourced idea if there is one, else the coach line. */
+function coachText(c) {
+  return c.src.some((x) => x !== 'position' && x !== 'sf') ? coachHTML(c.why) : coachHTML(c.say);
+}
 const esc = (t) => String(t).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 
 /** Hint: level 1 lights up the piece that has to move; level 2 also marks its target. Never an arrow. */
@@ -774,7 +779,7 @@ function attemptUserMove(move) {
   feedback.flash(els.board, [move.from, move.to], 'good');
   feedback.haptic('good');
   const c = coachAt(state.ply);
-  if (c && state.learning) setStatusHTML(`<span>${coachHTML(c.say)}</span><small>${esc(c.why)}</small>`, 'good');
+  if (c && state.learning) setStatusHTML(`<span>${coachText(c)}</span>`, 'good');
   else if (c) setStatusHTML(`<span>${coachHTML(c.say)}</span>`, 'good');   // drilling: one line, key info only, stays until your next move
   else setStatus(`✓ ${describeMove(played)}`, 'good');
 
@@ -877,11 +882,13 @@ function finishLine() {
   els.nextLine.textContent = state.learning ? 'From memory' : !perfect ? 'Try again' : run.results.length >= SESSION_LEN ? 'Finish session' : 'Next line';
   state.retry = !state.learning && !perfect ? state.lineObj : null;
   els.planReview.textContent = state.retry ? 'Next line' : 'Watch it';
+  els.againBtn.hidden = state.learning || Boolean(state.retry);
   state.justLearned = state.learning ? state.lineObj : null;
 }
 
 /** End of a learning chunk: learn → from memory → continue with the next chunk. No progress is recorded until the whole line is done. */
 function showActions() {
+  els.againBtn.hidden = true;
   els.coachMeta.querySelector('b')?.remove();   // the card title already names the line
   els.status.hidden = true;
   els.after.hidden = false;
@@ -952,67 +959,60 @@ function hideAfter() {
 /* ---------- XP: "+10 XP" rises off the board and lands in the level chip ---------- */
 let xpInFlight = 0;
 let xpShown = null;
+/**
+ * XP as a substance (owner, 2026-09-26): a gold blob with its number pops over the board and floats,
+ * wobbling, until you tap anywhere (or ~6 s pass). Then it rises to a point above the level bar and is
+ * sucked down into it, stretching thin; the bar fills. Taps pass through — play is never blocked.
+ */
 function flyXp(n) {
   if (!n) return;
   xpInFlight += 1;
-  const bar = (els.xpTop.offsetParent ? els.xpTop : els.homeLevel);
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const b = els.board.getBoundingClientRect();
-  const cx = b.left + b.width / 2, cy = b.top + b.height / 2;
-  const to = bar.querySelector('.lv-bar')?.getBoundingClientRect() ?? bar.getBoundingClientRect();
-  const tx = to.left + to.width * 0.15 - cx, ty = to.top + to.height / 2 - cy;
-  // 1) the number pops big in the middle of the board
-  const num = document.createElement('div');
-  num.className = 'xp-pop';
-  num.innerHTML = `<b>+${n}</b><span>XP</span>`;
-  num.style.left = `${cx}px`; num.style.top = `${cy}px`;
-  document.body.appendChild(num);
-  num.animate(still ? [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }] : [
-    { transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0 },
-    { transform: 'translate(-50%, -50%) scale(1.25)', opacity: 1, offset: 0.25 },
-    { transform: 'translate(-50%, -50%) scale(0.95)', opacity: 1, offset: 0.4 },
-    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.85 },
-    { transform: 'translate(-50%, -50%) scale(0.6)', opacity: 0 },
-  ], { duration: 1600, easing: 'ease-out', fill: 'forwards' });
-  // 2) it melts into a blob of gold energy that wobbles, hops, stretches in flight and is sucked into the bar
-  const el = document.createElement('div');
-  el.className = 'xp-blob';
-  el.style.left = `${cx}px`; el.style.top = `${cy}px`;
-  document.body.appendChild(el);
-  const ang = Math.atan2(ty, tx) * 180 / Math.PI;
-  const anim = el.animate(still ? [{ opacity: 0 }, { opacity: 0 }] : [
-    { transform: 'translate(-50%, -50%) scale(0)', borderRadius: '50%', opacity: 0, offset: 0 },
-    { transform: 'translate(-50%, -50%) scale(0)', borderRadius: '50%', opacity: 0, offset: 0.36 },
-    { transform: 'translate(-50%, -50%) scale(1.25, 0.8)', borderRadius: '46% 54% 42% 58%', opacity: 1, offset: 0.44 },
-    { transform: 'translate(-50%, -50%) scale(0.85, 1.2)', borderRadius: '58% 42% 55% 45%', offset: 0.5 },
-    { transform: 'translate(-50%, calc(-50% - 46px)) scale(1.1, 0.95)', borderRadius: '50% 50% 45% 55%', offset: 0.58 },
-    { transform: `translate(calc(-50% + ${tx * 0.45}px), calc(-50% + ${ty * 0.45 - 70}px)) rotate(${ang}deg) scale(1.6, 0.7)`, borderRadius: '60% 40% 40% 60%', offset: 0.72 },
-    { transform: `translate(calc(-50% + ${tx * 0.85}px), calc(-50% + ${ty * 0.9}px)) rotate(${ang}deg) scale(1.8, 0.35)`, borderRadius: '70% 30% 30% 70%', opacity: 1, offset: 0.88 },
-    { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) rotate(${ang}deg) scale(0.2, 0.15)`, borderRadius: '50%', opacity: 0.9, offset: 1 },
-  ], { duration: 2600, easing: 'cubic-bezier(0.45, 0.05, 0.3, 1)' });
-  // droplets that break off and merge back in
-  if (!still) for (let i = 0; i < 4; i++) {
-    const d = document.createElement('div');
-    d.className = 'xp-drop';
-    d.style.left = `${cx}px`; d.style.top = `${cy}px`;
-    document.body.appendChild(d);
-    const ox = (i - 1.5) * 26, oy = -30 - (i % 2) * 24;
-    d.animate([
-      { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0 },
-      { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0.46 },
-      { transform: `translate(calc(-50% + ${ox}px), calc(-50% + ${oy}px)) scale(1)`, opacity: 1, offset: 0.58 },
-      { transform: `translate(calc(-50% + ${tx * 0.7 + ox * 0.4}px), calc(-50% + ${ty * 0.7 - 40}px)) scale(0.8)`, opacity: 1, offset: 0.8 },
-      { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0.2)`, opacity: 0, offset: 1 },
-    ], { duration: 2600 + i * 90, easing: 'cubic-bezier(0.45, 0.05, 0.3, 1)' }).onfinish = () => d.remove();
-  }
-  setTimeout(() => num.remove(), 1700);
-  anim.onfinish = () => {
-    el.remove();
-    xpInFlight = Math.max(0, xpInFlight - 1);
-    renderStreakChip();
-    for (const c of [els.xpTop, els.homeLevel]) { c.classList.remove('fill'); void c.offsetWidth; c.classList.add('fill'); }
+  const cx = b.left + b.width / 2, cy = b.top + b.height * 0.42;
+  const wrap = document.createElement('div');
+  wrap.className = 'xp-float';
+  wrap.style.left = `${cx}px`; wrap.style.top = `${cy}px`;
+  wrap.innerHTML = `<div class="xp-blob"></div><div class="xp-num"><b>+${n}</b><span>XP</span></div>`;
+  document.body.appendChild(wrap);
+  const blob = wrap.querySelector('.xp-blob'), num = wrap.querySelector('.xp-num');
+  // pop in with overshoot, then idle: float + wobble
+  wrap.animate([{ transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0 }, { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 1, offset: 0.6 }, { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+  const idle = still ? null : blob.animate([
+    { borderRadius: '50% 50% 50% 50%', transform: 'translateY(0) scale(1, 1)' },
+    { borderRadius: '44% 56% 52% 48%', transform: 'translateY(-8px) scale(1.06, 0.95)' },
+    { borderRadius: '56% 44% 46% 54%', transform: 'translateY(-3px) scale(0.95, 1.07)' },
+    { borderRadius: '50% 50% 50% 50%', transform: 'translateY(0) scale(1, 1)' },
+  ], { duration: 1700, iterations: Infinity, easing: 'ease-in-out' });
+  let gone = false;
+  const go = () => {
+    if (gone) return;
+    gone = true;
+    removeEventListener('pointerdown', go, true);
+    clearTimeout(timer);
+    idle?.cancel();
+    const chip = els.xpTop.offsetParent ? els.xpTop : els.homeLevel;
+    const bar = (chip.querySelector('.lv-bar') ?? chip).getBoundingClientRect();
+    const tx = bar.left + bar.width * 0.2 - cx, ty = bar.top + bar.height / 2 - cy;
+    num.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-10px) scale(0.8)' }], { duration: 260, fill: 'forwards' });
+    const path = still ? [{ opacity: 1 }, { opacity: 0 }] : [
+      { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0 },
+      { transform: 'translate(-50%, calc(-50% + 14px)) scale(1.15, 0.8)', offset: 0.1 },                       // crouch
+      { transform: `translate(calc(-50% + ${tx * 0.5}px), calc(-50% + ${ty - 90}px)) scale(0.8, 1.2)`, offset: 0.45 }, // leap up, stretched
+      { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty - 64}px)) scale(0.75, 0.75)`, offset: 0.65 },   // hover above the bar
+      { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty - 30}px)) scale(0.45, 1.3)`, offset: 0.8 },     // pulled down, thin
+      { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0.12, 0.5)`, opacity: 0.9, offset: 1 }, // sucked in
+    ];
+    const fly = wrap.animate(path, { duration: 1150, easing: 'cubic-bezier(0.45, 0.05, 0.35, 1)', fill: 'forwards' });
+    fly.onfinish = () => {
+      wrap.remove();
+      xpInFlight = Math.max(0, xpInFlight - 1);
+      renderStreakChip();
+      for (const c of [els.xpTop, els.homeLevel]) { c.classList.remove('fill'); void c.offsetWidth; c.classList.add('fill'); }
+    };
   };
-  return;
+  const timer = setTimeout(go, 6000);
+  setTimeout(() => addEventListener('pointerdown', go, true), 450);   // a tap anywhere sends it; the tap still does its job
 }
 function flyXpOld(n) {
   if (!n) return;
@@ -1205,12 +1205,12 @@ els.trainerMain.addEventListener('touchend', (e) => {
   const dx = t.clientX - edge.x, dy = t.clientY - edge.y;
   const horiz = Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5;
   if (horiz && edge.fromEdge && dx < 0 && !els.trainerMain.classList.contains('drawer-open')) openDrawer();
-  else if (horiz && edge.onCats) {
+  else if (horiz && edge.inDrawer) {
     // swipe along the category row changes category
     const order = ['main', 'side', 'surprise', 'mine'];
     const i = order.indexOf(settings.lineMode);
     settings = updateSetting('lineMode', order[Math.max(0, Math.min(3, i + (dx < 0 ? 1 : -1)))]); renderLineMode(); renderLineList(); feedback.haptic('good');
-  } else if (horiz && edge.inDrawer) closeDrawer();   // swipe either way on the list closes it
+  }
   else if (edge.onGrab && Math.abs(dy) > 30) {
     const full = els.linesSheet.classList.contains('full');
     if (dy > 0) els.linesSheet.classList.add('full');           // pull down: cover the board
@@ -1320,7 +1320,7 @@ function renderReviewStatus() {
     const mine = tree.isUserPly(opening, ply - 1);
     const c = coachAt(ply);
     if (c) {
-      setStatusHTML(`<span>${coachHTML(c.say)}</span><small>${esc(c.why)}</small>`, mine ? 'good' : 'neutral');
+      setStatusHTML(`<span>${coachText(c)}</span>`, mine ? 'good' : 'neutral');
       drawMarks(c.marks, mine ? '' : 'them');
     } else {
       const g = new Chess(); line.slice(0, ply - 1).forEach((m) => g.move(m));
@@ -1893,6 +1893,7 @@ els.nextLine.addEventListener('click', () => {
   if ((state.run?.results.length ?? 0) >= SESSION_LEN) { showSessionEnd(); return; }
   resetLine();
 });
+els.againBtn.addEventListener('click', () => { const l = state.lineObj; state.retry = state.justLearned = state.after = null; resetLine(l, { test: true }); });
 els.planReview.addEventListener('click', () => {
   if (state.retry) { state.retry = null; if ((state.run?.results.length ?? 0) >= SESSION_LEN) showSessionEnd(); else resetLine(); return; }
   const l = state.lineObj;

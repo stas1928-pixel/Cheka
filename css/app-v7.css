@@ -188,3 +188,27 @@ body { background: var(--bg); }
 .coach-top .status.good, .coach-top .status.bad, .coach-top .status.warn, .coach-top .status.intro, .coach-top .status.neutral,
 .coach-top .after, .coach-top .session-end, .coach-top .whatif { background: var(--card); color: var(--card-ink); }
 .coach-top .status small, .coach-top .status.two small, .coach-top .status.good.two small, .coach-top .plan-text, .coach-top .se-insight, .coach-top .se-next { color: var(--card-sub); }
+
+/* ---------- pass 9 (owner, 2026-09-26) ---------- */
+/* bar: [↻] [secondary] [PRIMARY] — flex so the primary always gets the room */
+.action-bar .after-actions { display: flex; gap: var(--sp-2); }
+.action-bar .after-actions > button { flex: 1 1 0; min-width: 0; }
+.action-bar .after-actions > .primary { flex: 1.7 1 0; }
+.action-bar .after-actions > .icon-only { flex: none; width: 52px; padding: 0; display: grid; place-items: center; }
+.icon-only svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.action-bar .after-actions > [hidden] { display: none; }
+
+/* drawer scrolling: smooth — no per-row animations, filters or heavy shadows while it scrolls */
+.drawer .line-list { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; will-change: scroll-position; }
+.drawer-open .drawer .line-row, .drawer .line-row { animation: none; box-shadow: inset 0 0 0 1px var(--line); transition: none; }
+.drawer .line-row.playing { box-shadow: inset 0 0 0 2px var(--ice-300); }
+.drawer .ring .fill { filter: none; animation: none; stroke-dashoffset: var(--off); }
+.drawer .cats button { transition: background 160ms, box-shadow 160ms; }
+
+/* XP blob: floats until a tap, then leaps above the bar and is sucked in */
+.xp-float { position: fixed; z-index: 61; pointer-events: none; width: 76px; height: 76px; }
+.xp-float .xp-blob { position: absolute; inset: 0; width: auto; height: auto; border-radius: 50%; }
+.xp-num { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: baseline; gap: 2px; white-space: nowrap; }
+.xp-num b { font-size: 30px; font-weight: 900; color: #3a2500; line-height: 1; }
+.xp-num span { font-size: 12px; font-weight: 900; color: #5a3c00; }
+.xp-float::before { content: ""; position: absolute; inset: -34px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 209, 102, 0.4), rgba(255, 209, 102, 0) 65%); }
